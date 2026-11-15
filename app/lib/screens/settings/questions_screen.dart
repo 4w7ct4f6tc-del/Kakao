@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/account_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
+import '../../widgets/kakao_ui.dart';
 
 /// Smart recovery questions — answers are normalized and bcrypt-hashed on the server.
 class QuestionsScreen extends ConsumerStatefulWidget {
@@ -45,22 +46,18 @@ class _QuestionsScreenState extends ConsumerState<QuestionsScreen> {
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(tProvider);
-    return Scaffold(
-      appBar: AppBar(title: Text(t('smartQuestions'))),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: [
-          Text(t('questionsSetup'), style: const TextStyle(fontSize: 16)),
-          const SizedBox(height: 16),
-          for (var i = 0; i < 3; i++) ...[
-            TextField(controller: qs[i], decoration: InputDecoration(labelText: '${i + 1}')),
-            const SizedBox(height: 6),
-            TextField(controller: as[i], obscureText: true, decoration: InputDecoration(labelText: t('answer'))),
-            const SizedBox(height: 16),
-          ],
-          BigButton(label: t('save'), accent: true, loading: busy, onPressed: _save),
+    return KPage(children: [
+      KCard(children: [
+        Text(t('smartQuestions'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4),
+        Text(t('questionsSetup'), style: const TextStyle(color: Colors.black54)),
+        for (var i = 0; i < 3; i++) ...[
+          const SizedBox(height: 8),
+          KInput(qs[i], '${i + 1}'),
+          KInput(as[i], t('answer'), obscure: true),
         ],
-      ),
-    );
+        KBtn(t('save'), v: KVariant.green, busy: busy, onTap: _save),
+      ]),
+    ]);
   }
 }

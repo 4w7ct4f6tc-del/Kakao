@@ -4,8 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/auth_service.dart';
 import '../services/biometric_service.dart';
 import '../state/providers.dart';
-import '../widgets/common.dart';
+import '../widgets/kakao_ui.dart';
 
+/// Face ID / fingerprint lock (Settings → Security). Same white-card design.
 class LockScreen extends ConsumerStatefulWidget {
   final VoidCallback onUnlocked;
   const LockScreen({super.key, required this.onUnlocked});
@@ -22,32 +23,19 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   }
 
   Future<void> _unlock() async {
-    final t = ref.read(tProvider);
-    final ok = await BiometricService.authenticate(t('continueBiometric'));
+    final ok = await BiometricService.authenticate(ref.read(tProvider)('continueBiometric'));
     if (ok) widget.onUnlocked();
   }
 
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(tProvider);
-    return Scaffold(
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              const Spacer(),
-              const KakaoLogo(size: 88),
-              const SizedBox(height: 24),
-              const KakaoTitle(),
-              const Spacer(),
-              BigButton(label: t('continueBiometric'), icon: Icons.fingerprint, accent: true, onPressed: _unlock),
-              BigButton(label: t('signOut'), icon: Icons.logout, onPressed: () => AuthService.signOut()),
-              const KakaoFooter(),
-            ],
-          ),
-        ),
-      ),
-    );
+    return KPage(children: [
+      KCard(children: [
+        const Icon(Icons.fingerprint, size: 72, color: Colors.black),
+        KBtn(t('continueBiometric'), v: KVariant.green, onTap: _unlock),
+        KBtn(t('signOut'), v: KVariant.grey, onTap: () => AuthService.signOut()),
+      ]),
+    ]);
   }
 }

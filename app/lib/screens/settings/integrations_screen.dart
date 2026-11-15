@@ -1,10 +1,10 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/theme.dart';
 import '../../services/account_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
+import '../../widgets/kakao_ui.dart';
 
 /// "Connect X" -> official X consent page -> token stored encrypted ->
 /// used only for approved scopes -> Disconnect revokes it.
@@ -95,36 +95,44 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> with Wi
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(tProvider);
-    return Scaffold(
-      appBar: AppBar(title: Text(t('integrations')), actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: _load)]),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: items.length,
-        itemBuilder: (_, idx) {
-          final i = items[idx];
-          return Card(
-            color: KColors.surface,
-            margin: const EdgeInsets.symmetric(vertical: 5),
-            child: ListTile(
-              leading: Text(i.icon, style: const TextStyle(fontSize: 26)),
-              title: Text(i.name, style: const TextStyle(color: Colors.white)),
-              subtitle: Text(
-                i.connected ? '✅ ${t('connected')}${i.scopes.isEmpty ? '' : ' • ${i.scopes.join(', ')}'}' : (i.kind == 'oauth' ? 'OAuth' : 'API key'),
-                style: const TextStyle(color: KColors.muted),
+    return KPage(children: [
+      KCard(children: [
+        Row(children: [
+          Expanded(child: Text(t('integrations'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800))),
+          IconButton(icon: const Icon(Icons.refresh, color: Colors.black), onPressed: _load),
+        ]),
+        for (final i in items)
+          Container(
+            margin: const EdgeInsets.only(top: 10),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: K.soft, borderRadius: BorderRadius.circular(14)),
+            child: Row(children: [
+              Text(i.icon, style: const TextStyle(fontSize: 24)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(i.name, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
+                  Text(
+                    i.connected ? '✅ ${t('connected')}' : (i.kind == 'oauth' ? 'OAuth' : 'API key'),
+                    style: const TextStyle(color: Colors.black54, fontSize: 12),
+                  ),
+                ]),
               ),
-              trailing: busy == i.id
-                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2))
-                  : i.connected
-                      ? OutlinedButton(onPressed: () => _disconnect(i), child: Text(t('disconnect')))
-                      : FilledButton(
-                          style: FilledButton.styleFrom(backgroundColor: KColors.accent),
-                          onPressed: () => _connect(i),
-                          child: Text(t('connect')),
-                        ),
-            ),
-          );
-        },
-      ),
-    );
+              if (busy == i.id)
+                const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+              else
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: i.connected ? K.grey : Colors.black,
+                    foregroundColor: i.connected ? Colors.black : Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () => i.connected ? _disconnect(i) : _connect(i),
+                  child: Text(i.connected ? t('disconnect') : t('connect')),
+                ),
+            ]),
+          ),
+      ]),
+    ]);
   }
 }
