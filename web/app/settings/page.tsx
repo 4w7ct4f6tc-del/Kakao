@@ -82,14 +82,8 @@ export default function Settings() {
   const title = view === 'list' ? (ar ? 'الإعدادات' : 'Settings') : rows.find((r) => r[0] === view)?.[2] || '';
   const signedIn = !!auth?.currentUser;
 
-  const back = (
-    <button onClick={() => setView('list')} className="mt-5 flex items-center gap-1 text-[15px] font-medium" style={{ color: 'var(--primary-fg)' }}>
-      <Icon name={ar ? 'chevron' : 'back'} size={18} />{ar ? 'الإعدادات' : 'Settings'}
-    </button>
-  );
-
   return (
-    <Shell title={title}>
+    <Shell title={title} onBack={view !== 'list' ? () => setView('list') : undefined}>
       {msg && <p className="mt-3 text-center text-sm" style={{ color: 'var(--muted)' }}>{msg}</p>}
 
       {view === 'list' && (
@@ -121,7 +115,6 @@ export default function Settings() {
         </Card>
       )}
 
-      {view !== 'list' && back}
 
       {view === 'account' && (
         <>
@@ -167,7 +160,7 @@ export default function Settings() {
       {view === 'ai' && (
         <Card>
           <p className="mb-3 text-sm" style={{ color: 'var(--muted)' }}>{ar ? 'الذكاء الافتراضي للمصنع والنقاش. تقدر تغيّره بأي وقت.' : 'Default AI for the builder and discussions. Change it anytime.'}</p>
-          <div className="flex flex-wrap gap-2.5">{AIS.map(([id, name]) => <Pill key={id} on={ai === id} logo={id} onClick={() => { setAi(id); store.set('ai_engine', id); }}>{name}</Pill>)}</div>
+          <div className="flex flex-wrap gap-2.5">{AIS.map(([id, name]) => <Pill key={id} on={ai === id} onClick={() => { setAi(id); store.set('ai_engine', id); }}>{name}</Pill>)}</div>
           <p className="mb-1 mt-6 font-semibold">{t('keys')}</p>
           {BYOK.map(([id, name]) => (
             <div key={id} className="mt-3">
@@ -224,11 +217,11 @@ export default function Settings() {
       {view === 'appearance' && (
         <Card>
           <div className="grid grid-cols-2 gap-3">
-            {([['dark', ar ? 'داكن (الأساسي)' : 'Dark (default)', '#0f0f0f', '#16a34a'], ['light', ar ? 'فاتح' : 'Light', '#ffffff', '#dce7f6']] as const).map(([id, label, bg, accent]) => (
-              <button key={id} onClick={() => setAppearance(id)} className={`rounded-[18px] border-2 p-3 ${appearance === id ? 'border-[#4a78b5]' : 'border-[#d6d9de]'}`}>
+            {([['light', ar ? 'فاتح (الأساسي)' : 'Light (default)', '#f5f5f4', '#141210'], ['dark', ar ? 'داكن' : 'Dark', '#0f0f0f', '#ffffff']] as const).map(([id, label, bg, accent]) => (
+              <button key={id} onClick={() => setAppearance(id)} className={`rounded-[18px] border-2 p-3 ${appearance === id ? 'border-[#141210]' : 'border-[#dedddA]'}`}>
                 <div className="flex h-20 flex-col justify-between rounded-[12px] border p-2" style={{ background: bg, borderColor: '#d6d9de' }}>
                   <div className="h-3 w-3 rounded-[4px]" style={{ background: accent }} />
-                  <div className="h-2 w-2/3 rounded" style={{ background: id === 'dark' ? '#ffffff' : '#e8f0fb' }} />
+                  <div className="h-2 w-2/3 rounded" style={{ background: id === 'dark' ? '#ffffff' : '#fcfcfb' }} />
                 </div>
                 <p className="mt-2 font-semibold">{label}</p>
               </button>

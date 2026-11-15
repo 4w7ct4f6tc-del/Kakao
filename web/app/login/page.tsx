@@ -57,7 +57,7 @@ export default function Login() {
 
   if (user && !needPass) {
     return (
-      <Shell>
+      <Shell title={ar ? 'تسجيل الدخول' : 'Log in'}>
         <Card className="text-center">
           <p className="text-sm text-black/60">{t('signedInAs')}</p>
           <p className="mt-1 text-xl font-extrabold">{user.displayName || user.email || user.phoneNumber}</p>
@@ -68,7 +68,7 @@ export default function Login() {
   }
 
   return (
-    <Shell>
+    <Shell title={ar ? 'تسجيل الدخول' : 'Log in'}>
       {needPass ? (
         <Card>
           <h2 className="text-lg font-extrabold">{ar ? 'كلمة السر الجديدة' : 'New password'}</h2>
@@ -77,10 +77,10 @@ export default function Login() {
         </Card>
       ) : mode === 'main' ? (
         <Card>
-          <Btn disabled={busy === 'g'} onClick={() => social('g', new GoogleAuthProvider())}>Google</Btn>
-          <Btn disabled={busy === 'f'} onClick={() => social('f', new FacebookAuthProvider())}>Facebook</Btn>
-          <Btn disabled={busy === 'h'} onClick={() => social('h', new GithubAuthProvider())}>GitHub</Btn>
-          <Btn disabled={busy === 'a'} onClick={() => social('a', new OAuthProvider('apple.com'))}>Apple</Btn>
+          <Btn v="grey" disabled={busy === 'g'} onClick={() => social('g', new GoogleAuthProvider())}>Google</Btn>
+          <Btn v="grey" disabled={busy === 'f'} onClick={() => social('f', new FacebookAuthProvider())}>Facebook</Btn>
+          <Btn v="grey" disabled={busy === 'h'} onClick={() => social('h', new GithubAuthProvider())}>GitHub</Btn>
+          <Btn v="grey" disabled={busy === 'a'} onClick={() => social('a', new OAuthProvider('apple.com'))}>Apple</Btn>
 
           <Input type="tel" dir="ltr" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={t('phoneLabel')} aria-label={t('phoneLabel')} className="mt-4" />
           <Btn v="green" disabled={busy === 'send'} onClick={() => run('send', async () => { const r = await api<{ sentVia: string[] }>('/otp/send', { phone, lang }); setSent(r.sentVia); })}>

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'The easiest app builder in the world — K.A Familia Global Company',
 };
 
-export const viewport: Viewport = { themeColor: '#0F0F0F', width: 'device-width', initialScale: 1 };
+export const viewport: Viewport = { themeColor: '#EDE7E1', width: 'device-width', initialScale: 1 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

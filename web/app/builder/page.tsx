@@ -117,7 +117,7 @@ function Builder() {
     <KPage>
       <KTop band={false} />
       <main className="mx-auto w-full max-w-[460px] px-4 pb-32">
-      <section style={{ background: '#FCFCFB', borderRadius: 28, padding: '28px 18px 22px', boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 12px 32px rgba(60,40,20,.06)', color: KC.ink }}>
+      <section style={{ background: 'var(--card)', borderRadius: 28, padding: '28px 18px 22px', boxShadow: 'var(--card-shadow)', color: KC.ink }}>
         <p style={LBL}>{ar ? 'اختر نموذج الذكاء' : 'Select AI model'}</p>
         <div className="mt-6 grid gap-2.5" style={{ gridTemplateColumns: `repeat(${AIS.length}, minmax(0, 1fr))` }}>
           {AIS.map(([id, name]) => (

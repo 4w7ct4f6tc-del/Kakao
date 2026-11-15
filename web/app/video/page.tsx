@@ -52,7 +52,7 @@ export default function VideoPage() {
   }
 
   return (
-    <Shell>
+    <Shell title={lang === 'ar' ? 'الفيديو' : 'Video'}>
       <Card>
         <TextArea rows={6} value={story} onChange={(e) => setStory(e.target.value)} placeholder={t('storyPh')} />
         <Btn icon="film" onClick={make}>{t('makeVideo2')}</Btn>

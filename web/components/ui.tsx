@@ -6,6 +6,7 @@ import { Brand } from '@/lib/brand';
 import { useLang } from '@/lib/i18n';
 import BrandLogo from './BrandLogo';
 import Icon, { type IconName } from './Icon';
+import { KShell } from './KakaoFrame';
 
 /*
  * KAKAO design — colors come from the appearance tokens in globals.css:
@@ -85,16 +86,16 @@ export function Footer() {
 
 /** Section label, e.g. "SELECT AI MODEL". */
 export function Label({ children }: { children: ReactNode }) {
-  return <p className="k-label mb-4 mt-8 text-center">{children}</p>;
+  return <p className="k-label mb-4 mt-7 text-center">{children}</p>;
 }
 
-/** A content block: flat in light, white 22px card in dark. */
+/** A white rounded card — the owner's design. */
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <section className={`mt-4 rounded-[22px] ${className}`} style={{ background: 'var(--card)', color: 'var(--card-fg)', padding: 'var(--card-pad)', ['--muted' as string]: 'var(--card-muted)' } as React.CSSProperties}>{children}</section>;
+  return <section className={`mt-4 rounded-[28px] ${className}`} style={{ background: 'var(--card)', color: 'var(--card-fg)', padding: 'var(--card-pad)', boxShadow: 'var(--card-shadow)', ['--muted' as string]: 'var(--card-muted)', ['--text' as string]: 'var(--card-fg)' } as React.CSSProperties}>{children}</section>;
 }
 
 type Variant = 'black' | 'green' | 'grey';
-// black = main action (soft blue in light), green = final approve, grey = secondary (outlined in light)
+// black = main action, green = final approve (black too in this design), grey = white outlined
 const V: Record<Variant, React.CSSProperties> = {
   black: { background: 'var(--primary-bg)', color: 'var(--primary-fg)', borderColor: 'var(--primary-bg)' },
   green: { background: 'var(--strong-bg)', color: 'var(--strong-fg)', borderColor: 'var(--strong-bg)' },
@@ -108,7 +109,7 @@ export function Btn({ children, onClick, v = 'black', disabled, className = '', 
       disabled={disabled}
       onClick={onClick}
       style={accentText ? { ...V[v], color: 'var(--accent-text)' } : V[v]}
-      className={`mt-2.5 flex min-h-[52px] items-center justify-center gap-2 rounded-[14px] border px-5 text-[17px] font-semibold transition active:scale-[0.99] disabled:opacity-40 ${wide ? 'w-full' : 'mx-auto w-fit'} ${className}`}
+      className={`mt-2.5 flex min-h-[54px] items-center justify-center gap-2 rounded-[16px] border px-5 text-[17px] font-semibold transition active:scale-[0.99] disabled:opacity-40 ${wide ? 'w-full' : 'mx-auto w-fit'} ${className}`}
     >
       {icon && <Icon name={icon} />}
       {children}
@@ -121,39 +122,21 @@ export const Button = ({ children, onClick, accent, disabled }: { children: Reac
   <Btn v={accent ? 'green' : 'black'} onClick={onClick} disabled={disabled}>{children}</Btn>
 );
 
-/** Outlined pill (AI models, dialects, types…). Selected = soft blue. */
+/** Grey choice; selected = black. */
 export function Pill({ on, onClick, children, icon, logo, className = '' }: { on: boolean; onClick: () => void; children: ReactNode; icon?: IconName; logo?: string; className?: string }) {
   return <button onClick={onClick} className={`k-pill ${on ? 'k-pill-on' : ''} ${className}`}>{logo && <BrandLogo name={logo} />}{icon && <Icon name={icon} size={18} />}{children}</button>;
 }
 
+const FIELD = 'mt-2.5 w-full rounded-[18px] border px-4 py-3.5 text-[16px] text-[#141210] outline-none placeholder:text-[#8E8C88] focus:border-[#BDBBB7]';
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return <input {...props} className={`mt-2.5 w-full rounded-[14px] border border-[#d6d9de] bg-white px-4 py-3.5 text-[16px] text-black outline-none placeholder:text-black/40 focus:border-[#9db8de] ${props.className || ''}`} />;
+  return <input {...props} className={`${FIELD} ${props.className || ''}`} style={{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', ...props.style }} />;
 }
 
 export function TextArea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea {...props} className={`mt-2.5 w-full resize-none rounded-[14px] border border-[#d6d9de] bg-white px-4 py-3.5 text-[16px] text-black outline-none placeholder:text-black/40 focus:border-[#9db8de] ${props.className || ''}`} />;
+  return <textarea {...props} className={`${FIELD} resize-none ${props.className || ''}`} style={{ background: 'var(--input-bg)', borderColor: 'var(--input-border)', ...props.style }} />;
 }
 
-/** Compact header (Settings): small wordmark on one side, page title on the other. */
-export function CompactHeader({ title }: { title: string }) {
-  const { lang } = useLang();
-  return (
-    <header className="flex items-center justify-between pt-8">
-      <span className="k-wordmark text-[24px]" style={{ color: 'var(--text)' }}>{Brand.name(lang)}</span>
-      <span className="text-[18px] font-medium" style={{ color: 'var(--text)' }}>{title}</span>
-    </header>
-  );
-}
-
-/** One centered column, max 460px: header, tabs, the screen, footer. */
-export function Shell({ children, title }: { children: ReactNode; title?: string }) {
-  return (
-    <div className="mx-auto min-h-screen w-full max-w-[460px] px-4" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
-      {title ? <CompactHeader title={title} /> : <Header />}
-      <Tabs />
-      {title && <hr className="mt-4" style={{ borderColor: 'var(--line)' }} />}
-      <main>{children}</main>
-      <Footer />
-    </div>
-  );
+/** Every inner page: the owner's top bar (menu · KAkAo · K), soft page, optional title with back. */
+export function Shell({ children, title, onBack }: { children: ReactNode; title?: string; onBack?: () => void }) {
+  return <KShell title={title} onBack={onBack}>{children}</KShell>;
 }

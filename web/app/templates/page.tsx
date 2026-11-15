@@ -17,7 +17,7 @@ export default function Templates() {
   const [design, setDesign] = useState(() => localDesign(prompt, lang));
   useEffect(() => setDesign(localDesign(prompt, lang)), [prompt, lang]);
   return (
-    <Shell>
+    <Shell title={lang === 'ar' ? 'القوالب' : 'Templates'}>
       <Card>
         <h1 className="text-lg font-extrabold">{l === 'ar' ? 'القوالب' : 'Templates'}</h1>
         <p className="mt-1 text-sm text-black/60">
