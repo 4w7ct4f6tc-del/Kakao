@@ -1,0 +1,112 @@
+# KAKAO CI/CD — every push builds Android APK, Windows EXE, iOS IPA (unsigned),
+# web (Next.js) and tests the backend. Tag v* to publish a GitHub Release.
+#
+# Optional repository secrets / variables:
+#   secrets.FIREBASE_OPTIONS_DART  base64 of app/lib/firebase_options.dart (from `flutterfire configure`)
+#   vars.KAKAO_API                 https://<region>-<project>.cloudfunctions.net/api
+#   vars.KAKAO_WEB                 https://your-web-domain
+name: Build KAKAO
+on:
+  push:
+    branches: ['**']
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  FIREBASE_OPTIONS_DART: ${{ secrets.FIREBASE_OPTIONS_DART }}
+  DART_DEFINES: --dart-define=KAKAO_API=${{ vars.KAKAO_API }} --dart-define=KAKAO_WEB=${{ vars.KAKAO_WEB }}
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: functions/package-lock.json }
+      - run: npm ci
+        working-directory: functions
+      - run: npm test
+        working-directory: functions
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg && npm install && npm test
+        working-directory: video-service
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: web/package-lock.json }
+      - run: npm ci && npm run build
+        working-directory: web
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Firebase config
+        if: env.FIREBASE_OPTIONS_DART != ''
+        run: echo "$FIREBASE_OPTIONS_DART" | base64 -d > app/lib/firebase_options.dart
+      - run: flutter pub get && flutter analyze && flutter build apk --release $DART_DEFINES
+        working-directory: app
+      - uses: actions/upload-artifact@v4
+        with: { name: KAkAo-android-apk, path: app/build/app/outputs/flutter-apk/app-release.apk }
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Firebase config
+        if: env.FIREBASE_OPTIONS_DART != ''
+        shell: bash
+        run: echo "$FIREBASE_OPTIONS_DART" | base64 -d > app/lib/firebase_options.dart
+      - run: flutter pub get
+        working-directory: app
+      - run: flutter build windows --release ${{ env.DART_DEFINES }}
+        working-directory: app
+      - name: Zip EXE
+        shell: pwsh
+        run: Compress-Archive -Path app/build/windows/x64/runner/Release/* -DestinationPath KAkAo-windows.zip
+      - uses: actions/upload-artifact@v4
+        with: { name: KAkAo-windows-exe, path: KAkAo-windows.zip }
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Firebase config
+        if: env.FIREBASE_OPTIONS_DART != ''
+        run: echo "$FIREBASE_OPTIONS_DART" | base64 -d > app/lib/firebase_options.dart
+      - run: flutter pub get && flutter build ios --release --no-codesign $DART_DEFINES
+        working-directory: app
+      - name: Package unsigned IPA (sign with your Apple account / Fastlane before App Store)
+        run: |
+          mkdir -p Payload && cp -R app/build/ios/iphoneos/Runner.app Payload/
+          zip -qr KAkAo-ios-unsigned.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with: { name: KAkAo-ios-ipa, path: KAkAo-ios-unsigned.ipa }
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [android, windows, ios]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: dist }
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/KAkAo-android-apk/app-release.apk
+            dist/KAkAo-windows-exe/KAkAo-windows.zip
+            dist/KAkAo-ios-ipa/KAkAo-ios-unsigned.ipa

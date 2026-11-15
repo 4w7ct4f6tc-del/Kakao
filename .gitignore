@@ -9,3 +9,4 @@ web/.env.local
 .DS_Store
 *.log
 service-account*.json
+kakao.config.bat
