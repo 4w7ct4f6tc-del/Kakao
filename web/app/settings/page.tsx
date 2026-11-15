@@ -167,7 +167,7 @@ export default function Settings() {
       {view === 'ai' && (
         <Card>
           <p className="mb-3 text-sm" style={{ color: 'var(--muted)' }}>{ar ? 'الذكاء الافتراضي للمصنع والنقاش. تقدر تغيّره بأي وقت.' : 'Default AI for the builder and discussions. Change it anytime.'}</p>
-          <div className="flex flex-wrap gap-2.5">{AIS.map(([id, name]) => <Pill key={id} on={ai === id} logo={id} onClick={() => { setAi(id); store.set('ai', id); }}>{name}</Pill>)}</div>
+          <div className="flex flex-wrap gap-2.5">{AIS.map(([id, name]) => <Pill key={id} on={ai === id} logo={id} onClick={() => { setAi(id); store.set('ai_engine', id); }}>{name}</Pill>)}</div>
           <p className="mb-1 mt-6 font-semibold">{t('keys')}</p>
           {BYOK.map(([id, name]) => (
             <div key={id} className="mt-3">

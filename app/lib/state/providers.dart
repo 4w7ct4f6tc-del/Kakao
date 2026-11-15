@@ -74,13 +74,13 @@ final planProvider = NotifierProvider<PlanNotifier, String>(PlanNotifier.new);
 class AiChoiceNotifier extends Notifier<AiEngine> {
   @override
   AiEngine build() {
-    final saved = prefs.getString('ai');
+    final saved = prefs.getString('ai_engine');
     return AiEngine.values.firstWhere((e) => e.name == saved && e != AiEngine.auto, orElse: () => AiEngine.meta);
   }
 
   Future<void> set(AiEngine e) async {
     state = e;
-    await prefs.setString('ai', e.name);
+    await prefs.setString('ai_engine', e.name);
   }
 }
 
