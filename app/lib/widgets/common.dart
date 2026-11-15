@@ -66,6 +66,7 @@ class KakaoFooter extends ConsumerWidget {
   }
 }
 
+/// Same look as KBtn (owner's design): black, or green when [accent].
 class BigButton extends StatelessWidget {
   final String label;
   final IconData? icon;
@@ -77,22 +78,29 @@ class BigButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bg = accent ? KColors.accent : Colors.black;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: ElevatedButton(
-        onPressed: loading ? null : onPressed,
-        style: accent ? ElevatedButton.styleFrom(backgroundColor: KColors.accent, side: BorderSide.none) : null,
-        child: loading
-            ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  if (leading != null) Text(leading!, style: const TextStyle(fontSize: 20)),
-                  if (icon != null) Icon(icon, size: 22),
-                  if (leading != null || icon != null) const SizedBox(width: 10),
-                  Flexible(child: Text(label, overflow: TextOverflow.ellipsis)),
-                ],
-              ),
+      padding: const EdgeInsets.only(top: 10),
+      child: SizedBox(
+        height: 54,
+        child: FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: bg,
+            foregroundColor: Colors.white,
+            disabledBackgroundColor: bg.withValues(alpha: 0.4),
+            disabledForegroundColor: Colors.white70,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          ),
+          onPressed: loading ? null : onPressed,
+          child: loading
+              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
+              : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  if (leading != null) Text(leading!, style: const TextStyle(fontSize: 18)),
+                  if (icon != null) Icon(icon, size: 20),
+                  if (leading != null || icon != null) const SizedBox(width: 8),
+                  Flexible(child: Text(label, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700))),
+                ]),
+        ),
       ),
     );
   }

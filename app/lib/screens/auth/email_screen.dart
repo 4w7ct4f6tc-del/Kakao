@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/auth_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
+import '../../widgets/kakao_ui.dart';
 import 'recovery_screen.dart';
 
 class EmailScreen extends ConsumerStatefulWidget {
@@ -40,11 +41,9 @@ class _EmailScreenState extends ConsumerState<EmailScreen> {
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(tProvider);
-    return Scaffold(
-      appBar: AppBar(title: const KakaoTitle()),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
+    return KPage(
+      children: [
+        KCard(children: [
           SegmentedButton<bool>(
             segments: [
               ButtonSegment(value: false, label: Text(t('signIn'))),
@@ -72,10 +71,10 @@ class _EmailScreenState extends ConsumerState<EmailScreen> {
           BigButton(label: signUp ? t('signUp') : t('signIn'), accent: true, loading: busy, onPressed: _submit),
           TextButton(
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RecoveryScreen())),
-            child: Text(t('forgot'), style: const TextStyle(color: Colors.white)),
+            child: Text(t('forgot'), style: const TextStyle(color: Colors.black54)),
           ),
-        ],
-      ),
+        ]),
+      ],
     );
   }
 }

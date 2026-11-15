@@ -179,7 +179,8 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
     <div key="ct" className="space-y-3 py-3.5"><ContactBtns /><Map /><Reviews /></div>,
   ];
 
-  const nav = [['🏠', tr('الرئيسية', 'Home')], ['▦', tr('المنتجات', 'Products')], ['🛒', tr('السلة', 'Cart')], ['📅', tr('حجز', 'Booking')], ['📞', tr('تواصل', 'Contact')]];
+  // Owner's design: 🏪 Home | 👕 Products | 🛒 Cart | 📞 Contact (booking opens from Home).
+  const nav: [string, string, number][] = [['🏪', tr('الرئيسية', 'Home'), 0], ['👕', tr('المنتجات', 'Products'), 1], ['🛒', tr('السلة', 'Cart'), 2], ['📞', tr('تواصل', 'Contact'), 4]];
 
   return (
     <div dir={ar ? 'rtl' : 'ltr'} className={`flex flex-col text-[13px] ${fullscreen ? 'min-h-screen' : 'h-full'}`} style={{ background: c.background, color: c.text, fontFamily: `${d.font}, Cairo, Inter, sans-serif` }}>
@@ -202,17 +203,18 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
       )}
       <div className="flex-1 overflow-auto">{pages[tab]}</div>
       <div className="flex bg-white pb-2.5 pt-1.5">
-        {nav.map(([i, l], idx) => <button key={idx} onClick={() => setTab(idx)} className="flex flex-1 flex-col items-center text-[9px]" style={{ color: tab === idx ? c.primary : '#0008' }}><span className="text-base">{i}</span>{l}</button>)}
+        {nav.map(([i, l, idx]) => <button key={idx} onClick={() => setTab(idx)} className="flex flex-1 flex-col items-center text-[10px] font-semibold" style={{ color: tab === idx ? c.primary : '#0008' }}><span className="text-base">{i}</span>{l}</button>)}
       </div>
     </div>
   );
 }
 
-export function PhoneFrame({ children }: { children: React.ReactNode }) {
+/** Phone frame with a black border (owner's design). */
+export function PhoneFrame({ children, width = 290 }: { children: React.ReactNode; width?: number }) {
   return (
-    <div className="relative h-[656px] w-[320px] rounded-[46px] border-2 border-[#3A3A3A] bg-black p-2.5 shadow-2xl">
-      <div className="h-full overflow-hidden rounded-[36px]">{children}</div>
-      <div className="absolute left-1/2 top-[18px] h-6 w-[100px] -translate-x-1/2 rounded-full bg-black" />
+    <div className="relative mx-auto rounded-[40px] border-[10px] border-black bg-black shadow-xl" style={{ width, height: width * 2 }}>
+      <div className="h-full overflow-hidden rounded-[30px] bg-white">{children}</div>
+      <div className="absolute left-1/2 top-1.5 h-5 w-[86px] -translate-x-1/2 rounded-full bg-black" />
     </div>
   );
 }

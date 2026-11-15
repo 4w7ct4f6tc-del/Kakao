@@ -61,9 +61,10 @@ r.post('/builder/generate', optionalAuth, wrap(async (req, res) => {
   const uid = req.user && req.user.uid;
   await rateLimit(`gen:${uid || clientIp(req)}`, 30, 3600);
   const { prompt = '', lang = 'ar', answers = {}, base = {} } = req.body;
+  const chosen = ['claude', 'chatgpt', 'meta', 'gemini'].includes(req.body.engine) ? req.body.engine : 'claude';
   const { data, engine } = await aiJson({
     uid,
-    engine: 'claude',
+    engine: chosen,
     prompt: `User request: "${String(prompt).slice(0, 1000)}"
 Shop/app name: "${answers.name || ''}"
 Colors they like: "${answers.colors || ''}"

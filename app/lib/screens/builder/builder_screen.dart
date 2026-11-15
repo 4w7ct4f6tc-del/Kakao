@@ -6,131 +6,98 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config.dart';
-import '../../core/theme.dart';
 import '../../models/app_design.dart';
 import '../../models/templates.dart';
-import '../../services/account_service.dart';
+import '../../services/ai_service.dart';
 import '../../services/builder_service.dart';
+import '../../services/voice_service.dart';
 import '../../state/providers.dart';
-import '../../widgets/common.dart';
+import '../../widgets/common.dart' show toast, friendlyError;
+import '../../widgets/kakao_ui.dart';
 import '../camera/camera_screen.dart';
 import '../settings/plans_screen.dart';
 import 'design_editor.dart';
 import 'phone_preview.dart';
 
-enum BStep { input, questions, generating, edit, consent, connect, publishing, done }
+enum _Step { build, consent, connect, done }
 
-class BuilderScreen extends ConsumerStatefulWidget {
-  const BuilderScreen({super.key});
+/// مصنع — AI pills · selected AI · one box · ✨ build · 📷 camera · 🔊 real voice reply ·
+/// live phone preview · ✅ approve → consent → connect → publish (link + QR).
+class BuilderTab extends ConsumerStatefulWidget {
+  const BuilderTab({super.key});
 
   @override
-  ConsumerState<BuilderScreen> createState() => _BuilderScreenState();
+  ConsumerState<BuilderTab> createState() => _BuilderTabState();
 }
 
-class _BuilderScreenState extends ConsumerState<BuilderScreen> {
-  BStep step = BStep.input;
-  final prompt = TextEditingController();
-  final answers = List.generate(3, (_) => TextEditingController());
-  int q = 0;
-  AppDesign? design;
-  bool terms = false, privacy = false, payment = false;
-  final domain = TextEditingController();
+class _BuilderTabState extends ConsumerState<BuilderTab> {
+  final text = TextEditingController();
+  final qName = TextEditingController();
+  final qColors = TextEditingController();
+  final qSell = TextEditingController();
   final whatsapp = TextEditingController();
   final instagram = TextEditingController();
+  final domain = TextEditingController();
+  AppDesign? design;
+  String? busy;
+  String reply = '';
+  _Step step = _Step.build;
+  final consent = [false, false, false];
   PublishResult? result;
-  List<AppDesign> myApps = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _loadApps();
-  }
+  static const _ais = [(AiEngine.claude, 'Claude'), (AiEngine.chatgpt, 'ChatGPT'), (AiEngine.meta, 'Meta'), (AiEngine.gemini, 'Gemini')];
 
-  Future<void> _loadApps() async {
-    final list = await BuilderService.myApps();
-    if (mounted) setState(() => myApps = list);
-  }
+  String get _prompt => text.text.trim().isEmpty ? ref.read(tProvider)('examplePh').split(':').last.trim() : text.text.trim();
 
-  void _consumeSeed() {
-    final seed = ref.read(builderSeedProvider);
-    if (seed == null) return;
-    ref.read(builderSeedProvider.notifier).set(null);
-    if (seed.design != null) {
+  /// Instant local design, then the selected AI improves it.
+  Future<void> _build() async {
+    final lang = ref.read(languageProvider);
+    await ref.read(languageProvider.notifier).observe(_prompt);
+    setState(() {
+      design = buildLocalDesign(prompt: _prompt, lang: lang, name: qName.text, colorsText: qColors.text, sellText: qSell.text);
+      step = _Step.build;
+      busy = 'build';
+    });
+    final d = await BuilderService.generate(prompt: _prompt, lang: lang, name: qName.text, colors: qColors.text, sell: qSell.text);
+    if (mounted) {
       setState(() {
-        design = seed.design;
-        step = BStep.edit;
+        design = d;
+        busy = null;
       });
-    } else if (seed.prompt != null) {
-      prompt.text = seed.prompt!;
-      _startQuestions();
     }
   }
 
-  void _startQuestions() {
-    if (prompt.text.trim().isEmpty) return;
-    ref.read(languageProvider.notifier).observe(prompt.text);
-    // Instant preview while the user answers.
-    design = buildLocalDesign(prompt: prompt.text, lang: ref.read(languageProvider));
-    setState(() {
-      q = 0;
-      step = BStep.questions;
-    });
+  void _refine() {
+    setState(() => design = buildLocalDesign(
+        prompt: _prompt, lang: ref.read(languageProvider), name: qName.text, colorsText: qColors.text, sellText: qSell.text));
   }
 
-  Future<void> _generate() async {
-    setState(() => step = BStep.generating);
-    final d = await BuilderService.generate(
-      prompt: prompt.text,
-      lang: ref.read(languageProvider),
-      name: answers[0].text,
-      colors: answers[1].text,
-      sell: answers[2].text,
-    );
-    if (!mounted) return;
-    setState(() {
-      design = d;
-      step = BStep.edit;
-    });
-    BuilderService.saveDraft(d);
-  }
-
-  void _useLocalNow() {
-    setState(() {
-      design = buildLocalDesign(
-        prompt: prompt.text,
-        lang: ref.read(languageProvider),
-        name: answers[0].text,
-        colorsText: answers[1].text,
-        sellText: answers[2].text,
-      );
-      step = BStep.edit;
-    });
-  }
-
-  void _update(AppDesign d) {
-    setState(() => design = d);
+  Future<void> _voiceReply() async {
+    if (text.text.trim().isEmpty) return;
+    setState(() => busy = 'voice');
+    final lang = ref.read(languageProvider);
+    final r = await AiService.chat(history: [ChatMessage('user', text.text.trim())], engine: ref.read(aiChoiceProvider), lang: lang);
+    setState(() => reply = r.text);
+    try {
+      await VoiceService.speak(r.text, ref.read(voiceProvider), lang: lang);
+    } catch (e) {
+      if (mounted) toast(context, friendlyError(e, lang));
+    }
+    if (mounted) setState(() => busy = null);
   }
 
   Future<void> _approve() async {
-    final plan = ref.read(planProvider);
-    final live = myApps.where((a) => a.status == 'live' && a.id != design!.id).length;
-    if (plan == 'free' && live >= AppConfig.freeAppLimit) {
-      final t = ref.read(tProvider);
-      final go = await showDialog<bool>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          content: Text(t('freeLimit')),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(t('back'))),
-            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(t('upgrade'))),
-          ],
-        ),
-      );
-      if (go == true && mounted) Navigator.push(context, MaterialPageRoute(builder: (_) => const PlansScreen()));
+    final apps = await BuilderService.myApps();
+    final live = apps.where((a) => a.status == 'live' && a.id != design!.id).length;
+    if (ref.read(planProvider) == 'free' && live >= AppConfig.freeAppLimit) {
+      if (mounted) {
+        toast(context, ref.read(tProvider)('freeLimit'));
+        Navigator.push(context, MaterialPageRoute(builder: (_) => const PlansScreen()));
+      }
       return;
     }
     BuilderService.saveDraft(design!);
-    setState(() => step = BStep.consent);
+    setState(() => step = _Step.consent);
   }
 
   Future<void> _publish() async {
@@ -141,328 +108,182 @@ class _BuilderScreenState extends ConsumerState<BuilderScreen> {
     );
     setState(() {
       design = d;
-      step = BStep.publishing;
+      busy = 'publish';
     });
     try {
       result = await BuilderService.publish(d, domain: domain.text.trim().isEmpty ? null : domain.text.trim());
-    } catch (_) {
-      // Alternative: local share link to the web viewer (works once the web app is deployed).
-      result = PublishResult('${AppConfig.webBaseUrl}/a/${d.id}', notes: ['offline']);
+      await BuilderService.saveDraft(d);
+      setState(() => step = _Step.done);
+    } catch (e) {
+      if (mounted) toast(context, friendlyError(e, ref.read(languageProvider)));
     }
-    await BuilderService.saveDraft(d);
-    await _loadApps();
-    if (mounted) setState(() => step = BStep.done);
-  }
-
-  void _reset() {
-    prompt.clear();
-    for (final a in answers) {
-      a.clear();
-    }
-    setState(() {
-      design = null;
-      result = null;
-      terms = privacy = payment = false;
-      step = BStep.input;
-    });
+    if (mounted) setState(() => busy = null);
   }
 
   @override
   Widget build(BuildContext context) {
-    ref.listen(builderSeedProvider, (_, next) {
-      if (next != null) _consumeSeed();
-    });
-    final t = ref.watch(tProvider);
-    return Scaffold(
-      appBar: AppBar(
-        title: const KakaoTitle(),
-        leading: step == BStep.input || step == BStep.generating || step == BStep.publishing
-            ? null
-            : IconButton(icon: const Icon(Icons.arrow_back), onPressed: _back),
-      ),
-      body: SafeArea(child: _body(t)),
-    );
-  }
-
-  void _back() {
-    setState(() {
-      switch (step) {
-        case BStep.questions:
-          if (q > 0) {
-            q--;
-          } else {
-            step = BStep.input;
-          }
-        case BStep.edit:
-          step = BStep.input;
-        case BStep.consent:
-          step = BStep.edit;
-        case BStep.connect:
-          step = BStep.consent;
-        case BStep.done:
-          _reset();
-        default:
-          break;
+    ref.listen(builderSeedProvider, (_, seed) {
+      if (seed == null) return;
+      ref.read(builderSeedProvider.notifier).set(null);
+      if (seed.design != null) {
+        setState(() {
+          design = seed.design;
+          step = _Step.build;
+        });
+      } else if (seed.prompt != null) {
+        text.text = seed.prompt!;
+        _build();
       }
     });
-  }
+    final t = ref.watch(tProvider);
+    final ai = ref.watch(aiChoiceProvider);
+    final ar = ref.watch(languageProvider) == 'ar';
+    final aiName = _ais.firstWhere((x) => x.$1 == ai, orElse: () => _ais.first).$2;
 
-  Widget _body(String Function(String) t) {
-    switch (step) {
-      case BStep.input:
-        return _inputStep(t);
-      case BStep.questions:
-        return _questionsStep(t);
-      case BStep.generating:
-        return Center(
-          child: ProgressWithAlternatives(
-            label: t('livePreview'),
-            slowAfter: const Duration(seconds: 10),
-            alternatives: [(t('useLocal'), _useLocalNow), (t('retry'), _generate)],
-          ),
-        );
-      case BStep.edit:
-        return _editStep(t);
-      case BStep.consent:
-        return _consentStep(t);
-      case BStep.connect:
-        return _connectStep(t);
-      case BStep.publishing:
-        return Center(
-          child: ProgressWithAlternatives(
-            label: t('publishing'),
-            slowAfter: const Duration(seconds: 25),
-            alternatives: [(t('retry'), _publish)],
-          ),
-        );
-      case BStep.done:
-        return _doneStep(t);
-    }
-  }
-
-  Widget _inputStep(String Function(String) t) {
-    final lang = ref.watch(languageProvider);
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Text(t('welcome'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 16),
-        TextField(
-          controller: prompt,
-          minLines: 3,
-          maxLines: 6,
-          decoration: InputDecoration(hintText: t('oneBoxHint')),
-        ),
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      KCard(children: [
+        KPills<AiEngine>(items: _ais, selected: ai, onSelect: (e) => ref.read(aiChoiceProvider.notifier).set(e)),
         const SizedBox(height: 12),
-        BigButton(label: t('next'), icon: Icons.auto_awesome, accent: true, onPressed: _startQuestions),
-        BigButton(
-          label: t('buildFromPhoto'),
-          icon: Icons.photo_camera,
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen())),
-        ),
-        const SizedBox(height: 20),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: [
-            for (final tpl in templates)
-              ActionChip(
-                avatar: Text(tpl.emoji),
-                label: Text(tpl.title[lang == 'ar' ? 'ar' : 'en']!),
-                onPressed: () {
-                  prompt.text = lang == 'ar' ? 'أبي تطبيق ${tpl.title['ar']}' : 'I want a ${tpl.title['en']} app';
-                  _startQuestions();
-                },
-              ),
-          ],
-        ),
-        if (myApps.isNotEmpty) ...[
-          const SizedBox(height: 28),
-          Text(t('myApps'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 8),
-          for (final a in myApps)
-            Card(
-              color: KColors.surface,
-              child: ListTile(
-                leading: CircleAvatar(backgroundColor: a.primaryColor, child: Text(a.logoEmoji)),
-                title: Text(a.name),
-                subtitle: Text(a.status == 'live' ? '🟢 live' : '📝 draft', style: const TextStyle(color: KColors.muted)),
-                trailing: const Icon(Icons.edit),
-                onTap: () => setState(() {
-                  design = a;
-                  step = BStep.edit;
-                }),
-              ),
-            ),
-        ],
-        const KakaoFooter(),
-      ],
-    );
-  }
-
-  Widget _questionsStep(String Function(String) t) {
-    final labels = [t('q1'), t('q2'), t('q3')];
-    final wide = MediaQuery.of(context).size.width > 900;
-    final form = ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        LinearProgressIndicator(value: (q + 1) / 3, color: KColors.accent, backgroundColor: KColors.surface),
-        const SizedBox(height: 24),
-        Text('${q + 1}/3', style: const TextStyle(color: KColors.muted)),
-        Text(labels[q], style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 16),
-        TextField(
-          key: ValueKey(q),
-          controller: answers[q],
-          autofocus: true,
-          onChanged: (_) => setState(() {
-            design = buildLocalDesign(
-              prompt: prompt.text,
-              lang: ref.read(languageProvider),
-              name: answers[0].text,
-              colorsText: answers[1].text,
-              sellText: answers[2].text,
-            );
-          }),
-          onSubmitted: (_) => q < 2 ? setState(() => q++) : _generate(),
-        ),
-        const SizedBox(height: 16),
-        BigButton(label: q < 2 ? t('next') : t('livePreview'), accent: true, onPressed: () => q < 2 ? setState(() => q++) : _generate()),
-        BigButton(label: t('skip'), onPressed: () => q < 2 ? setState(() => q++) : _generate()),
-      ],
-    );
-    if (!wide || design == null) return form;
-    return Row(children: [
-      Expanded(child: form),
-      Expanded(child: Center(child: PhoneFrame(child: LivePreviewApp(design: design!)))),
+        Text('${t('chosenAI')}: $aiName', style: const TextStyle(fontWeight: FontWeight.w600)),
+        KInput(text, t('examplePh'), lines: 4),
+        KBtn(t('buildBtn'), busy: busy == 'build', onTap: _build),
+        Row(children: [
+          Expanded(child: KBtn(t('cameraBtn'), v: KVariant.grey, fontSize: 15, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen())))),
+          const SizedBox(width: 10),
+          Expanded(child: KBtn(t('voiceBtn'), v: KVariant.grey, fontSize: 15, busy: busy == 'voice', onTap: _voiceReply)),
+        ]),
+        if (reply.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: K.soft, borderRadius: BorderRadius.circular(14)),
+            child: SelectableText(reply, style: const TextStyle(color: Colors.black, height: 1.6)),
+          ),
+        if (design == null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Wrap(spacing: 6, runSpacing: 6, children: [
+              for (final tpl in templates.take(6))
+                ActionChip(
+                  backgroundColor: K.soft,
+                  side: BorderSide.none,
+                  label: Text('${tpl.emoji} ${tpl.title[ar ? 'ar' : 'en']}', style: const TextStyle(color: Colors.black, fontSize: 12)),
+                  onPressed: () {
+                    text.text = ar ? 'أبي تطبيق ${tpl.title['ar']}' : 'I want a ${tpl.title['en']} app';
+                    _build();
+                  },
+                ),
+            ]),
+          ),
+      ]),
+      if (design != null && step == _Step.build) _previewCard(t),
+      if (step == _Step.consent) _consentCard(t),
+      if (step == _Step.connect) _connectCard(t),
+      if (step == _Step.done && result != null) _doneCard(t),
     ]);
   }
 
-  Widget _editStep(String Function(String) t) {
-    final d = design!;
-    final wide = MediaQuery.of(context).size.width > 900;
-    final preview = Center(
-      child: FittedBox(
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: PhoneFrame(child: LivePreviewApp(design: d, onChanged: _update)),
+  Widget _previewCard(String Function(String) t) => KCard(children: [
+        Text(t('liveDemo'), textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 12),
+        Center(child: PhoneFrame(width: 290, child: LivePreviewApp(design: design!, onChanged: (d) => setState(() => design = d)))),
+        const SizedBox(height: 12),
+        _expand(t('quickQ'), Column(children: [
+          KInput(qName, t('q1'), onChanged: (_) => _refine()),
+          KInput(qColors, t('q2'), onChanged: (_) => _refine()),
+          KInput(qSell, t('q3'), onChanged: (_) => _refine()),
+        ])),
+        const SizedBox(height: 10),
+        _expand(
+          t('editDesign'),
+          Theme(
+            data: ThemeData.dark(useMaterial3: true).copyWith(colorScheme: const ColorScheme.dark(primary: K.green)),
+            child: Container(
+            height: 440,
+            margin: const EdgeInsets.only(top: 8),
+            decoration: BoxDecoration(color: const Color(0xFF1A1A1A), borderRadius: BorderRadius.circular(14)),
+            clipBehavior: Clip.antiAlias,
+            child: DesignEditor(design: design!, onChanged: (d) => setState(() => design = d)),
+          ),
+          ),
         ),
-      ),
-    );
-    final editor = DesignEditor(design: d, onChanged: _update);
-    final approve = Padding(
-      padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-      child: BigButton(label: t('iLikeIt'), icon: Icons.check_circle, accent: true, onPressed: _approve),
-    );
-    if (wide) {
-      return Row(children: [
-        Expanded(child: preview),
-        Expanded(child: Column(children: [Expanded(child: editor), approve])),
+        KBtn(t('approveFull'), v: KVariant.green, onTap: _approve),
       ]);
-    }
-    return Column(children: [
-      Expanded(flex: 5, child: preview),
-      Expanded(flex: 4, child: editor),
-      approve,
-    ]);
-  }
 
-  Widget _consentStep(String Function(String) t) {
-    final ok = terms && privacy && payment;
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Text(t('consentTitle'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 16),
-        CheckboxListTile(value: terms, activeColor: KColors.accent, onChanged: (v) => setState(() => terms = v!), title: Text(t('terms'))),
-        CheckboxListTile(value: privacy, activeColor: KColors.accent, onChanged: (v) => setState(() => privacy = v!), title: Text(t('privacy'))),
-        CheckboxListTile(value: payment, activeColor: KColors.accent, onChanged: (v) => setState(() => payment = v!), title: Text(t('payment'))),
+  Widget _expand(String title, Widget child) => Container(
+        decoration: BoxDecoration(color: K.soft, borderRadius: BorderRadius.circular(14)),
+        child: Theme(
+          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+            iconColor: Colors.black,
+            collapsedIconColor: Colors.black,
+            title: Text(title, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 14)),
+            childrenPadding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            children: [child],
+          ),
+        ),
+      );
+
+  Widget _consentCard(String Function(String) t) => KCard(children: [
+        Text(t('consentTitle'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+        for (final (i, label) in [t('terms'), t('privacy'), t('payment')].indexed)
+          Container(
+            margin: const EdgeInsets.only(top: 10),
+            decoration: BoxDecoration(color: K.soft, borderRadius: BorderRadius.circular(14)),
+            child: CheckboxListTile(
+              value: consent[i],
+              activeColor: K.green,
+              onChanged: (v) => setState(() => consent[i] = v ?? false),
+              title: Text(label, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
+            ),
+          ),
         TextButton(
           onPressed: () => launchUrl(Uri.parse('${AppConfig.webBaseUrl}/legal'), mode: LaunchMode.externalApplication),
-          child: const Text('Terms • Privacy • Payment'),
+          child: const Text('Terms • Privacy • Payment', style: TextStyle(color: Colors.black54)),
         ),
-        const SizedBox(height: 16),
-        BigButton(label: t('next'), accent: true, onPressed: ok ? () => setState(() => step = BStep.connect) : null),
-      ],
-    );
-  }
+        KBtn(t('next'), v: KVariant.green, onTap: consent.every((c) => c) ? () => setState(() => step = _Step.connect) : null),
+        KBtn(t('back'), v: KVariant.grey, onTap: () => setState(() => step = _Step.build)),
+      ]);
 
-  Widget _connectStep(String Function(String) t) {
-    final paid = ref.watch(planProvider) != 'free';
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        Text(t('connectTitle'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 16),
-        TextField(controller: whatsapp, keyboardType: TextInputType.phone, decoration: InputDecoration(labelText: t('whatsapp'), prefixIcon: const Icon(Icons.chat))),
-        const SizedBox(height: 12),
-        TextField(controller: instagram, decoration: InputDecoration(labelText: t('instagram'), prefixIcon: const Icon(Icons.camera_alt_outlined))),
-        const SizedBox(height: 12),
-        TextField(
-          controller: domain,
-          enabled: paid,
-          decoration: InputDecoration(
-            labelText: t('domain'),
-            prefixIcon: const Icon(Icons.language),
-            helperText: paid ? null : t('paidFeature'),
-          ),
-        ),
-        const SizedBox(height: 12),
-        BigButton(
-          label: t('paymentConnect'),
-          icon: Icons.credit_card,
-          onPressed: () async {
-            try {
-              await AccountService.connectOAuth('stripe');
-            } catch (e) {
-              if (mounted) toast(context, friendlyError(e, ref.read(languageProvider)));
-            }
-          },
-        ),
-        const SizedBox(height: 20),
-        BigButton(label: t('publish'), icon: Icons.rocket_launch, accent: true, onPressed: _publish),
-      ],
-    );
-  }
+  Widget _connectCard(String Function(String) t) => KCard(children: [
+        Text(t('connectTitle'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+        KInput(whatsapp, '💬 ${t('whatsapp')}', keyboard: TextInputType.phone),
+        KInput(instagram, '📸 ${t('instagram')}'),
+        KInput(domain, '🌐 ${t('domain')}'),
+        KBtn(t('publish'), v: KVariant.green, busy: busy == 'publish', onTap: _publish),
+        KBtn(t('back'), v: KVariant.grey, onTap: () => setState(() => step = _Step.consent)),
+      ]);
 
-  Widget _doneStep(String Function(String) t) {
+  Widget _doneCard(String Function(String) t) {
     final r = result!;
     final link = r.customDomain != null ? 'https://${r.customDomain}' : r.url;
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        const Text('🎉', textAlign: TextAlign.center, style: TextStyle(fontSize: 64)),
-        Text(t('published'), textAlign: TextAlign.center, style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w900)),
-        const SizedBox(height: 20),
-        Center(
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-            child: QrImageView(data: link, size: 200),
-          ),
-        ),
-        const SizedBox(height: 16),
-        SelectableText(link, textAlign: TextAlign.center, style: const TextStyle(fontSize: 16, color: KColors.accent)),
-        const SizedBox(height: 16),
-        BigButton(label: t('openLink'), icon: Icons.open_in_new, accent: true, onPressed: () => launchUrl(Uri.parse(link), mode: LaunchMode.externalApplication)),
-        BigButton(
-          label: t('copy'),
-          icon: Icons.copy,
-          onPressed: () {
-            Clipboard.setData(ClipboardData(text: link));
-            toast(context, t('copied'));
-          },
-        ),
-        BigButton(label: t('share'), icon: Icons.share, onPressed: () => SharePlus.instance.share(ShareParams(text: '${design!.name}\n$link'))),
-        if (r.apkUrl != null)
-          BigButton(label: 'APK', icon: Icons.android, onPressed: () => launchUrl(Uri.parse(r.apkUrl!), mode: LaunchMode.externalApplication)),
-        if (r.repoUrl != null)
-          BigButton(label: 'GitHub', icon: Icons.code, onPressed: () => launchUrl(Uri.parse(r.repoUrl!), mode: LaunchMode.externalApplication)),
-        for (final n in r.notes.where((n) => n != 'offline'))
-          Padding(padding: const EdgeInsets.only(top: 6), child: Text('• $n', style: const TextStyle(color: KColors.muted))),
-        const SizedBox(height: 12),
-        BigButton(label: t('newApp'), icon: Icons.add, onPressed: _reset),
-      ],
-    );
+    return KCard(align: CrossAxisAlignment.center, children: [
+      const Text('🎉', style: TextStyle(fontSize: 48)),
+      Text(t('published'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+      const SizedBox(height: 12),
+      QrImageView(data: link, size: 190),
+      SelectableText(link, textAlign: TextAlign.center, style: const TextStyle(color: K.green, fontWeight: FontWeight.w700)),
+      SizedBox(width: double.infinity, child: KBtn(t('openLink'), onTap: () => launchUrl(Uri.parse(link), mode: LaunchMode.externalApplication))),
+      SizedBox(
+        width: double.infinity,
+        child: KBtn(t('copy'), v: KVariant.grey, onTap: () {
+          Clipboard.setData(ClipboardData(text: link));
+          toast(context, t('copied'));
+        }),
+      ),
+      SizedBox(width: double.infinity, child: KBtn(t('share'), v: KVariant.grey, onTap: () => SharePlus.instance.share(ShareParams(text: '${design!.name}\n$link')))),
+      if (r.apkUrl != null) SizedBox(width: double.infinity, child: KBtn('APK', v: KVariant.grey, onTap: () => launchUrl(Uri.parse(r.apkUrl!), mode: LaunchMode.externalApplication))),
+      for (final n in r.notes) Text('• $n', style: const TextStyle(color: Colors.black54, fontSize: 12)),
+      SizedBox(
+        width: double.infinity,
+        child: KBtn('+ ${t('newApp')}', v: KVariant.grey, onTap: () => setState(() {
+              design = null;
+              result = null;
+              text.clear();
+              consent.fillRange(0, 3, false);
+              step = _Step.build;
+            })),
+      ),
+    ]);
   }
 }

@@ -65,8 +65,8 @@ class PhoneFrame extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.black,
-        borderRadius: BorderRadius.circular(46),
-        border: Border.all(color: const Color(0xFF3A3A3A), width: 2),
+        borderRadius: BorderRadius.circular(40),
+        border: Border.all(color: Colors.black, width: 2),
         boxShadow: const [BoxShadow(color: Colors.black54, blurRadius: 30, offset: Offset(0, 12))],
       ),
       child: ClipRRect(
@@ -255,27 +255,27 @@ class _LivePreviewAppState extends State<LivePreviewApp> {
       );
 
   Widget _bottomNav() {
+    // Owner's design: 🏪 Home | 👕 Products | 🛒 Cart | 📞 Contact (booking opens from Home).
     final items = [
-      (Icons.home_outlined, tr('الرئيسية', 'Home')),
-      (Icons.grid_view, tr('المنتجات', 'Products')),
-      (Icons.shopping_cart_outlined, tr('السلة', 'Cart')),
-      (Icons.event_available, tr('حجز', 'Booking')),
-      (Icons.call_outlined, tr('تواصل', 'Contact')),
+      ('🏪', tr('الرئيسية', 'Home'), 0),
+      ('👕', tr('المنتجات', 'Products'), 1),
+      ('🛒', tr('السلة', 'Cart'), 2),
+      ('📞', tr('تواصل', 'Contact'), 4),
     ];
     return Container(
       color: Colors.white,
       padding: const EdgeInsets.only(top: 6, bottom: 10),
       child: Row(
         children: [
-          for (var i = 0; i < items.length; i++)
+          for (final it in items)
             Expanded(
               child: InkWell(
-                onTap: () => setState(() => tab = i),
+                onTap: () => setState(() => tab = it.$3),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(items[i].$1, size: 20, color: tab == i ? d.primaryColor : Colors.black45),
-                    Text(items[i].$2, style: TextStyle(fontSize: 9, color: tab == i ? d.primaryColor : Colors.black45)),
+                    Text(it.$1, style: const TextStyle(fontSize: 17)),
+                    Text(it.$2, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: tab == it.$3 ? d.primaryColor : Colors.black45)),
                   ],
                 ),
               ),

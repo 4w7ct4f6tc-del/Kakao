@@ -5,6 +5,11 @@ import { api } from './api';
 
 const STR: Record<string, Record<string, string>> = {
   en: {
+    tagline: 'Write what you want — we build your full app', tabLogin: 'Login', tabBuilder: 'Builder', tabVideo: 'Video', tabSettings: 'Settings',
+    chosenAI: 'Selected AI', examplePh: 'Example: I want an app for a clothes shop', buildBtn: '✨ Build my app', cameraBtn: '📷 Camera', voiceBtn: '🔊 Reply with real voice',
+    liveDemo: 'Live demo design', approveFull: '✅ I like it — Create the full app', phoneLabel: 'Mobile number', sendActivation: 'Send activation code', codePh: 'Code 123456',
+    loginCode: 'Login with code', forgotSmart: 'Forgot password? — Smart unlock', storyPh: 'Story', makeVideo2: '🎬 Make my video', videoDone: '✅ Video created',
+    emailLogin: 'Login with email', signedInAs: 'Signed in as', quickQ: '3 quick questions (optional)',
     home: 'Home', builder: 'Builder', video: 'Video', settings: 'Settings', welcome: 'What do you want to build today?',
     hint: 'Write what you want… e.g. "I want an app for a clothes shop"', send: 'Send', buildThis: 'Build this app',
     q1: 'What is the shop / app name?', q2: 'Which colors do you like?', q3: 'What do you sell or offer?', next: 'Next', skip: 'Skip', back: 'Back',
@@ -19,6 +24,11 @@ const STR: Record<string, Record<string, string>> = {
     addProduct: 'Add product', slow: 'Taking longer than usual…', useLocal: 'Use instant version', retry: 'Try again', newApp: 'New app', listen: 'Listen', translate: 'Translate',
   },
   ar: {
+    tagline: 'اكتب اللي تبيه… ونسويه لك تطبيق كامل', tabLogin: 'دخول', tabBuilder: 'مصنع', tabVideo: 'فيديو', tabSettings: 'إعدادات',
+    chosenAI: 'الذكاء المختار', examplePh: 'مثال: أبي تطبيق لمحل ثياب', buildBtn: '✨ ابنِ لي التطبيق', cameraBtn: '📷 الكاميرا', voiceBtn: '🔊 رد بصوت حقيقي',
+    liveDemo: 'تصميم تجريبي حي', approveFull: '✅ عجبني - أنشئ التطبيق كامل', phoneLabel: 'رقم الجوال', sendActivation: 'أرسل كود التفعيل', codePh: 'الكود 123456',
+    loginCode: 'دخول بالكود', forgotSmart: 'نسيت كلمة السر؟ - فتح ذكي', storyPh: 'قصة', makeVideo2: '🎬 اصنع لي الفيديو', videoDone: '✅ تم صنع الفيديو',
+    emailLogin: 'دخول بالإيميل', signedInAs: 'مسجل باسم', quickQ: '3 أسئلة سريعة (اختياري)',
     home: 'الرئيسية', builder: 'المنشئ', video: 'فيديو', settings: 'الإعدادات', welcome: 'شنو تبي تسوي اليوم؟',
     hint: 'اكتب اللي تبيه… مثال: "أبي تطبيق لمحل ملابس"', send: 'إرسال', buildThis: 'ابنِ هذا التطبيق',
     q1: 'شنو اسم المحل / التطبيق؟', q2: 'شنو الألوان اللي تحبها؟', q3: 'شنو تبيع أو تقدم؟', next: 'التالي', skip: 'تخطي', back: 'رجوع',

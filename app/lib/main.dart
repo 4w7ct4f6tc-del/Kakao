@@ -8,7 +8,6 @@ import 'core/config.dart';
 import 'core/i18n.dart';
 import 'core/theme.dart';
 import 'firebase_options.dart';
-import 'screens/auth/login_screen.dart';
 import 'screens/lock_screen.dart';
 import 'screens/shell.dart';
 import 'state/providers.dart';
@@ -58,17 +57,21 @@ class RootGate extends ConsumerStatefulWidget {
 
 class _RootGateState extends ConsumerState<RootGate> {
   bool unlocked = false;
+  bool tabChosen = false;
 
   @override
   Widget build(BuildContext context) {
-    final guest = ref.watch(guestProvider);
     final auth = ref.watch(authProvider);
     final bioLock = ref.watch(bioLockProvider);
     return auth.when(
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-      error: (_, _) => const LoginScreen(),
+      loading: () => const Scaffold(backgroundColor: Color(0xFF0F0F0F), body: Center(child: CircularProgressIndicator())),
+      error: (_, _) => const MainShell(),
       data: (user) {
-        if (user == null && !guest) return const LoginScreen();
+        // Open on دخول when signed out, on مصنع when signed in.
+        if (!tabChosen) {
+          tabChosen = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) => ref.read(tabProvider.notifier).set(user == null ? 0 : 1));
+        }
         if (user != null && bioLock && !unlocked) {
           return LockScreen(onUnlocked: () => setState(() => unlocked = true));
         }

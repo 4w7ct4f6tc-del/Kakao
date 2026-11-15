@@ -21,6 +21,19 @@ Windows + Android + iPhone from **one Flutter codebase**, a **Next.js 14** web v
 
 ---
 
+## Design
+
+The UI follows the owner's design exactly, in the Flutter app and on the web:
+
+- **Colors:** background `#0F0F0F`, white cards, black buttons, green `#16A34A` approve button. White text on dark, black text on cards.
+- **Header:** logo with خعخعو / KAkAo and **B.K.A Famy** under it on one side, the **عربي | English** button on the other, then a one-line description centered.
+- **Tabs:** 4 in one row: دخول / مصنع / فيديو / إعدادات. The selected tab is white, the others dark grey.
+- **Cards:** radius 22px, padding 16px, max width 460px, centered.
+- **Fonts:** Cairo for Arabic, Inter for English.
+- **Rule:** one screen = one task, with big buttons.
+
+The shared pieces live in `app/lib/widgets/kakao_ui.dart` and `web/components/ui.tsx`.
+
 ## What's inside
 
 ```

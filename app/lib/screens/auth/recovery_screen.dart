@@ -5,6 +5,7 @@ import '../../services/auth_service.dart';
 import '../../services/biometric_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
+import '../../widgets/kakao_ui.dart';
 
 enum _Step { choose, otp, waiting, questions, newPassword }
 
@@ -128,16 +129,14 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(tProvider);
-    return Scaffold(
-      appBar: AppBar(title: const KakaoTitle()),
-      body: ListView(
-        padding: const EdgeInsets.all(24),
-        children: [
+    return KPage(
+      children: [
+        KCard(children: [
           Text(t('recoveryTitle'), style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800)),
           const SizedBox(height: 16),
           ..._body(t),
-        ],
-      ),
+        ]),
+      ],
     );
   }
 
@@ -155,7 +154,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
         ];
       case _Step.otp:
         return [
-          Text('${t('sentVia')}: ${via.join(' + ')}', style: const TextStyle(color: Colors.white70)),
+          Text('${t('sentVia')}: ${via.join(' + ')}', style: const TextStyle(color: Colors.black54)),
           const SizedBox(height: 12),
           TextField(
             controller: code,
