@@ -1,0 +1,9 @@
+{
+  "name": "kakao-video-service",
+  "description": "FFmpeg renderer: scenes (image + narration) + music + subtitles -> 1080p MP4",
+  "main": "server.js",
+  "engines": { "node": ">=20" },
+  "scripts": { "start": "node server.js", "test": "node test.js" },
+  "dependencies": { "express": "^4.21.2" },
+  "private": true
+}

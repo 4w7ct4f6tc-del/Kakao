@@ -1,0 +1,27 @@
+{
+  "name": "kakao-functions",
+  "description": "KAKAO backend: AI router, auth/OTP/recovery, builder, publish, voice, vision, video, payments, integrations",
+  "main": "index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "serve": "firebase emulators:start --only functions,firestore,auth,storage",
+    "deploy": "firebase deploy --only functions",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "@sendgrid/mail": "^8.1.4",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "ffmpeg-static": "^5.2.0",
+    "firebase-admin": "^14.5.1",
+    "firebase-functions": "^7.4.0",
+    "openai": "^7.57.0",
+    "stripe": "^23.1.0",
+    "twilio": "^5.4.0"
+  },
+  "private": true
+}

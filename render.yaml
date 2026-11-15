@@ -1,0 +1,11 @@
+# Render blueprint — deploys the FFmpeg video renderer.
+services:
+  - type: web
+    name: kakao-video-service
+    runtime: docker
+    rootDir: video-service
+    plan: starter
+    healthCheckPath: /health
+    envVars:
+      - key: VIDEO_SERVICE_SECRET
+        sync: false   # paste the same value as functions/.env VIDEO_SERVICE_SECRET

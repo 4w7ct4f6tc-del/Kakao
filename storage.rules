@@ -1,0 +1,7 @@
+rules_version = '2';
+// Files are written by the API and shared through signed URLs.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} { allow read, write: if false; }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "indexes": [
+    { "collectionGroup": "apps", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "userId", "order": "ASCENDING" }, { "fieldPath": "status", "order": "ASCENDING" }] },
+    { "collectionGroup": "approvals", "queryScope": "COLLECTION", "fields": [{ "fieldPath": "uid", "order": "ASCENDING" }, { "fieldPath": "status", "order": "ASCENDING" }] }
+  ],
+  "fieldOverrides": []
+}
