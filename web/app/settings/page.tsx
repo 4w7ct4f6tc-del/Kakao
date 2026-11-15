@@ -11,6 +11,7 @@ import { useAppearance } from '@/lib/appearance';
 import { Brand } from '@/lib/brand';
 import { auth } from '@/lib/firebase';
 import { useLang } from '@/lib/i18n';
+import { DEFAULT_AI, loadAi } from '@/lib/aiChoice';
 
 type View = 'list' | 'account' | 'ai' | 'notifications' | 'voice' | 'privacy' | 'appearance' | 'about' | 'danu';
 
@@ -43,7 +44,7 @@ export default function Settings() {
   const [keys, setKeys] = useState<Record<string, boolean>>({});
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [msg, setMsg] = useState('');
-  const [ai, setAi] = useState('claude');
+  const [ai, setAi] = useState(DEFAULT_AI);
   const [notifs, setNotifs] = useState<Record<string, boolean>>({});
   const [devices, setDevices] = useState<{ id: string; name: string; lastSeen: string }[]>([]);
   const [qs, setQs] = useState(['', '', '']);
@@ -57,7 +58,7 @@ export default function Settings() {
   };
   useEffect(() => {
     load();
-    setAi(store.get('ai', 'claude'));
+    setAi(loadAi());
     setNotifs(Object.fromEntries(NOTIFS.map(([id]) => [id, store.get(`notif_${id}`, '1') === '1'])));
     setQs(ar ? ['شنو اسم أول مدرسة درست فيها؟', 'شنو أكلتك المفضلة وأنت صغير؟', 'شنو اسم أقرب صديق لك؟'] : ['Your first school?', 'Favourite food as a kid?', 'Your closest friend?']);
     window.addEventListener('focus', load);

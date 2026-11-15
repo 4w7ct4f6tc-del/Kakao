@@ -47,7 +47,7 @@ r.post('/talk', optionalAuth, wrap(async (req, res) => {
   const lastUser = [...history].reverse().find((m) => m.role === 'user');
   if (lastUser) Object.assign(s, P.parseVoiceRequest(lastUser.content));
   if (!history.length) history.push({ role: 'user', content: '[سلمي على المستخدم بجملة قصيرة واسأليه شنو يبي]' });
-  const out = await routeChat({ uid, engine: body.engine || 'claude', messages: history, lang: 'ar', system: P.voiceAssistantPrompt(s) });
+  const out = await routeChat({ uid, engine: body.engine || 'meta', messages: history, lang: 'ar', system: P.voiceAssistantPrompt(s) });
   const parsed = P.extractActions(out.text);
   const audio = body.withAudio === false ? null : await speak(uid, parsed.text, s);
   res.json({ text: P.displayText(parsed.text), audio, action: null, comebackText: null, comebackAudio: null, build: parsed.build, video: parsed.video, settings: s, engine: out.engine });
@@ -82,7 +82,7 @@ r.post('/discuss', optionalAuth, wrap(async (req, res) => {
   const s = readSettings(body);
   const lastUser = [...history].reverse().find((m) => m.role === 'user');
   if (call && event === 'reply' && lastUser) Object.assign(s, P.parseVoiceRequest(lastUser.content));
-  const engine = body.engine || 'claude';
+  const engine = body.engine || 'meta';
   const result = { ai1: null, danu: null, settings: s };
 
   // AI 1 answers the user's message (also during the call, so all three think together).

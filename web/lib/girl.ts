@@ -87,7 +87,7 @@ function offlineReply(event: string, s: GirlSettings, history: Msg[], strikes: n
   return { ...base, text: 'حلو كلامك! بس هذي معاينة، أول ما نربط مفاتيح الذكاء الاصطناعي بسولف معاك صدق صدق.' };
 }
 
-export async function talk(event: 'start' | 'reply' | 'nudge', s: GirlSettings, history: Msg[], strikes: number, engine = 'claude'): Promise<TalkReply> {
+export async function talk(event: 'start' | 'reply' | 'nudge', s: GirlSettings, history: Msg[], strikes: number, engine = 'meta'): Promise<TalkReply> {
   try {
     return await api<TalkReply>('/talk', { event, ...s, messages: history, strikes, engine }, { retries: 0 });
   } catch {
@@ -174,7 +174,7 @@ function offlineAi1(history: DMsg[]): string {
   return `فهمت فكرتك: "${last.slice(0, 60)}". الفكرة زينة، وأقترح نبدأ بأبسط نسخة منها ونجربها بسرعة.\nاقتراح مني: نسوي معاينة في المصنع خلال دقيقة.\nاقتراح منك: شنو أهم شي تبيه يكون فيها؟`;
 }
 
-export async function discuss(event: 'reply' | 'join' | 'nudge', call: boolean, s: GirlSettings, history: DMsg[], st: DiscussState, engine = 'claude'): Promise<DiscussReply> {
+export async function discuss(event: 'reply' | 'join' | 'nudge', call: boolean, s: GirlSettings, history: DMsg[], st: DiscussState, engine = 'meta'): Promise<DiscussReply> {
   try {
     return await api<DiscussReply>('/discuss', { event, call, ...s, messages: history, ...st, engine }, { retries: 0 });
   } catch {

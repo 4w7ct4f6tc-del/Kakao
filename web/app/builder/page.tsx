@@ -8,6 +8,7 @@ import { api, friendly } from '@/lib/api';
 import { ALL_SECTIONS, type Design, localDesign, TEMPLATES } from '@/lib/design';
 import Icon from '@/components/Icon';
 import { useLang } from '@/lib/i18n';
+import { DEFAULT_AI, loadAi, saveAi } from '@/lib/aiChoice';
 import { loadGirl, parseRequest, playVoice, talk } from '@/lib/girl';
 
 const PALETTE = ['#111111', '#FFFFFF', '#DC2626', '#E11D48', '#EC4899', '#7C3AED', '#2563EB', '#1E3A8A', '#0EA5E9', '#14B8A6', '#16A34A', '#84CC16', '#EAB308', '#C9A227', '#EA580C', '#7C2D12', '#6B7280', '#E7D7C1', '#FFFBEB', '#0F172A'];
@@ -21,7 +22,8 @@ function Builder() {
   const ar = lang === 'ar';
   const params = useSearchParams();
   const router = useRouter();
-  const [ai, setAi] = useState('claude');
+  const [ai, setAiState] = useState(DEFAULT_AI);
+  const setAi = (id: string) => { setAiState(id); saveAi(id); };
   const [text, setText] = useState('');
   const [design, setDesign] = useState<Design | null>(null);
   const [answers, setAnswers] = useState({ name: '', colors: '', sell: '' });
@@ -33,6 +35,8 @@ function Builder() {
   const [contact, setContact] = useState({ whatsapp: '', instagram: '', domain: '' });
   const [result, setResult] = useState<{ url: string; customDomain?: string; notes?: string[] } | null>(null);
   const file = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { setAiState(loadAi()); }, []);
 
   useEffect(() => {
     const p = params.get('prompt');

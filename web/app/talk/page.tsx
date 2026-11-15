@@ -10,6 +10,7 @@ import {
 } from '@/lib/girl';
 import Icon from '@/components/Icon';
 import { useLang } from '@/lib/i18n';
+import { DEFAULT_AI, loadAi, saveAi } from '@/lib/aiChoice';
 
 type Status = 'idle' | 'thinking' | 'speaking' | 'listening';
 const NUDGE_AFTER_MS = 15000;
@@ -60,7 +61,8 @@ export default function Discuss() {
   const { lang } = useLang();
   const ar = lang === 'ar';
   const router = useRouter();
-  const [engine, setEngine] = useState('claude');
+  const [engine, setEngineState] = useState(DEFAULT_AI);
+  const setEngine = (id: string) => { setEngineState(id); saveAi(id); };
   const [s, setS] = useState<GirlSettings>(DEFAULT_GIRL);
   const [msgs, setMsgs] = useState<DMsg[]>([]);
   const [text, setText] = useState('');
@@ -83,7 +85,7 @@ export default function Discuss() {
   const sRef = useRef(s);
   const end = useRef<HTMLDivElement>(null);
 
-  useEffect(() => { setS({ ...DEFAULT_GIRL, ...loadGirl() }); }, []);
+  useEffect(() => { setS({ ...DEFAULT_GIRL, ...loadGirl() }); setEngineState(loadAi()); }, []);
   useEffect(() => { sRef.current = s; saveGirl(s); }, [s]);
   useEffect(() => () => { stopSpeaking(); stopListening.current?.(); clearTimeout(nudgeTimer.current); }, []);
   const push = (m: DMsg) => { msgsRef.current = [...msgsRef.current, m]; setMsgs(msgsRef.current); setTimeout(() => end.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }), 30); };

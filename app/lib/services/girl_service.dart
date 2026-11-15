@@ -99,7 +99,7 @@ class GirlService {
     return out;
   }
 
-  static Future<TalkReply> talk(String event, GirlSettings s, List<Map<String, String>> history, int strikes, {String engine = 'claude'}) async {
+  static Future<TalkReply> talk(String event, GirlSettings s, List<Map<String, String>> history, int strikes, {String engine = 'meta'}) async {
     try {
       final r = await Api.post('/talk', {'event': event, ...s.toJson(), 'messages': history, 'strikes': strikes, 'engine': engine},
           retries: 0, timeout: const Duration(seconds: 60));
@@ -201,7 +201,7 @@ class DiscussState {
 
 /// AI 1 (chat) + دانو (on a call). roles: user | ai1 | danu
 class DiscussService {
-  static Future<DiscussReply> send(String event, bool call, GirlSettings s, List<Map<String, String>> history, DiscussState st, {String engine = 'claude'}) async {
+  static Future<DiscussReply> send(String event, bool call, GirlSettings s, List<Map<String, String>> history, DiscussState st, {String engine = 'meta'}) async {
     try {
       final r = await Api.post('/discuss', {'event': event, 'call': call, ...s.toJson(), 'messages': history, ...st.toJson(), 'engine': engine},
           retries: 0, timeout: const Duration(seconds: 90));
