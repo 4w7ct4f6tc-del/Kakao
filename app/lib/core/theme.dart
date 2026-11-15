@@ -11,26 +11,23 @@ class KColors {
   static const danger = Color(0xFFDC2626);
 }
 
-ThemeData buildTheme(String lang) {
+ThemeData buildTheme(String lang, {bool dark = false}) {
   final rtlFamily = lang == 'ar' || lang == 'fa' || lang == 'ur';
   final base = ThemeData(
-    brightness: Brightness.dark,
+    brightness: dark ? Brightness.dark : Brightness.light,
     useMaterial3: true,
-    scaffoldBackgroundColor: KColors.background,
-    colorScheme: const ColorScheme.dark(
-      primary: KColors.accent,
-      secondary: KColors.accent,
-      surface: KColors.surface,
-      onPrimary: Colors.white,
-    ),
+    scaffoldBackgroundColor: dark ? KColors.background : Colors.white,
+    colorScheme: dark
+        ? const ColorScheme.dark(primary: KColors.accent, secondary: KColors.accent, surface: KColors.surface, onPrimary: Colors.white)
+        : const ColorScheme.light(primary: Color(0xFF4A78B5), secondary: Color(0xFF4A78B5), surface: Colors.white, onPrimary: Colors.white),
   );
   final textTheme = rtlFamily
       ? GoogleFonts.cairoTextTheme(base.textTheme)
       : GoogleFonts.interTextTheme(base.textTheme);
   return base.copyWith(
-    textTheme: textTheme.apply(bodyColor: Colors.white, displayColor: Colors.white),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: KColors.background,
+    textTheme: textTheme.apply(bodyColor: dark ? Colors.white : const Color(0xFF1F2328), displayColor: dark ? Colors.white : const Color(0xFF1F2328)),
+    appBarTheme: AppBarTheme(
+      backgroundColor: dark ? KColors.background : Colors.white,
       elevation: 0,
       centerTitle: true,
     ),

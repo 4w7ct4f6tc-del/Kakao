@@ -143,52 +143,89 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
     final t = ref.watch(tProvider);
     final ai = ref.watch(aiChoiceProvider);
     final ar = ref.watch(languageProvider) == 'ar';
-    final aiName = _ais.firstWhere((x) => x.$1 == ai, orElse: () => _ais.first).$2;
 
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      KCard(children: [
-        KPills<AiEngine>(items: _ais, selected: ai, onSelect: (e) => ref.read(aiChoiceProvider.notifier).set(e)),
-        const SizedBox(height: 12),
-        Text('${t('chosenAI')}: $aiName', style: const TextStyle(fontWeight: FontWeight.w600)),
-        KInput(text, t('examplePh'), lines: 4),
-        KBtn(t('buildBtn'), icon: Icons.auto_awesome_outlined, busy: busy == 'build', onTap: _build),
-        Row(children: [
-          Expanded(child: KBtn(t('cameraBtn'), icon: Icons.photo_camera_outlined, v: KVariant.grey, fontSize: 15, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen())))),
-          const SizedBox(width: 10),
-          Expanded(child: KBtn(t('voiceBtn'), icon: Icons.volume_up_outlined, v: KVariant.grey, fontSize: 15, busy: busy == 'voice', onTap: _voiceReply)),
-        ]),
-        KBtn(ar ? 'ناقش فكرتك مع دانو' : 'Discuss your idea with Danu', icon: Icons.chat_bubble_outline, v: KVariant.grey, fontSize: 15,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DiscussScreen()))),
-        if (reply.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(color: K.soft, borderRadius: BorderRadius.circular(14)),
-            child: SelectableText(reply, style: const TextStyle(color: Colors.black, height: 1.6)),
-          ),
-        if (design == null)
-          Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: Wrap(spacing: 6, runSpacing: 6, children: [
-              for (final tpl in templates.take(6))
-                ActionChip(
-                  backgroundColor: K.soft,
-                  side: BorderSide.none,
-                  label: Text('${tpl.title[ar ? 'ar' : 'en']}', style: const TextStyle(color: Colors.black, fontSize: 12)),
-                  onPressed: () {
-                    text.text = ar ? 'أبي تطبيق ${tpl.title['ar']}' : 'I want a ${tpl.title['en']} app';
-                    _build();
-                  },
-                ),
-            ]),
-          ),
+      KLabel(ar ? 'اختر نموذج الذكاء' : 'Select AI model'),
+      Row(children: [
+        for (final (i, m) in _ais.indexed) ...[
+          if (i > 0) const SizedBox(width: 6),
+          Expanded(child: _aiPill(m.$1, m.$2, ai == m.$1)),
+        ],
       ]),
+      const SizedBox(height: 22),
+      KInput(text, t('examplePh'), lines: 3, center: true),
+      const SizedBox(height: 8),
+      KBtn(t('buildBtn'), icon: Icons.auto_awesome_outlined, wide: false, busy: busy == 'build', onTap: _build),
+      const SizedBox(height: 18),
+      Row(children: [
+        Expanded(child: KBtn(ar ? 'الكاميرا' : 'Camera', icon: Icons.photo_camera_outlined, v: KVariant.grey, fontSize: 15, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen())))),
+        const SizedBox(width: 8),
+        Expanded(child: KBtn(ar ? 'صوت' : 'Voice', icon: Icons.volume_up_outlined, v: KVariant.grey, fontSize: 15, busy: busy == 'voice', onTap: _voiceReply)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: KBtn(ar ? 'دانو' : 'Danu', icon: Icons.chat_bubble_outline, v: KVariant.grey, accentText: true, fontSize: 15,
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DiscussScreen()))),
+        ),
+      ]),
+      if (reply.isNotEmpty)
+        Container(
+          margin: const EdgeInsets.only(top: 14),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: K.soft, borderRadius: BorderRadius.circular(14)),
+          child: SelectableText(reply, style: const TextStyle(color: Colors.black, height: 1.6)),
+        ),
+      if (design == null) ...[
+        KLabel(ar ? 'القوالب' : 'Templates'),
+        Wrap(spacing: 10, runSpacing: 10, alignment: WrapAlignment.center, children: [
+          for (final tpl in templates.take(6))
+            InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () {
+                text.text = ar ? 'أبي تطبيق ${tpl.title['ar']}' : 'I want a ${tpl.title['en']} app';
+                _build();
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
+                decoration: BoxDecoration(color: KT.chipBg, border: Border.all(color: KT.outlineBorder), borderRadius: BorderRadius.circular(14)),
+                child: Text('${tpl.title[ar ? 'ar' : 'en']}', style: const TextStyle(color: Colors.black, fontSize: 16)),
+              ),
+            ),
+        ]),
+      ],
       if (design != null && step == _Step.build) _previewCard(t),
       if (step == _Step.consent) _consentCard(t),
       if (step == _Step.connect) _connectCard(t),
       if (step == _Step.done && result != null) _doneCard(t),
     ]);
   }
+
+  static const _aiIcons = {
+    AiEngine.claude: Icons.brightness_7_outlined,
+    AiEngine.chatgpt: Icons.hexagon_outlined,
+    AiEngine.meta: Icons.all_inclusive,
+    AiEngine.gemini: Icons.auto_awesome_outlined,
+  };
+
+  Widget _aiPill(AiEngine e, String name, bool on) => InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () => ref.read(aiChoiceProvider.notifier).set(e),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: BoxDecoration(
+            color: on ? KT.pillOnBg : KT.pillBg,
+            border: Border.all(color: on ? KT.pillOnBorder : KT.pillBorder),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(_aiIcons[e], size: 16, color: on ? KT.pillOnFg : Colors.black87),
+              const SizedBox(width: 4),
+              Text(name, style: TextStyle(color: on ? KT.pillOnFg : Colors.black, fontWeight: FontWeight.w600, fontSize: 14)),
+            ]),
+          ),
+        ),
+      );
 
   Widget _previewCard(String Function(String) t) => KCard(children: [
         Text(t('liveDemo'), textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),

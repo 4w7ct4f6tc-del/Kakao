@@ -2,58 +2,45 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../services/auth_service.dart';
-import '../../services/biometric_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/kakao_ui.dart';
-import 'api_keys_screen.dart';
-import 'devices_screen.dart';
-import 'integrations_screen.dart';
-import 'plans_screen.dart';
-import 'questions_screen.dart';
+import 'settings_pages.dart';
 import 'voice_settings_screen.dart';
 
-/// إعدادات — plan, voice, connections, own keys, security. One card per group.
+/// Settings — a list like the owner's design:
+/// Account · Language · AI Model · Notifications · Voice · Privacy · Appearance · About · Danu · Log out.
 class SettingsTab extends ConsumerWidget {
   const SettingsTab({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(tProvider);
-    final plan = ref.watch(planProvider);
-    final bio = ref.watch(bioLockProvider);
+    final ar = ref.watch(languageProvider) == 'ar';
     final user = ref.watch(authProvider).value;
     void go(Widget w) => Navigator.push(context, MaterialPageRoute(builder: (_) => w));
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      KCard(children: [
-        Text('${t('currentPlan')}: ${t(plan)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-        if (plan == 'free') KBtn('${t('upgrade')} — ${t('pro')} / ${t('ultra')}', v: KVariant.green, onTap: () => go(const PlansScreen())),
-        KBtn(t('plans'), v: KVariant.grey, onTap: () => go(const PlansScreen())),
-      ]),
-      KCard(children: [
-        KBtn(t('voice'), icon: Icons.volume_up_outlined, onTap: () => go(const VoiceSettingsScreen())),
-        KBtn(t('integrations'), icon: Icons.link, onTap: () => go(const IntegrationsScreen())),
-        KBtn(t('apiKeys'), icon: Icons.key_outlined, onTap: () => go(const ApiKeysScreen())),
-      ]),
-      KCard(children: [
-        Text(t('security'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-        SwitchListTile(
-          contentPadding: EdgeInsets.zero,
-          value: bio,
-          activeThumbColor: K.green,
-          title: Text(t('biometricLock'), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
-          onChanged: (v) async {
-            if (v && !await BiometricService.authenticate(t('biometricLock'))) return;
-            await ref.read(bioLockProvider.notifier).set(v);
-          },
-        ),
-        KBtn(t('devices'), icon: Icons.devices_outlined, v: KVariant.grey, onTap: () => go(const DevicesScreen())),
-        KBtn(t('smartQuestions'), icon: Icons.help_outline, v: KVariant.grey, onTap: () => go(const QuestionsScreen())),
-        if (user != null)
-          KBtn(t('signOut'), v: KVariant.grey, onTap: () async {
-            await ref.read(guestProvider.notifier).set(false);
-            await AuthService.signOut();
-          }),
-      ]),
+      const SizedBox(height: 10),
+      KRow(icon: Icons.person_outline, label: ar ? 'الحساب' : 'Account', onTap: () => go(const AccountPage())),
+      KRow(
+        icon: Icons.language,
+        label: ar ? 'اللغة' : 'Language',
+        trailing: const KLangToggle(),
+        onTap: () => ref.read(languageProvider.notifier).set(ar ? 'en' : 'ar'),
+      ),
+      KRow(icon: Icons.auto_awesome_outlined, label: ar ? 'نموذج الذكاء' : 'AI Model', onTap: () => go(const AiModelPage())),
+      KRow(icon: Icons.notifications_none, label: ar ? 'الإشعارات' : 'Notifications', onTap: () => go(const NotificationsPage())),
+      KRow(icon: Icons.mic_none, label: ar ? 'الصوت' : 'Voice', onTap: () => go(const VoiceSettingsScreen())),
+      KRow(icon: Icons.lock_outline, label: ar ? 'الخصوصية' : 'Privacy', onTap: () => go(const PrivacyPage())),
+      KRow(icon: Icons.dark_mode_outlined, label: ar ? 'المظهر' : 'Appearance', onTap: () => go(const AppearancePage())),
+      KRow(icon: Icons.info_outline, label: ar ? 'عن التطبيق' : 'About', onTap: () => go(const AboutPage())),
+      KRow(icon: Icons.star_border, label: ar ? 'دانو' : 'Danu', onTap: () => go(const DanuPage())),
+      const SizedBox(height: 26),
+      if (user != null)
+        KBtn(ar ? 'تسجيل الخروج' : 'Log out', wide: false, onTap: () async {
+          await ref.read(guestProvider.notifier).set(false);
+          await AuthService.signOut();
+        })
+      else
+        KBtn(ar ? 'تسجيل الدخول' : 'Log in', wide: false, onTap: () => ref.read(tabProvider.notifier).set(0)),
     ]);
   }
 }

@@ -4,7 +4,6 @@ import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../services/account_service.dart';
-import '../../services/girl_service.dart';
 import '../../services/voice_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
@@ -23,9 +22,6 @@ class VoiceSettingsScreen extends ConsumerStatefulWidget {
 class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
   static const cloneSeconds = 30;
   late VoiceSettings draft = ref.read(voiceProvider);
-  GirlSettings girl = GirlSettings.load();
-  GirlSettings girlSaved = GirlSettings.load();
-  bool testingGirl = false;
   bool testing = false;
   bool saving = false;
   bool consent = false;
@@ -67,18 +63,6 @@ class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
     if (mounted) setState(() => testing = false);
   }
 
-  Future<void> _testGirl() async {
-    setState(() => testingGirl = true);
-    final r = await GirlService.talk('start', girl.copyWith(mode: 'chat'), const [], 0);
-    try {
-      if (r.audio != null) {
-        await VoiceService.playBase64(r.audio!, volume: draft.volume);
-      } else if (mounted) {
-        toast(context, ar ? 'صوت البنت الحقيقي يشتغل بعد ربط مفتاح ElevenLabs.\n${r.text}' : 'The real girl voice works once ElevenLabs is connected.\n${r.text}');
-      }
-    } catch (_) {}
-    if (mounted) setState(() => testingGirl = false);
-  }
 
   Future<void> _confirm() async {
     setState(() => saving = true);
@@ -192,24 +176,6 @@ class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
             padding: const EdgeInsets.only(top: 6),
             child: Text(arUi ? 'هذا صوتك الحالي' : 'This is your current voice', textAlign: TextAlign.center, style: const TextStyle(color: Colors.black54, fontSize: 12)),
           ),
-      ]),
-      KCard(children: [
-        Text(arUi ? 'صوت البنت' : 'Girl voice', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 4),
-        Text(arUi ? 'بنت حقيقية بكل اللهجات العربية — للرد الصوتي والمحادثة والقصص والإعلانات.' : 'A real girl voice in every Arabic dialect — for voice replies, conversation, stories and ads.',
-            style: const TextStyle(color: Colors.black54)),
-        Padding(padding: const EdgeInsets.only(top: 12, bottom: 8), child: Text(arUi ? 'اللهجة' : 'Dialect', style: const TextStyle(fontWeight: FontWeight.w700))),
-        KPills<String>(items: [for (final d in girlDialects) (d.$1, arUi ? d.$2 : d.$3)], selected: girl.dialect, onSelect: (v) => setState(() => girl = girl.copyWith(dialect: v))),
-        Padding(padding: const EdgeInsets.only(top: 12, bottom: 8), child: Text(arUi ? 'النوع' : 'Type', style: const TextStyle(fontWeight: FontWeight.w700))),
-        KPills<String>(items: [for (final d in girlStyles) (d.$1, arUi ? d.$2 : d.$3)], selected: girl.style, onSelect: (v) => setState(() => girl = girl.copyWith(style: v))),
-        Padding(padding: const EdgeInsets.only(top: 12, bottom: 8), child: Text(arUi ? 'السرعة' : 'Speed', style: const TextStyle(fontWeight: FontWeight.w700))),
-        KPills<String>(items: [for (final d in girlSpeeds) (d.$1, arUi ? d.$2 : d.$3)], selected: girl.speed, onSelect: (v) => setState(() => girl = girl.copyWith(speed: v))),
-        KBtn(arUi ? 'جرّب الصوت' : 'Test voice', icon: Icons.play_arrow, busy: testingGirl, onTap: _testGirl),
-        KBtn(arUi ? 'اعتمد صوت البنت' : 'Use this girl voice', icon: Icons.check, v: KVariant.green, onTap: girl == girlSaved ? null : () async {
-          await girl.save();
-          setState(() => girlSaved = girl);
-          if (context.mounted) toast(context, t('saved'));
-        }),
       ]),
       KCard(children: [
         Text(t('cloneVoice'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),

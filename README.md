@@ -23,16 +23,20 @@ Windows + Android + iPhone from **one Flutter codebase**, a **Next.js 14** web v
 
 ## Design
 
-The UI follows the owner's design exactly, in the Flutter app and on the web:
+The owner's latest design is the default (**light**). The first design is still available as **dark** in Settings → Appearance.
 
-- **Colors:** background `#0F0F0F`, white cards, black buttons, green `#16A34A` approve button. White text on dark, black text on cards.
-- **Header:** logo with خعخعو / KAkAo and **B.K.A Famy** under it on one side, the **عربي | English** button on the other, then a one-line description centered.
-- **Tabs:** 4 in one row: دخول / مصنع / فيديو / إعدادات. The selected tab is white, the others dark grey.
-- **Cards:** radius 22px, padding 16px, max width 460px, centered.
-- **Fonts:** Cairo for Arabic, Inter for English.
-- **Rule:** one screen = one task, with big buttons.
+**Light (default):**
+- **Page:** white, with a soft-blue **K / خ** tile and the name in a serif wordmark (Cormorant Garamond for Latin, Amiri for Arabic), **B.K.A Famy** under it, and **عربي | English** at the top.
+- **Tabs:** icon tabs (Login / Builder / Video / Settings). The selected tab is soft blue.
+- **Builder:** section labels ("SELECT AI MODEL", "TEMPLATES"), outlined AI buttons in one row, an outlined text box, a soft-blue **Build my app** button, and outlined **Camera / Voice / Danu** buttons.
+- **Settings:** a list (Account, Language, AI Model, Notifications, Voice, Privacy, Appearance, About, Danu) with **Log out** at the bottom.
 
-The shared pieces live in `app/lib/widgets/kakao_ui.dart` and `web/components/ui.tsx`.
+**Dark:** background `#0F0F0F`, white cards, black buttons, green approve, Cairo / Inter.
+
+**Rule:** one screen = one task, with big buttons and no emojis in the interface (plain line icons only).
+
+**Where the code lives:**
+- Tokens and components: `app/lib/widgets/kakao_ui.dart` (`KT` tokens) and `web/app/globals.css` + `web/components/ui.tsx`.
 
 ## What's inside
 

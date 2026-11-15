@@ -11,6 +11,7 @@ import 'firebase_options.dart';
 import 'screens/lock_screen.dart';
 import 'screens/shell.dart';
 import 'state/providers.dart';
+import 'widgets/kakao_ui.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,10 +35,13 @@ class KakaoApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final lang = ref.watch(languageProvider);
+    final dark = ref.watch(appearanceProvider) == 'dark';
+    KT.dark = dark;
     return MaterialApp(
+      key: ValueKey('appearance-$dark'),
       title: Brand.name(lang),
       debugShowCheckedModeBanner: false,
-      theme: buildTheme(lang),
+      theme: buildTheme(lang, dark: dark),
       builder: (context, child) => Directionality(
         textDirection: I18n.isRtl(lang) ? TextDirection.rtl : TextDirection.ltr,
         child: child!,
@@ -64,7 +68,7 @@ class _RootGateState extends ConsumerState<RootGate> {
     final auth = ref.watch(authProvider);
     final bioLock = ref.watch(bioLockProvider);
     return auth.when(
-      loading: () => const Scaffold(backgroundColor: Color(0xFF0F0F0F), body: Center(child: CircularProgressIndicator())),
+      loading: () => Scaffold(backgroundColor: KT.bg, body: const Center(child: CircularProgressIndicator())),
       error: (_, _) => const MainShell(),
       data: (user) {
         // Open on دخول when signed out, on مصنع when signed in.

@@ -17,8 +17,10 @@ class MainShell extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final index = ref.watch(tabProvider);
     const tabs = [LoginTab(), BuilderTab(), VideoTab(), SettingsTab()];
+    final ar = ref.watch(languageProvider) == 'ar';
     return KPage(
       tabs: true,
+      title: index == 3 ? (ar ? 'الإعدادات' : 'Settings') : null,
       children: [
         for (var i = 0; i < tabs.length; i++) Visibility(visible: i == index, maintainState: true, child: tabs[i]),
       ],
