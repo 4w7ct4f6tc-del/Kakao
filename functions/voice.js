@@ -151,7 +151,7 @@ function postProcess(buf, { pitch = 1, extraTempo = 1 }) {
 /** Shared TTS (also used by video jobs and the girl conversation).
  *  dialect: one of persona DIALECTS (Arabic text), style: one of persona STYLES.
  *  Returns { audio: Buffer, accent, gender, provider }. */
-async function synthesize({ uid, text, voice = 'auto', gender = 'female', speed = 1, pitch = 1, provider = 'elevenlabs', lang, dialect, style }) {
+async function synthesize({ uid, text, voice = 'auto', gender = 'female', speed = 1, pitch = 1, provider = 'elevenlabs', lang, dialect, style, lisp = false }) {
   const plan = await getPlan(uid);
   const raw = cleanForSpeech(text);
   if (!raw.replace(TAGS, '').trim()) throw new HttpError(400, 'Nothing to say', 'empty');
@@ -166,9 +166,10 @@ async function synthesize({ uid, text, voice = 'auto', gender = 'female', speed 
   const eleven = await getKey(uid, 'elevenlabs');
   const openai = await getKey(uid, 'openai');
 
-  const instructions = useDialect
+  const LISP = ' She has a very light, cute Riffa lisp: the R sound comes out as a soft, delicate W. Keep it subtle and sweet, never heavy, never like a speech problem.';
+  const instructions = (useDialect
     ? `You are a young Arab woman. Speak ONLY in the ${d.en} Arabic dialect (${d.ar}) with a native ${d.en} accent and intonation. Voice: ${st ? st.voice : 'warm and friendly'}. ${NATURAL} Where the text has [laughs] or [giggles], laugh lightly and naturally.`
-    : `${preset.instructions}${st ? ` Voice: ${st.voice}.` : ''}`;
+    : `${preset.instructions}${st ? ` Voice: ${st.voice}.` : ''}`) + (lisp ? LISP : '');
 
   const elevenVoiceId = () => {
     if (v.cloneId) return v.cloneId;

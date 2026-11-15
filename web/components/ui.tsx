@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { Brand } from '@/lib/brand';
 import { useLang } from '@/lib/i18n';
+import BrandLogo from './BrandLogo';
 import Icon, { type IconName } from './Icon';
 
 /*
@@ -15,19 +16,21 @@ import Icon, { type IconName } from './Icon';
 export function Logo({ size = 44 }: { size?: number }) {
   const { lang } = useLang();
   return (
-    <div className="inline-flex shrink-0 items-center justify-center rounded-[12px] font-light text-white" style={{ width: size, height: size, fontSize: size * 0.5, background: 'var(--tile)' }}>
+    <div className="inline-flex shrink-0 items-center justify-center rounded-[12px] font-light text-white" style={{ width: size, height: size, fontSize: size * 0.5, background: 'var(--tile)', border: '1px solid var(--line)' }}>
       {Brand.letter(lang)}
     </div>
   );
 }
 
-export function LangToggle() {
+export function LangToggle({ onCard = false }: { onCard?: boolean }) {
   const { lang, setLang } = useLang();
+  const off = onCard ? 'rgba(0,0,0,0.4)' : 'var(--muted)';
+  const on = onCard ? 'var(--card-fg)' : 'var(--text)';
   return (
-    <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} className="text-[15px]" style={{ color: 'var(--muted)' }} aria-label="Language">
-      <span style={lang === 'ar' ? { color: 'var(--text)' } : undefined}>عربي</span>
+    <button onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')} className="text-[15px]" style={{ color: off }} aria-label="Language">
+      <span style={lang === 'ar' ? { color: on } : undefined}>عربي</span>
       <span className="mx-2 opacity-50">|</span>
-      <span style={lang !== 'ar' ? { color: 'var(--text)' } : undefined}>English</span>
+      <span style={lang !== 'ar' ? { color: on } : undefined}>English</span>
     </button>
   );
 }
@@ -104,7 +107,7 @@ export function Btn({ children, onClick, v = 'black', disabled, className = '', 
       type="button"
       disabled={disabled}
       onClick={onClick}
-      style={accentText ? { ...V[v], color: 'var(--primary-fg)' } : V[v]}
+      style={accentText ? { ...V[v], color: 'var(--accent-text)' } : V[v]}
       className={`mt-2.5 flex min-h-[52px] items-center justify-center gap-2 rounded-[14px] border px-5 text-[17px] font-semibold transition active:scale-[0.99] disabled:opacity-40 ${wide ? 'w-full' : 'mx-auto w-fit'} ${className}`}
     >
       {icon && <Icon name={icon} />}
@@ -119,8 +122,8 @@ export const Button = ({ children, onClick, accent, disabled }: { children: Reac
 );
 
 /** Outlined pill (AI models, dialects, types…). Selected = soft blue. */
-export function Pill({ on, onClick, children, icon, className = '' }: { on: boolean; onClick: () => void; children: ReactNode; icon?: IconName; className?: string }) {
-  return <button onClick={onClick} className={`k-pill ${on ? 'k-pill-on' : ''} ${className}`}>{icon && <Icon name={icon} size={18} />}{children}</button>;
+export function Pill({ on, onClick, children, icon, logo, className = '' }: { on: boolean; onClick: () => void; children: ReactNode; icon?: IconName; logo?: string; className?: string }) {
+  return <button onClick={onClick} className={`k-pill ${on ? 'k-pill-on' : ''} ${className}`}>{logo && <BrandLogo name={logo} />}{icon && <Icon name={icon} size={18} />}{children}</button>;
 }
 
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {

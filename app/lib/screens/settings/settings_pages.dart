@@ -53,7 +53,7 @@ class AiModelPage extends ConsumerWidget {
         const SizedBox(height: 12),
         KPills<AiEngine>(
           items: const [(AiEngine.claude, 'Claude'), (AiEngine.chatgpt, 'ChatGPT'), (AiEngine.meta, 'Meta'), (AiEngine.gemini, 'Gemini')],
-          icons: const {AiEngine.claude: Icons.brightness_7_outlined, AiEngine.chatgpt: Icons.hexagon_outlined, AiEngine.meta: Icons.all_inclusive, AiEngine.gemini: Icons.auto_awesome_outlined},
+          logos: true,
           selected: ai,
           onSelect: (e) => ref.read(aiChoiceProvider.notifier).set(e),
         ),
@@ -166,9 +166,9 @@ class AppearancePage extends ConsumerWidget {
     return KPage(title: ar ? 'المظهر' : 'Appearance', children: [
       KCard(children: [
         Row(children: [
-          option('light', ar ? 'فاتح' : 'Light', Colors.white, const Color(0xFFDCE7F6), const Color(0xFFE8F0FB)),
+          option('dark', ar ? 'داكن (الأساسي)' : 'Dark (default)', const Color(0xFF0F0F0F), K.green, Colors.white),
           const SizedBox(width: 12),
-          option('dark', ar ? 'داكن' : 'Dark', const Color(0xFF0F0F0F), K.green, Colors.white),
+          option('light', ar ? 'فاتح' : 'Light', Colors.white, const Color(0xFFDCE7F6), const Color(0xFFE8F0FB)),
         ]),
       ]),
     ]);

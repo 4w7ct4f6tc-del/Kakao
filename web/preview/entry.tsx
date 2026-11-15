@@ -29,6 +29,6 @@ function App() {
   return <Page />;
 }
 
-try { document.documentElement.setAttribute('data-app-theme', localStorage.getItem('appearance') === 'dark' ? 'dark' : 'light'); } catch { document.documentElement.setAttribute('data-app-theme', 'light'); }
+try { document.documentElement.setAttribute('data-app-theme', localStorage.getItem('appearance') === 'light' ? 'light' : 'dark'); } catch { document.documentElement.setAttribute('data-app-theme', 'dark'); }
 
 createRoot(document.getElementById('root')!).render(<LangProvider><App /></LangProvider>);

@@ -1,11 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 
-/** Appearance: 'light' (owner's new design, default) or 'dark' (first design). Per device. */
+/** Appearance: 'dark' (default) or 'light' (option). Per device. */
 export type Appearance = 'light' | 'dark';
 
 export function getAppearance(): Appearance {
-  try { return localStorage.getItem('appearance') === 'dark' ? 'dark' : 'light'; } catch { return 'light'; }
+  try { return localStorage.getItem('appearance') === 'light' ? 'light' : 'dark'; } catch { return 'dark'; }
 }
 
 export function setAppearance(a: Appearance) {
@@ -15,7 +15,7 @@ export function setAppearance(a: Appearance) {
 }
 
 export function useAppearance(): [Appearance, (a: Appearance) => void] {
-  const [a, setA] = useState<Appearance>('light');
+  const [a, setA] = useState<Appearance>('dark');
   useEffect(() => {
     const sync = () => setA(getAppearance());
     sync();
@@ -27,5 +27,5 @@ export function useAppearance(): [Appearance, (a: Appearance) => void] {
 
 /** Applies the saved appearance before first paint (no flash). */
 export function AppearanceScript() {
-  return <script dangerouslySetInnerHTML={{ __html: "try{document.documentElement.setAttribute('data-app-theme',localStorage.getItem('appearance')==='dark'?'dark':'light')}catch(e){}" }} />;
+  return <script dangerouslySetInnerHTML={{ __html: "try{document.documentElement.setAttribute('data-app-theme',localStorage.getItem('appearance')==='light'?'light':'dark')}catch(e){}" }} />;
 }

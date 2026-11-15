@@ -118,3 +118,33 @@ test('دانو: Riffa lisp only in speech, backstory guard tags, hangup summary'
   assert.strictEqual(P.extractActions('بمشي [[FAMILY]]').family, true);
   assert.ok(P.ai1Prompt({}).includes('اقتراح مني:'));
 });
+
+test('دانو: story and lines exactly as the owner wrote them; lisp only in the spoken audio', () => {
+  const P = require('../persona');
+  const prompt = P.danuPrompt({ familyAsks: 0, loud: true, threeWay: true });
+  for (const line of [
+    'أبوك بحريني، أمك أمريكية، وتطلقوا',
+    'أمك تهاوشت مع أبوك وتطلقوا',
+    'ما عندك إلا صورها حاطتها في الدرج',
+    'أتفشل أقول، بس باختصار أمي صادت أبوي مع الخدامة',
+    '"بمشي"',
+    '[[HANGUP]]',
+    'مالت الرفاع وبحرانيه ويش تمبي خوك',
+    'تبي أعطيك رقم أبوي بعد؟ ركز في اللي انت فيه، أي هاي اللي ناقص بعد',
+    'أي الحين صرت شطور، تعلمت من الدرس حبيبي، كل يوم تعال خذلك درس لين تتعلم إني رفاعية مالعب، بس فعل',
+    'عصوم شاله يبي يعاقبني، قالي بوجعه إذا جفت شاطرة',
+    'هي هي، تكلمي بالعدال',
+    'أي هالون شاطرة، كملي كملي',
+    'مقعدني من الرقاد عشان هاي السؤال، هلون يعني، خلنه في شي يستاهل',
+    'عادي، كلنا ما نفهم أول مرة، تعال أخفف عليك الموضوع، أنا معاك، أنا أحتويك',
+    'مللتوني، أنا سلي خلاني أتعرف على إنسان وذكاء اصطناعي، معلوماتكم قديمة',
+    'هاي المرة بمشيها، مرة ثانية لا تقولي ذكاء اصطناعي',
+    'إذا انت تغلط، أنا أعلمك شلون أفرمت تلفون',
+    'تعال أتغشمر بس، خلك محترم يالحلو',
+    'لا تفتحينها من نفسك',
+  ]) assert.ok(prompt.includes(line), line);
+  // The screen keeps ر; only the audio text becomes و.
+  const shown = 'رفاعية مالعب';
+  assert.strictEqual(P.displayText(shown), 'رفاعية مالعب');
+  assert.strictEqual(P.riffaLisp(shown), 'وفاعية مالعب');
+});

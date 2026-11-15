@@ -17,13 +17,12 @@ class SettingsTab extends ConsumerWidget {
     final ar = ref.watch(languageProvider) == 'ar';
     final user = ref.watch(authProvider).value;
     void go(Widget w) => Navigator.push(context, MaterialPageRoute(builder: (_) => w));
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      const SizedBox(height: 10),
+    return KCard(children: [
       KRow(icon: Icons.person_outline, label: ar ? 'الحساب' : 'Account', onTap: () => go(const AccountPage())),
       KRow(
         icon: Icons.language,
         label: ar ? 'اللغة' : 'Language',
-        trailing: const KLangToggle(),
+        trailing: const KLangToggle(onCard: true),
         onTap: () => ref.read(languageProvider.notifier).set(ar ? 'en' : 'ar'),
       ),
       KRow(icon: Icons.auto_awesome_outlined, label: ar ? 'نموذج الذكاء' : 'AI Model', onTap: () => go(const AiModelPage())),
@@ -41,6 +40,7 @@ class SettingsTab extends ConsumerWidget {
         })
       else
         KBtn(ar ? 'تسجيل الدخول' : 'Log in', wide: false, onTap: () => ref.read(tabProvider.notifier).set(0)),
+      const SizedBox(height: 8),
     ]);
   }
 }

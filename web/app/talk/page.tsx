@@ -1,6 +1,7 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import BrandLogo from '@/components/BrandLogo';
 import Prank from '@/components/Prank';
 import { Btn, Card, Input, Shell } from '@/components/ui';
 import { api } from '@/lib/api';
@@ -219,7 +220,7 @@ export default function Discuss() {
             <button onClick={() => setSetup(!setup)} className="flex items-center gap-1.5 rounded-[14px] px-3.5 py-2 text-sm font-semibold" style={{ background: 'var(--strong-bg)', color: 'var(--strong-fg)' }}><Icon name="phone" size={16} />{ar ? 'اتصلوا حق دانو' : 'Call Danu'}</button>
           )}
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">{AIS.map(([id, n]) => <button key={id} onClick={() => setEngine(id)} className={pill(engine === id)}>{n}</button>)}</div>
+        <div className="mt-3 flex flex-wrap gap-2">{AIS.map(([id, n]) => <button key={id} onClick={() => setEngine(id)} className={pill(engine === id)}><BrandLogo name={id} />{n}</button>)}</div>
         <p className="mt-2 text-xs text-black/60">
           {call ? (ar ? `مكالمة ثلاثية: أنت + المساعد + دانو • ${name(DIALECTS, s.dialect)} • ${name(STYLES, s.style)}` : `Three-way call: you + assistant + Danu • ${name(DIALECTS, s.dialect)} • ${name(STYLES, s.style)}`)
             : (ar ? 'المساعد يفكر معاك: يأكد فكرتك أو يعدلها، ويعطيك اقتراح منه ويسألك عن اقتراحك.' : 'The assistant thinks with you: confirms or improves your idea, suggests, and asks for yours.')}

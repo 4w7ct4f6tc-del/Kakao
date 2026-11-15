@@ -145,6 +145,7 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
     final ar = ref.watch(languageProvider) == 'ar';
 
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      KCard(children: [
       KLabel(ar ? 'اختر نموذج الذكاء' : 'Select AI model'),
       Row(children: [
         for (final (i, m) in _ais.indexed) ...[
@@ -158,12 +159,12 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
       KBtn(t('buildBtn'), icon: Icons.auto_awesome_outlined, wide: false, busy: busy == 'build', onTap: _build),
       const SizedBox(height: 18),
       Row(children: [
-        Expanded(child: KBtn(ar ? 'الكاميرا' : 'Camera', icon: Icons.photo_camera_outlined, v: KVariant.grey, fontSize: 15, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen())))),
+        Expanded(child: KBtn(ar ? 'الكاميرا' : 'Camera', icon: Icons.photo_camera_outlined, v: KVariant.grey, fontSize: 14, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen())))),
         const SizedBox(width: 8),
-        Expanded(child: KBtn(ar ? 'صوت' : 'Voice', icon: Icons.volume_up_outlined, v: KVariant.grey, fontSize: 15, busy: busy == 'voice', onTap: _voiceReply)),
+        Expanded(child: KBtn(ar ? 'صوت' : 'Voice', icon: Icons.volume_up_outlined, v: KVariant.grey, fontSize: 14, busy: busy == 'voice', onTap: _voiceReply)),
         const SizedBox(width: 8),
         Expanded(
-          child: KBtn(ar ? 'دانو' : 'Danu', icon: Icons.chat_bubble_outline, v: KVariant.grey, accentText: true, fontSize: 15,
+          child: KBtn(ar ? 'دانو' : 'Danu', icon: Icons.chat_bubble_outline, v: KVariant.grey, accentText: true, fontSize: 14,
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DiscussScreen()))),
         ),
       ]),
@@ -192,19 +193,13 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
             ),
         ]),
       ],
+      ]),
       if (design != null && step == _Step.build) _previewCard(t),
       if (step == _Step.consent) _consentCard(t),
       if (step == _Step.connect) _connectCard(t),
       if (step == _Step.done && result != null) _doneCard(t),
     ]);
   }
-
-  static const _aiIcons = {
-    AiEngine.claude: Icons.brightness_7_outlined,
-    AiEngine.chatgpt: Icons.hexagon_outlined,
-    AiEngine.meta: Icons.all_inclusive,
-    AiEngine.gemini: Icons.auto_awesome_outlined,
-  };
 
   Widget _aiPill(AiEngine e, String name, bool on) => InkWell(
         borderRadius: BorderRadius.circular(14),
@@ -219,7 +214,7 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
           child: FittedBox(
             fit: BoxFit.scaleDown,
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(_aiIcons[e], size: 16, color: on ? KT.pillOnFg : Colors.black87),
+              KBrandLogo(e.name, size: 16, invert: on && KT.dark),
               const SizedBox(width: 4),
               Text(name, style: TextStyle(color: on ? KT.pillOnFg : Colors.black, fontWeight: FontWeight.w600, fontSize: 14)),
             ]),

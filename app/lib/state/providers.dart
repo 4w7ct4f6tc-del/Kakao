@@ -149,10 +149,10 @@ class TabNotifier extends Notifier<int> {
 
 final tabProvider = NotifierProvider<TabNotifier, int>(TabNotifier.new);
 
-// ---------------- Appearance: light (owner's new design, default) / dark (first design) ----------------
+// ---------------- Appearance: dark (default) / light (option) ----------------
 class AppearanceNotifier extends Notifier<String> {
   @override
-  String build() => prefs.getString('appearance') ?? 'light';
+  String build() => prefs.getString('appearance') ?? 'dark';
   Future<void> set(String v) async {
     state = v;
     await prefs.setString('appearance', v);

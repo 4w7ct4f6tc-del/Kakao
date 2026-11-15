@@ -1,5 +1,6 @@
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../core/branding.dart';
@@ -14,10 +15,10 @@ class K {
   static const maxWidth = 460.0;
 }
 
-/// Appearance tokens. Light (default) = the owner's new design; dark = the first design.
+/// Appearance tokens. Dark (default) = the first design; light = the second design (option).
 /// `KT.dark` is set by the app root from Settings → Appearance; the whole tree rebuilds on change.
 class KT {
-  static bool dark = false;
+  static bool dark = true;
   static Color get bg => dark ? const Color(0xFF0F0F0F) : Colors.white;
   static Color get text => dark ? Colors.white : const Color(0xFF1F2328);
   static Color get muted => dark ? Colors.white60 : const Color(0xFF8A8F98);
@@ -50,16 +51,19 @@ TextStyle wordmark(String lang, double size, {Color? color}) => lang == 'ar'
     : GoogleFonts.cormorantGaramond(fontSize: size, color: color ?? KT.text, fontWeight: FontWeight.w500, letterSpacing: size * 0.18);
 
 class KLangToggle extends ConsumerWidget {
-  const KLangToggle({super.key});
+  final bool onCard;
+  const KLangToggle({super.key, this.onCard = false});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final ar = ref.watch(languageProvider) == 'ar';
+    final on = onCard ? Colors.black : KT.text;
+    final off = onCard ? Colors.black38 : KT.muted;
     return InkWell(
       onTap: () => ref.read(languageProvider.notifier).set(ar ? 'en' : 'ar'),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Text('عربي', style: TextStyle(color: ar ? KT.text : KT.muted, fontSize: 15)),
-        Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text('|', style: TextStyle(color: KT.line))),
-        Text('English', style: TextStyle(color: ar ? KT.muted : KT.text, fontSize: 15)),
+        Text('عربي', style: TextStyle(color: ar ? on : off, fontSize: 15)),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 8), child: Text('|', style: TextStyle(color: off))),
+        Text('English', style: TextStyle(color: ar ? off : on, fontSize: 15)),
       ]),
     );
   }
@@ -82,7 +86,7 @@ class KHeader extends ConsumerWidget {
             width: 56,
             height: 56,
             alignment: Alignment.center,
-            decoration: BoxDecoration(color: KT.tile, borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(color: KT.tile, borderRadius: BorderRadius.circular(12), border: Border.all(color: KT.line)),
             child: Text(Brand.logoLetter(lang), style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w300)),
           ),
           const SizedBox(width: 16),
@@ -167,7 +171,7 @@ class KLabel extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 28, bottom: 14),
       child: Text(ar ? text : text.toUpperCase(),
-          textAlign: TextAlign.center, style: TextStyle(color: KT.text.withValues(alpha: 0.8), fontSize: 13, letterSpacing: ar ? 0 : 2.4)),
+          textAlign: TextAlign.center, style: TextStyle(color: (DefaultTextStyle.of(context).style.color ?? KT.text).withValues(alpha: 0.8), fontSize: 13, letterSpacing: ar ? 0 : 2.4)),
     );
   }
 }
@@ -225,7 +229,7 @@ class KBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     final bg = switch (v) { KVariant.black => KT.primaryBg, KVariant.green => KT.strongBg, KVariant.grey => KT.outlineBg };
     var fg = switch (v) { KVariant.black => KT.primaryFg, KVariant.green => Colors.white, KVariant.grey => KT.dark ? Colors.black : const Color(0xFF1F2328) };
-    if (accentText) fg = KT.dark ? Colors.black : const Color(0xFF3F6FB0);
+    if (accentText) fg = KT.dark ? K.green : const Color(0xFF3F6FB0);
     final border = v == KVariant.grey ? KT.outlineBorder : bg;
     final button = SizedBox(
       height: 52,
@@ -237,13 +241,13 @@ class KBtn extends StatelessWidget {
           disabledForegroundColor: fg.withValues(alpha: 0.6),
           side: BorderSide(color: border),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-          padding: const EdgeInsets.symmetric(horizontal: 18),
+          padding: EdgeInsets.symmetric(horizontal: wide ? 8 : 18),
         ),
         onPressed: busy ? null : onTap,
         child: busy
             ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.5, color: fg))
             : Row(mainAxisSize: wide ? MainAxisSize.max : MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.center, children: [
-                if (icon != null) ...[Icon(icon, size: 20), const SizedBox(width: 8)],
+                if (icon != null) ...[Icon(icon, size: 20), const SizedBox(width: 6)],
                 Flexible(child: Text(label, textAlign: TextAlign.center, maxLines: 2, style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w600))),
               ]),
       ),
@@ -354,7 +358,8 @@ class KPills<T> extends StatelessWidget {
   final T selected;
   final ValueChanged<T> onSelect;
   final Map<T, IconData>? icons;
-  const KPills({super.key, required this.items, required this.selected, required this.onSelect, this.icons});
+  final bool logos; // T is AiEngine: show official provider logos
+  const KPills({super.key, required this.items, required this.selected, required this.onSelect, this.icons, this.logos = false});
 
   @override
   Widget build(BuildContext context) => Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.center, children: [
@@ -371,6 +376,7 @@ class KPills<T> extends StatelessWidget {
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
                 if (icons?[it.$1] != null) ...[Icon(icons![it.$1], size: 17, color: it.$1 == selected ? KT.pillOnFg : Colors.black87), const SizedBox(width: 6)],
+                if (logos) ...[KBrandLogo((it.$1 as Enum).name, size: 17, invert: it.$1 == selected && KT.dark), const SizedBox(width: 6)],
                 Text(it.$2, style: TextStyle(color: it.$1 == selected ? KT.pillOnFg : Colors.black, fontWeight: FontWeight.w600, fontSize: 14)),
               ]),
             ),
@@ -388,24 +394,43 @@ class KRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rtl = Directionality.of(context) == TextDirection.rtl;
+    final fg = DefaultTextStyle.of(context).style.color ?? Colors.black;
     return InkWell(
       onTap: onTap,
       child: Row(children: [
-        Padding(padding: const EdgeInsetsDirectional.only(start: 12, end: 20), child: Icon(icon, size: 26, color: KT.text)),
+        Padding(padding: const EdgeInsetsDirectional.only(start: 8, end: 18), child: Icon(icon, size: 26, color: fg)),
         Expanded(
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: KT.line))),
+            padding: const EdgeInsets.symmetric(vertical: 18),
+            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0x1A000000)))),
             child: Row(children: [
-              Expanded(child: Text(label, style: TextStyle(color: KT.text, fontSize: 19))),
+              Expanded(child: Text(label, style: TextStyle(color: fg, fontSize: 19))),
               ?trailing,
               const SizedBox(width: 10),
-              Icon(rtl ? Icons.chevron_left : Icons.chevron_right, color: KT.muted),
+              Icon(Directionality.of(context) == TextDirection.rtl ? Icons.chevron_left : Icons.chevron_right, color: Colors.black38),
             ]),
           ),
         ),
       ]),
     );
+  }
+}
+
+/// Official logo of an AI provider (assets/brands, from @lobehub/icons-static-svg, MIT).
+/// Trademarks belong to their owners; used only to identify each provider.
+class KBrandLogo extends StatelessWidget {
+  final String engine; // claude | chatgpt | meta | gemini
+  final double size;
+  final bool invert; // the black OpenAI mark on a black (selected) pill
+  const KBrandLogo(this.engine, {super.key, this.size = 18, this.invert = false});
+
+  static const _files = {'claude': 'claude-color', 'chatgpt': 'openai', 'meta': 'meta-color', 'gemini': 'gemini-color'};
+
+  @override
+  Widget build(BuildContext context) {
+    final f = _files[engine];
+    if (f == null) return const SizedBox.shrink();
+    return SvgPicture.asset('assets/brands/$f.svg', width: size, height: size,
+        colorFilter: engine == 'chatgpt' ? ColorFilter.mode(invert ? Colors.white : Colors.black, BlendMode.srcIn) : null);
   }
 }

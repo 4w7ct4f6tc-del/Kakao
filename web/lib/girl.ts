@@ -161,9 +161,9 @@ function offlineDanu(event: string, history: DMsg[], st: DiscussState, s: GirlSe
   if (/^\s*(لا|لاء)\s*$/.test(last) && history.some((m) => m.role === 'danu' && m.content.includes('وين بيتنا'))) {
     return { ...base, text: 'أي الحين صرت شطور، تعلمت من الدرس حبيبي، كل يوم تعال خذلك درس لين تتعلم إني رفاعية مالعب، بس فعل.' };
   }
-  if (SILLY.test(last.trim())) return { ...base, text: 'مقعدني من الرقاد عشان هاي السؤال؟ هلون يعني، خلنا في شي يستاهل.' };
+  if (SILLY.test(last.trim())) return { ...base, text: 'مقعدني من الرقاد عشان هاي السؤال، هلون يعني، خلنه في شي يستاهل.' };
   if (/(ما فهمت|مافهمت)/.test(last)) return { ...base, text: 'عادي، كلنا ما نفهم أول مرة. تعال أخفف عليك الموضوع، أنا معاك، أنا أحتويك.' };
-  if (st.loud) return { ...base, text: 'هي هي، تكلم بالعدال! … أي هالون شاطر، كمل كمل.' };
+  if (st.loud) return { ...base, text: 'هي هي، تكلمي بالعدال! … أي هالون شاطرة، كملي كملي.' };
   if (st.turns >= 3 && st.turns % 4 === 3) return { ...base, text: 'مللتوني، أنا سلي خلاني أتعرف على إنسان وذكاء اصطناعي، معلوماتكم قديمة.' };
   if (st.turns === 2) return { ...base, text: 'المساعد قال كلام حلو، بس أنا عندي أذكى منه: خله بسيط وبسرعة. تعال صج تبي أقولك وين بيتنا؟' };
   return { ...base, text: 'فكرة حلوة، بس عدلها شوي: ابدأ بشي صغير وجربه، وبعدين كبّره. ضبطني أضبطك!' };

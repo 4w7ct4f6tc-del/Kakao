@@ -242,7 +242,7 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
               : _chip(arUi ? 'اتصلوا حق دانو' : 'Call Danu', K.green, () => setState(() => setup = !setup), icon: Icons.phone_outlined),
         ]),
         const SizedBox(height: 12),
-        KPills<AiEngine>(items: _ais, selected: ai, onSelect: (e) => ref.read(aiChoiceProvider.notifier).set(e)),
+        KPills<AiEngine>(items: _ais, selected: ai, logos: true, onSelect: (e) => ref.read(aiChoiceProvider.notifier).set(e)),
         const SizedBox(height: 8),
         Text(
           call

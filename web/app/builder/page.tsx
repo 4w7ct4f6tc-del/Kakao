@@ -6,14 +6,14 @@ import PreviewApp, { PhoneFrame } from '@/components/PreviewApp';
 import { Btn, Card, Input, Label, Pill, Shell, TextArea } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
 import { ALL_SECTIONS, type Design, localDesign, TEMPLATES } from '@/lib/design';
-import Icon, { type IconName } from '@/components/Icon';
+import Icon from '@/components/Icon';
 import { useLang } from '@/lib/i18n';
 import { loadGirl, parseRequest, playVoice, talk } from '@/lib/girl';
 
 const PALETTE = ['#111111', '#FFFFFF', '#DC2626', '#E11D48', '#EC4899', '#7C3AED', '#2563EB', '#1E3A8A', '#0EA5E9', '#14B8A6', '#16A34A', '#84CC16', '#EAB308', '#C9A227', '#EA580C', '#7C2D12', '#6B7280', '#E7D7C1', '#FFFBEB', '#0F172A'];
 const FONTS = ['Cairo', 'Tajawal', 'Inter'];
 const SECTION_NAMES: Record<string, [string, string]> = { hero: ['الواجهة', 'Hero'], categories: ['الأقسام', 'Categories'], products: ['المنتجات', 'Products'], offers: ['العروض', 'Offers'], booking: ['الحجز', 'Booking'], reviews: ['التقييمات', 'Reviews'], map: ['الخريطة', 'Map'], contact: ['التواصل', 'Contact'], about: ['من نحن', 'About'] };
-const AIS: [string, string, IconName][] = [['claude', 'Claude', 'aiBurst'], ['chatgpt', 'ChatGPT', 'aiKnot'], ['meta', 'Meta', 'aiLoop'], ['gemini', 'Gemini', 'aiStar']];
+const AIS: [string, string][] = [['claude', 'Claude'], ['chatgpt', 'ChatGPT'], ['meta', 'Meta'], ['gemini', 'Gemini']];
 type Step = 'build' | 'consent' | 'connect' | 'done';
 
 function Builder() {
@@ -108,9 +108,10 @@ function Builder() {
 
   return (
     <>
+      <Card>
       <Label>{ar ? 'اختر نموذج الذكاء' : 'Select AI model'}</Label>
       <div className="grid grid-cols-4 gap-1.5">
-        {AIS.map(([id, name, icon]) => <Pill key={id} on={ai === id} onClick={() => setAi(id)} icon={icon} className="!justify-center !gap-1 !px-1 !text-[13.5px]">{name}</Pill>)}
+        {AIS.map(([id, name]) => <Pill key={id} on={ai === id} onClick={() => setAi(id)} logo={id} className="!justify-center !gap-1 !px-1 !text-[13.5px]">{name}</Pill>)}
       </div>
       <TextArea rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('examplePh')} className="mt-8 text-center" />
       <Btn icon="sparkles" wide={false} className="mt-5" onClick={() => build()} disabled={busy === 'build'}>{busy === 'build' ? '…' : t('buildBtn')}</Btn>
@@ -134,6 +135,7 @@ function Builder() {
           </div>
         </>
       )}
+      </Card>
 
       {design && step === 'build' && (
         <Card>

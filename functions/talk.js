@@ -29,7 +29,7 @@ async function speak(uid, text, s, { lisp = false } = {}) {
   try {
     const ratio = Number(env('DANU_LISP_RATIO', '1'));
     const said = lisp ? P.riffaLisp(text, Number.isFinite(ratio) ? ratio : 1) : text;
-    const out = await synthesize({ uid, text: said, voice: 'auto', gender: 'female', speed: P.SPEEDS[s.speed] || 1, pitch: s.pitch, dialect: s.dialect, style: s.style });
+    const out = await synthesize({ uid, text: said, voice: 'auto', gender: 'female', speed: P.SPEEDS[s.speed] || 1, pitch: s.pitch, dialect: s.dialect, style: s.style, lisp });
     return out.audio.toString('base64');
   } catch {
     return null; // the text still arrives; the app says why the voice is missing

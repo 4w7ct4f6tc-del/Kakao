@@ -22,7 +22,7 @@ const INTEGRATIONS: [string, string, 'oauth' | 'apikey'][] = [
   ['sendgrid', 'SendGrid', 'apikey'], ['benefitpay', 'BenefitPay', 'apikey'], ['paypal', 'PayPal', 'apikey'],
 ];
 const BYOK: [string, string][] = [['openai', 'OpenAI (ChatGPT)'], ['anthropic', 'Anthropic (Claude)'], ['gemini', 'Google Gemini'], ['meta', 'Meta Llama'], ['elevenlabs', 'ElevenLabs']];
-const AIS: [string, string, IconName][] = [['claude', 'Claude', 'aiBurst'], ['chatgpt', 'ChatGPT', 'aiKnot'], ['meta', 'Meta', 'aiLoop'], ['gemini', 'Gemini', 'aiStar']];
+const AIS: [string, string][] = [['claude', 'Claude'], ['chatgpt', 'ChatGPT'], ['meta', 'Meta'], ['gemini', 'Gemini']];
 const NOTIFS: [string, string, string][] = [
   ['video', 'الفيديو جاهز', 'Video is ready'], ['publish', 'تم نشر تطبيقك', 'Your app was published'],
   ['danu', 'دانو تسأل عنك', 'Danu checks in on you'], ['offers', 'العروض والجديد', 'Offers and news'],
@@ -92,8 +92,8 @@ export default function Settings() {
       {msg && <p className="mt-3 text-center text-sm" style={{ color: 'var(--muted)' }}>{msg}</p>}
 
       {view === 'list' && (
-        <>
-          <ul className="mt-6">
+        <Card>
+          <ul className="mt-2">
             {rows.map(([id, icon, label]) => (
               <li key={id}>
                 <button
@@ -101,10 +101,10 @@ export default function Settings() {
                   className="flex w-full items-center gap-5 py-4 text-start"
                 >
                   <Icon name={icon} size={26} />
-                  <span className="flex flex-1 items-center justify-between border-b pb-4 pt-0.5 text-[19px]" style={{ borderColor: 'var(--line)', marginBottom: -16 }}>
+                  <span className="flex flex-1 items-center justify-between border-b border-black/10 pb-4 pt-0.5 text-[19px]" style={{ marginBottom: -16 }}>
                     {label}
-                    <span className="flex items-center gap-3" style={{ color: 'var(--muted)' }}>
-                      {id === 'language' && <span onClick={(e) => e.stopPropagation()}><LangToggle /></span>}
+                    <span className="flex items-center gap-3 text-black/40">
+                      {id === 'language' && <span onClick={(e) => e.stopPropagation()}><LangToggle onCard /></span>}
                       <Icon name={ar ? 'back' : 'chevron'} size={20} />
                     </span>
                   </span>
@@ -117,7 +117,7 @@ export default function Settings() {
           ) : (
             <Link href="/login" className="mx-auto mt-10 flex w-fit items-center rounded-[14px] px-6 py-3 text-[17px] font-semibold" style={{ background: 'var(--primary-bg)', color: 'var(--primary-fg)' }}>{ar ? 'تسجيل الدخول' : 'Log in'}</Link>
           )}
-        </>
+        </Card>
       )}
 
       {view !== 'list' && back}
@@ -166,7 +166,7 @@ export default function Settings() {
       {view === 'ai' && (
         <Card>
           <p className="mb-3 text-sm" style={{ color: 'var(--muted)' }}>{ar ? 'الذكاء الافتراضي للمصنع والنقاش. تقدر تغيّره بأي وقت.' : 'Default AI for the builder and discussions. Change it anytime.'}</p>
-          <div className="flex flex-wrap gap-2.5">{AIS.map(([id, name, icon]) => <Pill key={id} on={ai === id} icon={icon} onClick={() => { setAi(id); store.set('ai', id); }}>{name}</Pill>)}</div>
+          <div className="flex flex-wrap gap-2.5">{AIS.map(([id, name]) => <Pill key={id} on={ai === id} logo={id} onClick={() => { setAi(id); store.set('ai', id); }}>{name}</Pill>)}</div>
           <p className="mb-1 mt-6 font-semibold">{t('keys')}</p>
           {BYOK.map(([id, name]) => (
             <div key={id} className="mt-3">
@@ -223,7 +223,7 @@ export default function Settings() {
       {view === 'appearance' && (
         <Card>
           <div className="grid grid-cols-2 gap-3">
-            {([['light', ar ? 'فاتح' : 'Light', '#ffffff', '#dce7f6'], ['dark', ar ? 'داكن' : 'Dark', '#0f0f0f', '#16a34a']] as const).map(([id, label, bg, accent]) => (
+            {([['dark', ar ? 'داكن (الأساسي)' : 'Dark (default)', '#0f0f0f', '#16a34a'], ['light', ar ? 'فاتح' : 'Light', '#ffffff', '#dce7f6']] as const).map(([id, label, bg, accent]) => (
               <button key={id} onClick={() => setAppearance(id)} className={`rounded-[18px] border-2 p-3 ${appearance === id ? 'border-[#4a78b5]' : 'border-[#d6d9de]'}`}>
                 <div className="flex h-20 flex-col justify-between rounded-[12px] border p-2" style={{ background: bg, borderColor: '#d6d9de' }}>
                   <div className="h-3 w-3 rounded-[4px]" style={{ background: accent }} />

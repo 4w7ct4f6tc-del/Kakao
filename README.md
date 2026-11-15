@@ -23,20 +23,26 @@ Windows + Android + iPhone from **one Flutter codebase**, a **Next.js 14** web v
 
 ## Design
 
-The owner's latest design is the default (**light**). The first design is still available as **dark** in Settings → Appearance.
+**Dark is the default.** Light is an option in Settings → Appearance.
 
-**Light (default):**
-- **Page:** white, with a soft-blue **K / خ** tile and the name in a serif wordmark (Cormorant Garamond for Latin, Amiri for Arabic), **B.K.A Famy** under it, and **عربي | English** at the top.
-- **Tabs:** icon tabs (Login / Builder / Video / Settings). The selected tab is soft blue.
-- **Builder:** section labels ("SELECT AI MODEL", "TEMPLATES"), outlined AI buttons in one row, an outlined text box, a soft-blue **Build my app** button, and outlined **Camera / Voice / Danu** buttons.
-- **Settings:** a list (Account, Language, AI Model, Notifications, Voice, Privacy, Appearance, About, Danu) with **Log out** at the bottom.
+**Dark (default):**
+- **Page:** background `#0F0F0F`, white 22px cards, black buttons, green final approve.
+- **Header:** black **K / خ** tile, the name in a serif wordmark, **B.K.A Famy** under it, **عربي | English** at the top.
+- **Tabs:** icon tabs (Login / Builder / Video / Settings). The selected tab is white.
 
-**Dark:** background `#0F0F0F`, white cards, black buttons, green approve, Cairo / Inter.
+**Light (option):** white page, soft-blue tile and accents, outlined buttons.
 
-**Rule:** one screen = one task, with big buttons and no emojis in the interface (plain line icons only).
+**Both modes:**
+- **Builder:** "SELECT AI MODEL" with the **official logos** of Claude, ChatGPT (OpenAI), Meta and Gemini, then the box, **Build my app**, **Camera / Voice / Danu**, and the templates.
+- **Settings:** a list (Account, Language, AI Model, Notifications, Voice, Privacy, Appearance, About, Danu) and Log out.
+- **No emojis in the interface:** plain line icons only.
 
-**Where the code lives:**
-- Tokens and components: `app/lib/widgets/kakao_ui.dart` (`KT` tokens) and `web/app/globals.css` + `web/components/ui.tsx`.
+**Logos:** the official marks come from `@lobehub/icons-static-svg` (MIT).
+- Flutter: `app/assets/brands/`.
+- Web: `web/lib/brands.ts`.
+- They are trademarks of their owners and are used only to identify each AI provider.
+
+**Where the code lives:** tokens and components are in `app/lib/widgets/kakao_ui.dart` (`KT`) and `web/app/globals.css` + `web/components/ui.tsx`.
 
 ## What's inside
 
