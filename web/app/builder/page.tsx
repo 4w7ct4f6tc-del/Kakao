@@ -3,10 +3,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import PreviewApp, { PhoneFrame } from '@/components/PreviewApp';
-import { Btn, Card, Input, Label, Pill, Shell, TextArea } from '@/components/ui';
+import { Btn, Card, Input, Label, Pill, TextArea } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
 import { ALL_SECTIONS, type Design, localDesign, TEMPLATES } from '@/lib/design';
-import Icon from '@/components/Icon';
+import Icon, { type IconName } from '@/components/Icon';
+import { KBox, KC, KPage, KTop } from '@/components/KakaoFrame';
 import { useLang } from '@/lib/i18n';
 import { DEFAULT_AI, loadAi, saveAi } from '@/lib/aiChoice';
 import { loadGirl, parseRequest, playVoice, talk } from '@/lib/girl';
@@ -14,7 +15,7 @@ import { loadGirl, parseRequest, playVoice, talk } from '@/lib/girl';
 const PALETTE = ['#111111', '#FFFFFF', '#DC2626', '#E11D48', '#EC4899', '#7C3AED', '#2563EB', '#1E3A8A', '#0EA5E9', '#14B8A6', '#16A34A', '#84CC16', '#EAB308', '#C9A227', '#EA580C', '#7C2D12', '#6B7280', '#E7D7C1', '#FFFBEB', '#0F172A'];
 const FONTS = ['Cairo', 'Tajawal', 'Inter'];
 const SECTION_NAMES: Record<string, [string, string]> = { hero: ['الواجهة', 'Hero'], categories: ['الأقسام', 'Categories'], products: ['المنتجات', 'Products'], offers: ['العروض', 'Offers'], booking: ['الحجز', 'Booking'], reviews: ['التقييمات', 'Reviews'], map: ['الخريطة', 'Map'], contact: ['التواصل', 'Contact'], about: ['من نحن', 'About'] };
-const AIS: [string, string][] = [['claude', 'Claude'], ['chatgpt', 'ChatGPT'], ['meta', 'Meta'], ['gemini', 'Gemini']];
+const AIS: [string, string][] = [['meta', 'Meta'], ['chatgpt', 'ChatGPT'], ['gemini', 'Gemini']];
 type Step = 'build' | 'consent' | 'connect' | 'done';
 
 function Builder() {
@@ -110,36 +111,42 @@ function Builder() {
     setBusy('');
   }
 
+  const LBL: React.CSSProperties = { textAlign: 'center', fontSize: 13, letterSpacing: ar ? 0 : '.22em', fontWeight: 500, color: KC.ink, textTransform: 'uppercase' };
+  const TILE = 'flex h-[54px] items-center justify-center rounded-[16px] text-[16px] font-medium';
   return (
-    <>
-      <Card>
-      <Label>{ar ? 'اختر نموذج الذكاء' : 'Select AI model'}</Label>
-      <div className="grid grid-cols-4 gap-1.5">
-        {AIS.map(([id, name]) => <Pill key={id} on={ai === id} onClick={() => setAi(id)} logo={id} className="!justify-center !gap-1 !px-1 !text-[13.5px]">{name}</Pill>)}
-      </div>
-      <TextArea rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('examplePh')} className="mt-8 text-center" />
-      <Btn icon="sparkles" wide={false} className="mt-5" onClick={() => build()} disabled={busy === 'build'}>{busy === 'build' ? '…' : t('buildBtn')}</Btn>
-      <div className="mt-8 grid grid-cols-3 gap-2.5">
-        <Btn v="grey" icon="camera" className="!mt-0 !px-2 !text-[15px]" onClick={() => file.current?.click()} disabled={busy === 'camera'}>{busy === 'camera' ? '…' : (ar ? 'الكاميرا' : 'Camera')}</Btn>
-        <Btn v="grey" icon="volume" className="!mt-0 !px-2 !text-[15px]" onClick={voiceReply} disabled={busy === 'voice'}>{busy === 'voice' ? '…' : (ar ? 'صوت' : 'Voice')}</Btn>
-        <Btn v="grey" icon="chat" accentText className="!mt-0 !px-2 !text-[15px]" onClick={() => router.push('/talk')}>{ar ? 'دانو' : 'Danu'}</Btn>
-      </div>
-      <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={(e) => e.target.files?.[0] && camera(e.target.files[0])} />
-      {reply && <p className="mt-4 whitespace-pre-wrap rounded-[14px] bg-[#F3F3F3] p-3 leading-7 text-black">{reply}</p>}
-      {msg && <p className="mt-2 text-center text-sm" style={{ color: 'var(--muted)' }}>{msg}</p>}
-      {!design && (
-        <>
-          <Label>{ar ? 'القوالب' : 'Templates'}</Label>
-          <div className="flex flex-wrap justify-center gap-2.5">
-            {TEMPLATES.slice(0, 6).map((tpl) => (
-              <button key={tpl.type} onClick={() => { const p = ar ? `أبي تطبيق ${tpl.title.ar}` : `I want a ${tpl.title.en} app`; setText(p); build(p); }} className="rounded-[14px] border px-5 py-2.5 text-[16px] font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-fg)', borderColor: 'var(--outline-border)' }}>
-                {ar ? tpl.title.ar : tpl.title.en}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-      </Card>
+    <KPage>
+      <KTop band={false} />
+      <main className="mx-auto w-full max-w-[460px] px-4 pb-32">
+      <section style={{ background: '#FCFCFB', borderRadius: 28, padding: '28px 18px 22px', boxShadow: '0 1px 2px rgba(0,0,0,.04), 0 12px 32px rgba(60,40,20,.06)', color: KC.ink }}>
+        <p style={LBL}>{ar ? 'اختر نموذج الذكاء' : 'Select AI model'}</p>
+        <div className="mt-6 grid gap-2.5" style={{ gridTemplateColumns: `repeat(${AIS.length}, minmax(0, 1fr))` }}>
+          {AIS.map(([id, name]) => (
+            <button key={id} onClick={() => setAi(id)} aria-pressed={ai === id} className={`${TILE} k-ai ${ai === id ? 'k-pill-on' : ''}`} style={{ background: ai === id ? KC.ink : KC.grey, color: ai === id ? '#fff' : KC.ink, boxShadow: ai === id ? '0 4px 10px rgba(0,0,0,.18)' : undefined }}>{name}</button>
+          ))}
+        </div>
+        <input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') build(); }} placeholder={t('examplePh')} aria-label={t('examplePh')} className="mt-6 h-[56px] w-full rounded-[18px] px-4 text-[16px] outline-none placeholder:text-[#8E8C88]" style={{ background: '#F1F0EE', border: '1px solid #E7E6E3', color: KC.ink }} />
+        <button onClick={() => build()} disabled={busy === 'build'} className="mt-4 h-[54px] w-full rounded-[16px] text-[18px] font-semibold text-white" style={{ background: KC.ink }}>{busy === 'build' ? '…' : t('buildBtn')}</button>
+        <div className="mt-6 grid grid-cols-3 gap-2.5">
+          {([['camera', ar ? 'الكاميرا' : 'Camera', () => file.current?.click(), busy === 'camera'], ['mic', ar ? 'صوت' : 'Voice', voiceReply, busy === 'voice'], ['wand', ar ? 'دانو' : 'Danu', () => router.push('/talk'), false]] as [IconName, string, () => void, boolean][]).map(([ic, label, fn, b]) => (
+            <button key={label} onClick={fn} disabled={b} className="flex h-[54px] items-center justify-center gap-2 rounded-[16px] text-[16px]" style={{ background: '#fff', border: '1px solid #DEDDDA', color: KC.ink, boxShadow: '0 1px 2px rgba(0,0,0,.04)' }}><Icon name={ic} size={20} />{b ? '…' : label}</button>
+          ))}
+        </div>
+        <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={(e) => e.target.files?.[0] && camera(e.target.files[0])} />
+        {reply && <p className="mt-4 whitespace-pre-wrap rounded-[14px] bg-[#F3F3F3] p-3 leading-7 text-black">{reply}</p>}
+        {msg && <p className="mt-2 text-center text-sm" style={{ color: KC.text }}>{msg}</p>}
+        {!design && (
+          <>
+            <p style={{ ...LBL, marginTop: 30 }}>{ar ? 'القوالب' : 'Templates'}</p>
+            <div className="mt-5 grid grid-cols-3 gap-2.5">
+              {TEMPLATES.slice(0, 6).map((tpl) => (
+                <button key={tpl.type} onClick={() => { const p = ar ? `أبي تطبيق ${tpl.title.ar}` : `I want a ${tpl.title.en} app`; setText(p); build(p); }} className={TILE} style={{ background: KC.grey, color: KC.ink }}>
+                  {ar ? tpl.title.ar : tpl.title.en}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+      </section>
 
       {design && step === 'build' && (
         <Card>
@@ -230,10 +237,21 @@ function Builder() {
           </Card>
         );
       })()}
-    </>
+      </main>
+      <KBox
+        variant="build"
+        onSend={(p) => { setText(p); build(p); }}
+        onVoice={voiceReply}
+        plus={[
+          ['camera', ar ? 'الكاميرا' : 'Camera', () => file.current?.click()],
+          ['film', ar ? 'قصة إلى فيديو' : 'Story to video', () => router.push('/video')],
+          ['gear', ar ? 'الإعدادات' : 'Settings', () => router.push('/settings')],
+        ]}
+      />
+    </KPage>
   );
 }
 
 export default function BuilderPage() {
-  return <Shell><Suspense fallback={null}><Builder /></Suspense></Shell>;
+  return <Suspense fallback={null}><Builder /></Suspense>;
 }

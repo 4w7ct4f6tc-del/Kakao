@@ -14,7 +14,7 @@ import { DEFAULT_AI, loadAi, saveAi } from '@/lib/aiChoice';
 
 type Status = 'idle' | 'thinking' | 'speaking' | 'listening';
 const NUDGE_AFTER_MS = 15000;
-const AIS: [string, string][] = [['claude', 'Claude'], ['chatgpt', 'ChatGPT'], ['meta', 'Meta'], ['gemini', 'Gemini']];
+const AIS: [string, string][] = [['meta', 'Meta'], ['chatgpt', 'ChatGPT'], ['gemini', 'Gemini']];
 
 /** Records until the user stops talking. Reports whether they raised their voice. */
 async function listenOnce(onLevel: (v: number) => void, stopRef: { current: (() => void) | null }): Promise<{ blob: Blob; loud: boolean } | null> {

@@ -22,8 +22,8 @@ const INTEGRATIONS: [string, string, 'oauth' | 'apikey'][] = [
   ['cloudflare', 'Cloudflare', 'apikey'], ['render', 'Render', 'apikey'], ['telegram', 'Telegram', 'apikey'], ['twilio', 'Twilio', 'apikey'],
   ['sendgrid', 'SendGrid', 'apikey'], ['benefitpay', 'BenefitPay', 'apikey'], ['paypal', 'PayPal', 'apikey'],
 ];
-const BYOK: [string, string][] = [['openai', 'OpenAI (ChatGPT)'], ['anthropic', 'Anthropic (Claude)'], ['gemini', 'Google Gemini'], ['meta', 'Meta Llama'], ['elevenlabs', 'ElevenLabs']];
-const AIS: [string, string][] = [['claude', 'Claude'], ['chatgpt', 'ChatGPT'], ['meta', 'Meta'], ['gemini', 'Gemini']];
+const BYOK: [string, string][] = [['openai', 'OpenAI (ChatGPT)'], ['gemini', 'Google Gemini'], ['meta', 'Meta Llama'], ['elevenlabs', 'ElevenLabs']];
+const AIS: [string, string][] = [['meta', 'Meta'], ['chatgpt', 'ChatGPT'], ['gemini', 'Gemini']];
 const NOTIFS: [string, string, string][] = [
   ['video', 'الفيديو جاهز', 'Video is ready'], ['publish', 'تم نشر تطبيقك', 'Your app was published'],
   ['danu', 'دانو تسأل عنك', 'Danu checks in on you'], ['offers', 'العروض والجديد', 'Offers and news'],
