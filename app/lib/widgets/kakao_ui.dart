@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../core/branding.dart';
 import '../state/providers.dart';
+import 'kakao_frame.dart';
 
 /// Fixed colors used everywhere (status colors, light surfaces).
 class K {
@@ -15,32 +16,36 @@ class K {
   static const maxWidth = 460.0;
 }
 
-/// Appearance tokens. Dark (default) = the first design; light = the second design (option).
+/// Appearance tokens — the owner's design. Light (default): soft #F5F5F4 page, white rounded cards,
+/// black main buttons, grey choices. Dark (option): #0F0F0F page around the same white cards.
 /// `KT.dark` is set by the app root from Settings → Appearance; the whole tree rebuilds on change.
 class KT {
-  static bool dark = true;
-  static Color get bg => dark ? const Color(0xFF0F0F0F) : Colors.white;
-  static Color get text => dark ? Colors.white : const Color(0xFF1F2328);
-  static Color get muted => dark ? Colors.white60 : const Color(0xFF8A8F98);
-  static Color get line => dark ? const Color(0xFF2A2A2A) : const Color(0xFFDFE2E6);
-  static Color get card => dark ? Colors.white : Colors.white;
-  static double get cardPad => dark ? 16 : 4;
-  static Color get tile => dark ? Colors.black : const Color(0xFFDCE7F6);
-  static Color get primaryBg => dark ? Colors.black : const Color(0xFFE8F0FB);
-  static Color get primaryFg => dark ? Colors.white : const Color(0xFF3F6FB0);
-  static Color get strongBg => dark ? K.green : K.blue;
-  static Color get outlineBg => dark ? K.grey : Colors.white;
-  static Color get outlineBorder => dark ? K.grey : const Color(0xFFD6D9DE);
-  static Color get tabOnBg => dark ? Colors.white : const Color(0xFFEAF1FB);
-  static Color get tabOnFg => dark ? Colors.black : K.blue;
-  static Color get tabOffBg => dark ? const Color(0xFF2A2A2A) : Colors.transparent;
-  static Color get tabOffFg => dark ? Colors.white : const Color(0xFF8A8F98);
-  static Color get pillBg => dark ? K.grey : Colors.white;
-  static Color get pillBorder => dark ? K.grey : const Color(0xFFD6D9DE);
-  static Color get pillOnBg => dark ? Colors.black : const Color(0xFFEEF3FB);
-  static Color get pillOnFg => dark ? Colors.white : const Color(0xFF3F6FB0);
-  static Color get pillOnBorder => dark ? Colors.black : const Color(0xFF9DB8DE);
-  static Color get chipBg => dark ? K.soft : const Color(0xFFEFEFEF);
+  static bool dark = false;
+  static const ink = Color(0xFF141210);
+  static Color get bg => dark ? const Color(0xFF0F0F0F) : const Color(0xFFF5F5F4);
+  static Color get text => dark ? Colors.white : ink;
+  static Color get muted => dark ? Colors.white60 : const Color(0xFF6E625B);
+  static Color get line => dark ? const Color(0xFF2A2A2A) : const Color(0xFFE4E1DD);
+  static Color get card => dark ? Colors.white : const Color(0xFFFCFCFB);
+  static double get cardPad => 20;
+  static Color get tile => ink;
+  static Color get primaryBg => ink;
+  static Color get primaryFg => Colors.white;
+  static Color get strongBg => ink;
+  static Color get outlineBg => Colors.white;
+  static Color get outlineBorder => const Color(0xFFDEDDDA);
+  static Color get tabOnBg => dark ? Colors.white : const Color(0xFFEDE7E1);
+  static Color get tabOnFg => ink;
+  static Color get tabOffBg => Colors.transparent;
+  static Color get tabOffFg => muted;
+  static Color get pillBg => const Color(0xFFEBEAE8);
+  static Color get pillBorder => const Color(0xFFEBEAE8);
+  static Color get pillOnBg => ink;
+  static Color get pillOnFg => Colors.white;
+  static Color get pillOnBorder => ink;
+  static Color get chipBg => const Color(0xFFEBEAE8);
+  static Color get inputBg => const Color(0xFFF1F0EE);
+  static Color get inputBorder => const Color(0xFFE7E6E3);
 }
 
 enum KVariant { black, green, grey }
@@ -171,12 +176,12 @@ class KLabel extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 28, bottom: 14),
       child: Text(ar ? text : text.toUpperCase(),
-          textAlign: TextAlign.center, style: TextStyle(color: (DefaultTextStyle.of(context).style.color ?? KT.text).withValues(alpha: 0.8), fontSize: 13, letterSpacing: ar ? 0 : 2.4)),
+          textAlign: TextAlign.center, style: TextStyle(color: DefaultTextStyle.of(context).style.color ?? KT.text, fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: ar ? 0 : 2.8)),
     );
   }
 }
 
-/// Content block: flat in light, a white 22px card in dark. Content is dark-on-light in both.
+/// A white rounded card — the owner's design. Content is dark-on-light in both appearances.
 class KCard extends StatelessWidget {
   final List<Widget> children;
   final CrossAxisAlignment align;
@@ -187,25 +192,29 @@ class KCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(top: 16),
       padding: EdgeInsets.all(KT.cardPad),
-      decoration: BoxDecoration(color: KT.dark ? KT.card : Colors.transparent, borderRadius: BorderRadius.circular(22)),
+      decoration: BoxDecoration(
+        color: KT.card,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: KT.dark ? null : const [BoxShadow(color: Color(0x0A000000), blurRadius: 2, offset: Offset(0, 1)), BoxShadow(color: Color(0x0F3C2814), blurRadius: 32, offset: Offset(0, 12))],
+      ),
       child: Theme(
         data: Theme.of(context).copyWith(
           brightness: Brightness.light,
-          colorScheme: ColorScheme.light(primary: KT.dark ? Colors.black : K.blue, secondary: KT.strongBg, surface: Colors.white),
+          colorScheme: ColorScheme.light(primary: KT.ink, secondary: KT.ink, surface: Colors.white),
           textTheme: Theme.of(context).textTheme.apply(bodyColor: Colors.black, displayColor: Colors.black),
           inputDecorationTheme: InputDecorationTheme(
             filled: true,
-            fillColor: Colors.white,
+            fillColor: KT.inputBg,
             labelStyle: const TextStyle(color: Colors.black54),
-            hintStyle: const TextStyle(color: Colors.black38),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFD6D9DE))),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFD6D9DE))),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFF9DB8DE))),
+            hintStyle: const TextStyle(color: Color(0xFF8E8C88)),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: KT.inputBorder)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: KT.inputBorder)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: const BorderSide(color: Color(0xFFBDBBB7))),
           ),
           textSelectionTheme: const TextSelectionThemeData(cursorColor: Colors.black),
         ),
         child: DefaultTextStyle.merge(
-          style: TextStyle(color: KT.dark ? Colors.black : KT.text),
+          style: const TextStyle(color: KT.ink),
           child: Column(crossAxisAlignment: align, children: children),
         ),
       ),
@@ -213,7 +222,7 @@ class KCard extends StatelessWidget {
   }
 }
 
-/// black = main action (soft blue in light) · green = final approve · grey = secondary (outlined in light).
+/// black = main action · green = final approve (black in this design) · grey = white outlined secondary.
 class KBtn extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
@@ -228,11 +237,10 @@ class KBtn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bg = switch (v) { KVariant.black => KT.primaryBg, KVariant.green => KT.strongBg, KVariant.grey => KT.outlineBg };
-    var fg = switch (v) { KVariant.black => KT.primaryFg, KVariant.green => Colors.white, KVariant.grey => KT.dark ? Colors.black : const Color(0xFF1F2328) };
-    if (accentText) fg = KT.dark ? K.green : const Color(0xFF3F6FB0);
+    final fg = switch (v) { KVariant.black => KT.primaryFg, KVariant.green => Colors.white, KVariant.grey => KT.ink };
     final border = v == KVariant.grey ? KT.outlineBorder : bg;
     final button = SizedBox(
-      height: 52,
+      height: 54,
       child: FilledButton(
         style: FilledButton.styleFrom(
           backgroundColor: bg,
@@ -240,7 +248,7 @@ class KBtn extends StatelessWidget {
           disabledBackgroundColor: bg.withValues(alpha: 0.4),
           disabledForegroundColor: fg.withValues(alpha: 0.6),
           side: BorderSide(color: border),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           padding: EdgeInsets.symmetric(horizontal: wide ? 8 : 18),
         ),
         onPressed: busy ? null : onTap,
@@ -256,7 +264,7 @@ class KBtn extends StatelessWidget {
   }
 }
 
-/// White input with a light border.
+/// Soft grey input, rounded 18 — the owner's design.
 class KInput extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
@@ -271,7 +279,7 @@ class KInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final border = OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: Color(0xFFD6D9DE)));
+    final border = OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: KT.inputBorder));
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: TextField(
@@ -287,12 +295,12 @@ class KInput extends StatelessWidget {
         cursorColor: Colors.black,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: Colors.black38),
+          hintStyle: const TextStyle(color: Color(0xFF8E8C88)),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: KT.inputBg,
           border: border,
           enabledBorder: border,
-          focusedBorder: border.copyWith(borderSide: const BorderSide(color: Color(0xFF9DB8DE))),
+          focusedBorder: border.copyWith(borderSide: const BorderSide(color: Color(0xFFBDBBB7))),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
@@ -311,40 +319,38 @@ class KFooter extends ConsumerWidget {
 
 /// Centered 460px column: header (+ tabs), the content, footer.
 /// [title] switches to the compact Settings header.
-class KPage extends StatelessWidget {
+class KPage extends ConsumerWidget {
   final List<Widget> children;
-  final bool tabs;
+  final bool tabs; // kept for older callers; the round menu replaces the tabs
   final String? title;
-  const KPage({super.key, required this.children, this.tabs = false, this.title});
+  /// Lock screen: no menu and no account button, so nothing can be opened before unlocking.
+  final bool locked;
+  const KPage({super.key, required this.children, this.tabs = false, this.title, this.locked = false});
 
   @override
-  Widget build(BuildContext context) {
-    final canPop = Navigator.of(context).canPop();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ar = ref.watch(languageProvider) == 'ar';
     return Scaffold(
       backgroundColor: KT.bg,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: K.maxWidth),
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                if (title != null) KCompactHeader(title!) else const KHeader(),
-                if (tabs) const KTabs(),
-                if (title != null) Padding(padding: const EdgeInsets.only(top: 14), child: Divider(color: KT.line, height: 1)),
-                if (!tabs && canPop)
-                  Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: TextButton.icon(
-                      onPressed: () => Navigator.pop(context),
-                      icon: Icon(Icons.arrow_back_ios_new, size: 16, color: KT.primaryFg),
-                      label: Text(MaterialLocalizations.of(context).backButtonTooltip, style: TextStyle(color: KT.primaryFg)),
-                    ),
+      drawer: locked ? null : const KMenu(),
+      appBar: KTopBar(band: false, bare: locked),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: K.maxWidth),
+          child: ListView(
+            padding: EdgeInsets.fromLTRB(16, 0, 16, MediaQuery.paddingOf(context).bottom + 28),
+            children: [
+              if (title != null || (!locked && Navigator.of(context).canPop()))
+                Row(children: [
+                  IconButton(
+                    tooltip: ar ? 'رجوع' : 'Back',
+                    onPressed: () => Navigator.of(context).canPop() ? Navigator.pop(context) : null,
+                    icon: Icon(Icons.arrow_back_ios_new, size: 20, color: KT.text),
                   ),
-                ...children,
-                const KFooter(),
-              ],
-            ),
+                  Expanded(child: Text(title ?? '', style: TextStyle(color: KT.text, fontSize: 22, fontWeight: FontWeight.w600))),
+                ]),
+              ...children,
+            ],
           ),
         ),
       ),

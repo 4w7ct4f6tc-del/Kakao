@@ -8,7 +8,7 @@ import 'builder/builder_screen.dart';
 import 'settings/settings_screen.dart';
 import 'video/video_screen.dart';
 
-/// One screen = one task. Header, 4 tabs (دخول / مصنع / فيديو / إعدادات), the tab, footer.
+/// Login / Builder / Video / Settings in the owner's design: top bar with the round menu, a title, the page.
 /// Every tab keeps its state while you switch.
 class MainShell extends ConsumerWidget {
   const MainShell({super.key});
@@ -20,7 +20,7 @@ class MainShell extends ConsumerWidget {
     final ar = ref.watch(languageProvider) == 'ar';
     return KPage(
       tabs: true,
-      title: index == 3 ? (ar ? 'الإعدادات' : 'Settings') : null,
+      title: [ar ? 'تسجيل الدخول' : 'Log in', ar ? 'المصنع' : 'Builder', ar ? 'الفيديو' : 'Video', ar ? 'الإعدادات' : 'Settings'][index],
       children: [
         for (var i = 0; i < tabs.length; i++) Visibility(visible: i == index, maintainState: true, child: tabs[i]),
       ],

@@ -30,7 +30,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(tProvider);
-    return KPage(children: [
+    return KPage(locked: true, children: [
       KCard(children: [
         const Icon(Icons.fingerprint, size: 72, color: Colors.black),
         KBtn(t('continueBiometric'), v: KVariant.green, onTap: _unlock),

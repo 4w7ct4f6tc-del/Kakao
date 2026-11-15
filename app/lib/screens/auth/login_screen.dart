@@ -8,7 +8,7 @@ import '../../widgets/kakao_ui.dart';
 import 'email_screen.dart';
 import 'recovery_screen.dart';
 
-/// دخول — Google, Facebook, GitHub, Apple (black) · رقم الجوال · green send code ·
+/// دخول — Google, Facebook, GitHub, Apple (white outlined) · رقم الجوال · green send code ·
 /// code · black login with code · grey "forgot password — smart unlock".
 class LoginTab extends ConsumerStatefulWidget {
   const LoginTab({super.key});
@@ -49,7 +49,7 @@ class _LoginTabState extends ConsumerState<LoginTab> {
       ]);
     }
     Widget social(String key, String label, SocialProvider p) =>
-        KBtn(label, busy: busy == key, onTap: () => _run(key, () async {
+        KBtn(label, v: KVariant.grey, busy: busy == key, onTap: () => _run(key, () async {
               await AuthService.signInSocial(p);
               _afterLogin();
             }));

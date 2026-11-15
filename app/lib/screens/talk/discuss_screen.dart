@@ -231,7 +231,7 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
     final names = {'user': arUi ? 'أنت' : 'You', 'ai1': arUi ? 'المساعد' : 'Assistant', 'danu': arUi ? 'دانو' : 'Danu'};
     Widget label(String t) => Padding(padding: const EdgeInsets.only(top: 14, bottom: 8), child: Text(t, style: const TextStyle(fontWeight: FontWeight.w700)));
 
-    return KPage(children: [
+    return KPage(title: arUi ? 'المحادثة' : 'Talk', children: [
       KCard(children: [
         Row(children: [
           const Icon(Icons.chat_bubble_outline, color: Colors.black),
@@ -239,10 +239,10 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
           Expanded(child: Text(arUi ? 'ناقش فكرتك' : 'Discuss your idea', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800))),
           call
               ? _chip(arUi ? 'إنهاء المكالمة' : 'End call', const Color(0xFFDC2626), () => _hangUp(null, showSummary: false), icon: Icons.call_end)
-              : _chip(arUi ? 'اتصلوا حق دانو' : 'Call Danu', K.green, () => setState(() => setup = !setup), icon: Icons.phone_outlined),
+              : _chip(arUi ? 'اتصلوا حق دانو' : 'Call Danu', KT.ink, () => setState(() => setup = !setup), icon: Icons.phone_outlined),
         ]),
         const SizedBox(height: 12),
-        KPills<AiEngine>(items: _ais, selected: ai, logos: true, onSelect: (e) => ref.read(aiChoiceProvider.notifier).set(e)),
+        KPills<AiEngine>(items: _ais, selected: ai, onSelect: (e) => ref.read(aiChoiceProvider.notifier).set(e)),
         const SizedBox(height: 8),
         Text(
           call
@@ -279,12 +279,12 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             value: s.lisp,
-            activeThumbColor: K.green,
+            activeThumbColor: KT.ink,
             title: Text(arUi ? 'لدغة رفاعية خفيفة (ر ← و في الصوت)' : 'Light Riffa lisp (R → W in speech)', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
             onChanged: (v) => _set(s.copyWith(lisp: v)),
           ),
           KBtn(arUi ? 'جرّب الصوت' : 'Test voice', icon: Icons.play_arrow, v: KVariant.grey, busy: status != _Status.idle, onTap: _test),
-          KBtn(arUi ? 'اتصل' : 'Call', icon: Icons.phone_outlined, v: KVariant.green, onTap: _startCall),
+          KBtn(arUi ? 'اتصل' : 'Call', icon: Icons.phone_outlined, onTap: _startCall),
         ]),
       KCard(children: [
         ConstrainedBox(
