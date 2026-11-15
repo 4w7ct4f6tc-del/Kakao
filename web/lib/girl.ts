@@ -157,7 +157,7 @@ function offlineDanu(event: string, history: DMsg[], st: DiscussState, s: GirlSe
   }
   if (/وين حرف الراء/.test(last)) return { ...base, text: 'عصوم شاله يبي يعاقبني، قالي بوجعه إذا جفت شاطرة.' };
   if (/وين في الرفاع/.test(last)) return { ...base, text: 'تبي أعطيك رقم أبوي بعد؟ ركز في اللي انت فيه، أي هاي اللي ناقص بعد.' };
-  if (/وين بيتج|وين ساكنة|وين تسكنين/.test(last)) return { ...base, text: 'مالت الرفاع.' };
+  if (/وين بيتج|وين ساكنة|وين تسكنين|من وين انتي/.test(last)) return { ...base, text: 'مالت الرفاع وبحرانيه ويش تمبي خوك' };
   if (/^\s*(لا|لاء)\s*$/.test(last) && history.some((m) => m.role === 'danu' && m.content.includes('وين بيتنا'))) {
     return { ...base, text: 'أي الحين صرت شطور، تعلمت من الدرس حبيبي، كل يوم تعال خذلك درس لين تتعلم إني رفاعية مالعب، بس فعل.' };
   }

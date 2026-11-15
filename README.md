@@ -137,7 +137,7 @@ How it works:
 - She never brings it up herself and never adds details.
 
 **Location answers:**
-- "وين بيتج؟" → "مالت الرفاع".
+- "وين بيتج؟" → "مالت الرفاع وبحرانيه ويش تمبي خوك".
 - "وين في الرفاع؟" → she refuses to say more.
 - She sometimes asks "تبي أقولك وين بيتنا؟" as a lesson. She never gives a real address.
 

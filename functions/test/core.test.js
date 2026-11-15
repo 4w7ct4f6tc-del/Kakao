@@ -109,7 +109,7 @@ test('دانو: Riffa lisp only in speech, backstory guard tags, hangup summary'
   assert.strictEqual(P.riffaLisp('امره امير الأمراء بحفر حفره في الصحراء'), 'اموه اميو الأمواء بحفو حفوه في الصحواء');
   const prompt = P.danuPrompt({ familyAsks: 0 });
   assert.ok(prompt.includes('أتفشل أقول، بس باختصار أمي صادت أبوي مع الخدامة'));
-  assert.ok(prompt.includes('مالت الرفاع'));
+  assert.ok(prompt.includes('مالت الرفاع وبحرانيه ويش تمبي خوك'));
   assert.ok(prompt.includes('عصوم شاله يبي يعاقبني'));
   assert.ok(prompt.includes('حرف الراء صح'));
   const h = P.extractActions('قلت لك بمشي، باي [[HANGUP]] زبدة المكالمة: اتفقنا على محل ورد');
