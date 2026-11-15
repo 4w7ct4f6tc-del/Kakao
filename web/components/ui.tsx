@@ -90,7 +90,7 @@ export function Label({ children }: { children: ReactNode }) {
 
 /** A content block: flat in light, white 22px card in dark. */
 export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <section className={`mt-4 rounded-[22px] ${className}`} style={{ background: 'var(--card)', color: 'var(--card-fg)', padding: 'var(--card-pad)' }}>{children}</section>;
+  return <section className={`mt-4 rounded-[22px] ${className}`} style={{ background: 'var(--card)', color: 'var(--card-fg)', padding: 'var(--card-pad)', ['--muted' as string]: 'var(--card-muted)' } as React.CSSProperties}>{children}</section>;
 }
 
 type Variant = 'black' | 'green' | 'grey';

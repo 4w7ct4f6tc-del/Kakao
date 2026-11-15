@@ -15,6 +15,7 @@
   --soft: #f3f3f3;
   --card: #ffffff;
   --card-fg: #000000;
+  --card-muted: #6b7280;
   --card-pad: 16px;
   --tile: #000000;
   --primary-bg: #000000;
@@ -48,6 +49,7 @@
   --soft: #f4f5f7;
   --card: transparent;
   --card-fg: #1f2328;
+  --card-muted: #8a8f98;
   --card-pad: 4px;
   --tile: #dce7f6;
   --primary-bg: #e8f0fb;
