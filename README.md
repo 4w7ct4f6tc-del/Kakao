@@ -24,24 +24,45 @@ Windows + Android + iPhone from **one Flutter codebase**, a **Next.js 14** web v
 ## What's inside
 
 ```
-app/                       Flutter app (Windows, Android, iOS, web)
-  lib/main.dart            entry, startup gate (login → Face ID lock → app)
-  lib/core/                branding, theme, auto-language (no picker), API client, config
-  lib/models/              JSON design schema + 10 templates + local (offline) generator
-  lib/services/            auth & smart recovery, AI router, voice, vision, builder, video, payments
-  lib/screens/             login, phone OTP, email, recovery, home chat, builder, camera, video, settings
-functions/                 Firebase Functions (Node 22) — the only place secrets live
-  index.js                 HTTPS `api` + Firestore trigger `videoPipeline`
-  src/lib/ai.js            ChatGPT / Claude / Meta Llama / Gemini router, fallback, BYOK, plan gating
-  src/routes/              auth+OTP+recovery, ai+translate, voice, vision+images, builder+publish,
-                           video, payments (Stripe, BenefitPay via Tap, PayPal), account+integrations
-video-service/             FFmpeg renderer for story-to-video (Docker, deploys to Render)
-web/                       Next.js 14 + Tailwind — same design; also serves published apps (/a/<id>)
-templates/kakao-app-template/  Flutter template that each published app is built from (APK via Actions)
-.github/workflows/build.yml    CI: backend tests, web build, APK, Windows EXE, iOS IPA, release
-start.bat                  one-click Windows launcher
-firebase.json, firestore.rules, storage.rules, render.yaml
+kakao/
+  app/                         Flutter app (Windows, Android, iPhone)
+    lib/main.dart              entry: login → Face ID lock → app
+    lib/screens/               auth/ (login, phone OTP, email, smart recovery), builder/, video/, camera/, settings/, home/
+    lib/services/              auth, ai, voice, camera, builder, video, account (payments + integrations), biometric
+    lib/models/                design schema; templates_data.dart is generated from templates/
+    pubspec.yaml
+  functions/                   Server (Firebase Functions, or `node server.js` on Render)
+    index.js                   HTTPS `api` + video trigger
+    auth.js                    login + phone OTP (SMS + WhatsApp + email) + smart recovery + devices
+    ai.js                      ChatGPT + Claude + Meta + Gemini router, fallback, BYOK, /ai/chat, /translate
+    payments.js                Stripe (card, Apple Pay, Google Pay) + BenefitPay (Tap) + PayPal
+    builder.js voice.js vision.js video.js account.js   builder/publish, voice, camera AI, video jobs, integrations
+    lib/                       shared helpers (Firebase admin, encryption, rate limits, messaging, users)
+    server.js                  run the same API as a plain Node server (Render)
+  web/                         Next.js 14 + Tailwind, same design as the Flutter app
+    app/builder                one box → 3 questions → live preview in a phone frame → publish
+    app/templates              every template live in a phone frame
+    components/PreviewApp.tsx  the live app renderer (also serves published apps at /a/<id>)
+    preview/build.mjs          builds the single-file live preview page
+  video-service/               Story → MP4 (Docker on Render)
+    script.js                  story → script and scenes (OpenAI → Claude → offline splitter)
+    voice.js                   ElevenLabs real voice (OpenAI TTS fallback)
+    images.js                  one image per scene (gpt-image → Imagen)
+    assemble.js                FFmpeg: images + voice + music + subtitles → 1080p MP4
+    server.js                  POST /story and /render
+  templates/                   the templates every user app is built from
+    clothes-shop/ restaurant/ grocery/ salon/ school/ gym/
+    real-estate/ booking-clinic/ portfolio/ chat-app/
+      template.json            edit this (colors, sections, products in AR + EN)
+      design.ar.json / design.en.json   ready designs
+    sync.js                    `node templates/sync.js` regenerates the Flutter + web template data
+    _flutter-app/              Flutter app each published app is built from (customer APK + owner Admin APK)
+  start.bat                    one click: opens the app on Windows
+  render.yaml                  Render blueprint (API + video service)
+  .github/workflows/           build.yml (APK, EXE, IPA, tests) + deploy.yml (Vercel, Render, Firebase, Cloudflare)
 ```
+
+Every template includes Home, Products, Search, Cart, Checkout, WhatsApp order, Booking, Map, Reviews and an Admin Panel.
 
 ### Feature map
 
@@ -50,19 +71,19 @@ firebase.json, firestore.rules, storage.rules, render.yaml
 | One box → 3 questions → live phone preview → edit → consent → connect → publish + QR | `app/lib/screens/builder/*`, `web/app/builder` | Yes. A local template engine gives instant results; AI (Claude) improves them when keys are set |
 | Interactive generated app: Home, Products, Search, Cart, WhatsApp checkout, Booking, Contact, Instagram, Map, Reviews, Admin (add products) | `phone_preview.dart`, `web/components/PreviewApp.tsx` | Yes |
 | AI picker (ChatGPT / Claude / Meta AI / Gemini / Auto). The same chat continues when you switch | `home_screen.dart` → `/ai/chat` | Gives a helpful offline reply |
-| Auto-route (code → Claude, writing → ChatGPT, images → Gemini, fast → Meta). Fallback: up to 3 tries on other engines | `functions/src/lib/ai.js` | — |
+| Auto-route (code → Claude, writing → ChatGPT, images → Gemini, fast → Meta). Fallback: up to 3 tries on other engines | `functions/ai.js` | — |
 | BYOK: users paste their own OpenAI, Anthropic, Gemini, Llama or ElevenLabs keys, stored encrypted with AES-256-GCM | Settings → My own API keys | — |
-| Login: Google, Apple, Facebook, GitHub, phone OTP, email, Face ID / fingerprint | `auth_service.dart`, `routes/auth.js` | Guest mode |
-| One OTP code sent at the same time by SMS + WhatsApp + email | `lib/notify.js` | — |
-| Smart recovery: biometric on a trusted device, OTP on all channels, magic link, approval from another device, smart questions → new password | `recovery_screen.dart`, `routes/auth.js` | — |
+| Login: Google, Apple, Facebook, GitHub, phone OTP, email, Face ID / fingerprint | `auth_service.dart`, `functions/auth.js` | Guest mode |
+| One OTP code sent at the same time by SMS + WhatsApp + email | `functions/lib/notify.js` | — |
+| Smart recovery: biometric on a trusted device, OTP on all channels, magic link, approval from another device, smart questions → new password | `recovery_screen.dart`, `functions/auth.js` | — |
 | Auto language (device locale + script detection + "تكلم فرنسي"). RTL for Arabic, Persian and Urdu. Any other language is translated on the fly | `core/i18n.dart` | Arabic and English are bundled |
-| Real voice: ElevenLabs, with OpenAI TTS as fallback. Male / Female / Bahraini / EN / FR / HI voices, speed, pitch (FFmpeg), volume, test button, auto-read, 30-second voice clone with consent | `voice_settings_screen.dart`, `routes/voice.js` | — |
+| Real voice: ElevenLabs, with OpenAI TTS as fallback. Male / Female / Bahraini / EN / FR / HI voices, speed, pitch (FFmpeg), volume, test button, auto-read, 30-second voice clone with consent | `voice_settings_screen.dart`, `functions/voice.js` | — |
 | Speech-to-text in any language (Whisper) | mic in chat | — |
-| Smart camera: photo → app (name, colors, products, prices), translate text in a photo, QR/barcode, document scan, ID card → signup fields. Photos never go to your gallery | `camera_screen.dart`, `routes/vision.js` | On-device ML Kit OCR + local design |
-| Story → video: script and scenes → images → narration → music → FFmpeg 1080p MP4 with subtitles | `video_screen.dart`, `routes/video.js`, `video-service/` | An instant storyboard you can play with a voice |
-| Integrations, each with a Connect button that opens the official site, an encrypted token, and Disconnect + revoke: Google (Drive, Sheets, Maps, Gmail, Calendar), YouTube, Facebook, Instagram, WhatsApp, GitHub, Stripe, Vercel, TikTok, Supabase, Firebase; plus Cloudflare, Render, Telegram, Twilio, SendGrid, BenefitPay and PayPal by API key | `integrations_screen.dart`, `routes/account.js` | — |
-| Plans: Free (3 apps, 1 connection, Meta + basic Claude) / Pro / Ultra. Payment by Stripe (card, Apple Pay, Google Pay), BenefitPay or PayPal | `plans_screen.dart`, `routes/payments.js` | — |
-| Publishing: web link + QR, free subdomain, custom domain (Cloudflare DNS + Vercel), GitHub repo + APK build | `routes/builder.js` | Shows the share link |
+| Smart camera: photo → app (name, colors, products, prices), translate text in a photo, QR/barcode, document scan, ID card → signup fields. Photos never go to your gallery | `camera_screen.dart`, `functions/vision.js` | On-device ML Kit OCR + local design |
+| Story → video: script and scenes → images → narration → music → FFmpeg 1080p MP4 with subtitles | `video_screen.dart`, `functions/video.js`, `video-service/` | An instant storyboard you can play with a voice |
+| Integrations, each with a Connect button that opens the official site, an encrypted token, and Disconnect + revoke: Google (Drive, Sheets, Maps, Gmail, Calendar), YouTube, Facebook, Instagram, WhatsApp, GitHub, Stripe, Vercel, TikTok, Supabase, Firebase; plus Cloudflare, Render, Telegram, Twilio, SendGrid, BenefitPay and PayPal by API key | `integrations_screen.dart`, `functions/account.js` | — |
+| Plans: Free (3 apps, 1 connection, Meta + basic Claude) / Pro / Ultra. Payment by Stripe (card, Apple Pay, Google Pay), BenefitPay or PayPal | `plans_screen.dart`, `functions/payments.js` | — |
+| Publishing: web link + QR, free subdomain, custom domain (Cloudflare DNS + Vercel), GitHub repo + APK build | `functions/builder.js` | Shows the share link |
 
 ---
 
@@ -126,11 +147,24 @@ Webhooks:
 - Stripe: `{PUBLIC_API_URL}/payments/stripe/webhook`, event `checkout.session.completed`
 - Tap: set automatically per charge
 
-### 3. Video renderer (Render)
-Click **New → Blueprint** on render.com and select this repo. `render.yaml` deploys `video-service/`. Set the same `VIDEO_SERVICE_SECRET` on both sides.
+### 3. Deploy everything to ONE link (Vercel + Render + Cloudflare)
 
-### 4. Web (Vercel)
-Import the repo on vercel.com and set **Root Directory = `web`**. Add the variables from `web/.env.example`. Then put the project id in `VERCEL_PROJECT_ID`.
+One domain serves the app, the API and every published user app:
+
+```
+https://kakao.yourdomain.com          → Vercel (web/)          ← Cloudflare DNS
+https://kakao.yourdomain.com/api/...  → proxied to Render (functions/server.js)
+https://kakao.yourdomain.com/a/<id>   → published user apps
+video-service                         → Render (Docker), called by the API
+```
+
+1. **Render:** render.com → New → **Blueprint** → pick this repo. `render.yaml` creates `kakao-api` and `kakao-video-service`. Paste `FIREBASE_SERVICE_ACCOUNT` (Firebase → Project settings → Service accounts → Generate key) and the keys from `functions/.env.example`. Set `PUBLIC_API_URL=https://kakao.yourdomain.com/api` and `VIDEO_SERVICE_URL=https://kakao-video-service.onrender.com`.
+2. **Vercel:** vercel.com → Import the repo → **Root Directory = `web`**. Env: `KAKAO_API_ORIGIN=https://kakao-api.onrender.com`, `NEXT_PUBLIC_KAKAO_API=/api`, plus the Firebase web values from `web/.env.example`.
+3. **Cloudflare:** add your domain, then a DNS record `CNAME kakao → cname.vercel-dns.com` (DNS only). In Vercel → Domains, add `kakao.yourdomain.com`.
+4. **Auto-deploy on every push:** add these GitHub secrets and `.github/workflows/deploy.yml` redeploys the same link each time: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `RENDER_DEPLOY_HOOK_API`, `RENDER_DEPLOY_HOOK_VIDEO`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ZONE_ID` (optional: `FIREBASE_SERVICE_ACCOUNT`, `FIREBASE_PROJECT_ID`).
+
+### 4. Web only, without Render
+You can also call Firebase Functions directly: set `NEXT_PUBLIC_KAKAO_API=https://us-central1-<project>.cloudfunctions.net/api` in Vercel.
 
 ### 5. Flutter app
 ```bash

@@ -1,0 +1,65 @@
+{
+  "id": "template-chat-app-ar",
+  "name": "تطبيق دردشة",
+  "type": "chat",
+  "tagline": "أهلاً بك في تطبيق دردشة",
+  "colors": {
+    "primary": "#111827",
+    "secondary": "#16A34A",
+    "background": "#F3F4F6",
+    "text": "#111111"
+  },
+  "font": "Cairo",
+  "logoEmoji": "💬",
+  "heroImage": "",
+  "language": "ar",
+  "currency": "BHD",
+  "sections": [
+    "hero",
+    "products",
+    "reviews",
+    "map",
+    "contact",
+    "about"
+  ],
+  "categories": [
+    "عام",
+    "مجموعات"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "غرفة عامة",
+      "price": 0,
+      "category": "عام",
+      "emoji": "💬",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "مجموعة خاصة",
+      "price": 1,
+      "category": "مجموعات",
+      "emoji": "🔒",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

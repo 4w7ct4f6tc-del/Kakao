@@ -1,0 +1,738 @@
+[
+ {
+  "type": "clothes",
+  "emoji": "👗",
+  "title": {
+   "ar": "محل ملابس",
+   "en": "Clothes Shop"
+  },
+  "keywords": [
+   "ملابس",
+   "أزياء",
+   "ازياء",
+   "فساتين",
+   "عبايات",
+   "clothes",
+   "fashion",
+   "boutique",
+   "dress",
+   "abaya",
+   "بوتيك",
+   "ثياب",
+   "كندورة",
+   "shirt"
+  ],
+  "colors": [
+   "#111111",
+   "#E11D48",
+   "#FFFFFF"
+  ],
+  "sections": [
+   "hero",
+   "categories",
+   "products",
+   "offers",
+   "reviews",
+   "map",
+   "contact"
+  ],
+  "categories": {
+   "ar": [
+    "نسائي",
+    "رجالي",
+    "أطفال",
+    "عبايات"
+   ],
+   "en": [
+    "Women",
+    "Men",
+    "Kids",
+    "Abayas"
+   ]
+  },
+  "products": [
+   [
+    "فستان سهرة",
+    "Evening Dress",
+    35,
+    "👗",
+    0
+   ],
+   [
+    "عباية سوداء",
+    "Black Abaya",
+    28,
+    "🧥",
+    3
+   ],
+   [
+    "قميص رجالي",
+    "Men's Shirt",
+    12,
+    "👔",
+    1
+   ],
+   [
+    "تيشيرت أطفال",
+    "Kids T-Shirt",
+    6,
+    "👕",
+    2
+   ],
+   [
+    "حذاء رياضي",
+    "Sneakers",
+    22,
+    "👟",
+    1
+   ],
+   [
+    "شنطة يد",
+    "Handbag",
+    18,
+    "👜",
+    0
+   ]
+  ]
+ },
+ {
+  "type": "restaurant",
+  "emoji": "🍔",
+  "title": {
+   "ar": "مطعم",
+   "en": "Restaurant"
+  },
+  "keywords": [
+   "مطعم",
+   "منيو",
+   "أكل",
+   "اكل",
+   "كافيه",
+   "مقهى",
+   "قهوة",
+   "restaurant",
+   "menu",
+   "food",
+   "cafe",
+   "coffee",
+   "burger",
+   "pizza",
+   "قائمة طعام",
+   "مشويات"
+  ],
+  "colors": [
+   "#7C2D12",
+   "#F59E0B",
+   "#FFFBEB"
+  ],
+  "sections": [
+   "hero",
+   "categories",
+   "products",
+   "offers",
+   "booking",
+   "reviews",
+   "map",
+   "contact"
+  ],
+  "categories": {
+   "ar": [
+    "مقبلات",
+    "رئيسي",
+    "حلويات",
+    "مشروبات"
+   ],
+   "en": [
+    "Starters",
+    "Mains",
+    "Desserts",
+    "Drinks"
+   ]
+  },
+  "products": [
+   [
+    "برجر لحم",
+    "Beef Burger",
+    3.5,
+    "🍔",
+    1
+   ],
+   [
+    "بيتزا",
+    "Pizza",
+    4.2,
+    "🍕",
+    1
+   ],
+   [
+    "سلطة",
+    "Salad",
+    1.8,
+    "🥗",
+    0
+   ],
+   [
+    "كنافة",
+    "Kunafa",
+    2,
+    "🍰",
+    2
+   ],
+   [
+    "كرك",
+    "Karak Tea",
+    0.3,
+    "☕",
+    3
+   ],
+   [
+    "عصير طازج",
+    "Fresh Juice",
+    1.2,
+    "🥤",
+    3
+   ]
+  ]
+ },
+ {
+  "type": "grocery",
+  "emoji": "🛒",
+  "title": {
+   "ar": "بقالة",
+   "en": "Grocery"
+  },
+  "keywords": [
+   "بقالة",
+   "سوبرماركت",
+   "خضار",
+   "فواكه",
+   "grocery",
+   "supermarket",
+   "market"
+  ],
+  "colors": [
+   "#166534",
+   "#84CC16",
+   "#F7FEE7"
+  ],
+  "sections": [
+   "hero",
+   "categories",
+   "products",
+   "offers",
+   "reviews",
+   "map",
+   "contact"
+  ],
+  "categories": {
+   "ar": [
+    "خضار",
+    "فواكه",
+    "ألبان",
+    "مخبوزات"
+   ],
+   "en": [
+    "Vegetables",
+    "Fruits",
+    "Dairy",
+    "Bakery"
+   ]
+  },
+  "products": [
+   [
+    "طماط",
+    "Tomatoes",
+    0.6,
+    "🍅",
+    0
+   ],
+   [
+    "تفاح",
+    "Apples",
+    0.9,
+    "🍎",
+    1
+   ],
+   [
+    "حليب",
+    "Milk",
+    0.5,
+    "🥛",
+    2
+   ],
+   [
+    "خبز",
+    "Bread",
+    0.2,
+    "🍞",
+    3
+   ]
+  ]
+ },
+ {
+  "type": "salon",
+  "emoji": "💇",
+  "title": {
+   "ar": "صالون",
+   "en": "Salon"
+  },
+  "keywords": [
+   "صالون",
+   "حلاق",
+   "تجميل",
+   "سبا",
+   "salon",
+   "barber",
+   "beauty",
+   "spa",
+   "nails",
+   "مكياج",
+   "makeup"
+  ],
+  "colors": [
+   "#831843",
+   "#F472B6",
+   "#FDF2F8"
+  ],
+  "sections": [
+   "hero",
+   "products",
+   "booking",
+   "reviews",
+   "map",
+   "contact"
+  ],
+  "categories": {
+   "ar": [
+    "شعر",
+    "أظافر",
+    "مكياج"
+   ],
+   "en": [
+    "Hair",
+    "Nails",
+    "Makeup"
+   ]
+  },
+  "products": [
+   [
+    "قص شعر",
+    "Haircut",
+    5,
+    "💇",
+    0
+   ],
+   [
+    "صبغة",
+    "Hair Color",
+    20,
+    "🎨",
+    0
+   ],
+   [
+    "مناكير",
+    "Manicure",
+    8,
+    "💅",
+    1
+   ],
+   [
+    "مكياج سهرة",
+    "Evening Makeup",
+    25,
+    "💄",
+    2
+   ]
+  ]
+ },
+ {
+  "type": "school",
+  "emoji": "🏫",
+  "title": {
+   "ar": "مدرسة / معهد",
+   "en": "School"
+  },
+  "keywords": [
+   "مدرسة",
+   "معهد",
+   "دورات",
+   "تعليم",
+   "school",
+   "academy",
+   "courses",
+   "tutor"
+  ],
+  "colors": [
+   "#1E3A8A",
+   "#FBBF24",
+   "#EFF6FF"
+  ],
+  "sections": [
+   "hero",
+   "categories",
+   "products",
+   "booking",
+   "reviews",
+   "map",
+   "contact",
+   "about"
+  ],
+  "categories": {
+   "ar": [
+    "لغات",
+    "برمجة",
+    "رياضيات"
+   ],
+   "en": [
+    "Languages",
+    "Coding",
+    "Math"
+   ]
+  },
+  "products": [
+   [
+    "دورة إنجليزي",
+    "English Course",
+    45,
+    "📘",
+    0
+   ],
+   [
+    "دورة برمجة",
+    "Coding Course",
+    60,
+    "💻",
+    1
+   ],
+   [
+    "تقوية رياضيات",
+    "Math Tutoring",
+    30,
+    "📐",
+    2
+   ]
+  ]
+ },
+ {
+  "type": "gym",
+  "emoji": "🏋️",
+  "title": {
+   "ar": "نادي رياضي",
+   "en": "Gym"
+  },
+  "keywords": [
+   "جيم",
+   "نادي",
+   "رياضة",
+   "لياقة",
+   "gym",
+   "fitness",
+   "yoga",
+   "workout",
+   "crossfit"
+  ],
+  "colors": [
+   "#0F172A",
+   "#22C55E",
+   "#F8FAFC"
+  ],
+  "sections": [
+   "hero",
+   "products",
+   "booking",
+   "reviews",
+   "map",
+   "contact"
+  ],
+  "categories": {
+   "ar": [
+    "اشتراكات",
+    "تدريب شخصي",
+    "مكملات"
+   ],
+   "en": [
+    "Memberships",
+    "Personal training",
+    "Supplements"
+   ]
+  },
+  "products": [
+   [
+    "اشتراك شهري",
+    "Monthly Pass",
+    25,
+    "🎟️",
+    0
+   ],
+   [
+    "مدرب شخصي",
+    "Personal Trainer",
+    15,
+    "🏋️",
+    1
+   ],
+   [
+    "بروتين",
+    "Protein",
+    18,
+    "🥤",
+    2
+   ]
+  ]
+ },
+ {
+  "type": "realestate",
+  "emoji": "🏠",
+  "title": {
+   "ar": "عقارات",
+   "en": "Real Estate"
+  },
+  "keywords": [
+   "عقار",
+   "عقارات",
+   "شقق",
+   "فلل",
+   "real estate",
+   "apartment",
+   "villa",
+   "property"
+  ],
+  "colors": [
+   "#1F2937",
+   "#0EA5E9",
+   "#F9FAFB"
+  ],
+  "sections": [
+   "hero",
+   "categories",
+   "products",
+   "booking",
+   "reviews",
+   "map",
+   "contact"
+  ],
+  "categories": {
+   "ar": [
+    "للبيع",
+    "للإيجار",
+    "تجاري"
+   ],
+   "en": [
+    "For sale",
+    "For rent",
+    "Commercial"
+   ]
+  },
+  "products": [
+   [
+    "شقة غرفتين",
+    "2BR Apartment",
+    350,
+    "🏢",
+    1
+   ],
+   [
+    "فيلا",
+    "Villa",
+    180000,
+    "🏡",
+    0
+   ],
+   [
+    "محل تجاري",
+    "Shop Space",
+    600,
+    "🏬",
+    2
+   ]
+  ]
+ },
+ {
+  "type": "booking",
+  "emoji": "📅",
+  "title": {
+   "ar": "حجوزات / عيادة",
+   "en": "Booking / Clinic"
+  },
+  "keywords": [
+   "حجز",
+   "عيادة",
+   "موعد",
+   "دكتور",
+   "booking",
+   "clinic",
+   "appointment",
+   "doctor",
+   "dentist"
+  ],
+  "colors": [
+   "#0E7490",
+   "#06B6D4",
+   "#ECFEFF"
+  ],
+  "sections": [
+   "hero",
+   "products",
+   "booking",
+   "reviews",
+   "map",
+   "contact"
+  ],
+  "categories": {
+   "ar": [
+    "استشارة",
+    "فحص",
+    "متابعة"
+   ],
+   "en": [
+    "Consultation",
+    "Checkup",
+    "Follow-up"
+   ]
+  },
+  "products": [
+   [
+    "استشارة",
+    "Consultation",
+    15,
+    "🩺",
+    0
+   ],
+   [
+    "فحص شامل",
+    "Full Checkup",
+    40,
+    "🧪",
+    1
+   ],
+   [
+    "تنظيف أسنان",
+    "Teeth Cleaning",
+    20,
+    "🦷",
+    1
+   ]
+  ]
+ },
+ {
+  "type": "portfolio",
+  "emoji": "🎨",
+  "title": {
+   "ar": "معرض أعمال",
+   "en": "Portfolio"
+  },
+  "keywords": [
+   "معرض",
+   "أعمالي",
+   "مصور",
+   "مصمم",
+   "portfolio",
+   "photographer",
+   "designer",
+   "freelancer"
+  ],
+  "colors": [
+   "#18181B",
+   "#A855F7",
+   "#FAFAFA"
+  ],
+  "sections": [
+   "hero",
+   "products",
+   "reviews",
+   "map",
+   "contact",
+   "about"
+  ],
+  "categories": {
+   "ar": [
+    "تصوير",
+    "تصميم",
+    "فيديو"
+   ],
+   "en": [
+    "Photography",
+    "Design",
+    "Video"
+   ]
+  },
+  "products": [
+   [
+    "جلسة تصوير",
+    "Photo Session",
+    50,
+    "📸",
+    0
+   ],
+   [
+    "تصميم شعار",
+    "Logo Design",
+    40,
+    "✏️",
+    1
+   ],
+   [
+    "مونتاج فيديو",
+    "Video Editing",
+    70,
+    "🎬",
+    2
+   ]
+  ]
+ },
+ {
+  "type": "chat",
+  "emoji": "💬",
+  "title": {
+   "ar": "تطبيق دردشة",
+   "en": "Chat App"
+  },
+  "keywords": [
+   "دردشة",
+   "شات",
+   "محادثة",
+   "chat",
+   "messenger",
+   "community"
+  ],
+  "colors": [
+   "#111827",
+   "#16A34A",
+   "#F3F4F6"
+  ],
+  "sections": [
+   "hero",
+   "products",
+   "reviews",
+   "map",
+   "contact",
+   "about"
+  ],
+  "categories": {
+   "ar": [
+    "عام",
+    "مجموعات"
+   ],
+   "en": [
+    "General",
+    "Groups"
+   ]
+  },
+  "products": [
+   [
+    "غرفة عامة",
+    "Public Room",
+    0,
+    "💬",
+    0
+   ],
+   [
+    "مجموعة خاصة",
+    "Private Group",
+    1,
+    "🔒",
+    1
+   ]
+  ]
+ }
+]

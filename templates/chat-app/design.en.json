@@ -1,0 +1,65 @@
+{
+  "id": "template-chat-app-en",
+  "name": "Chat App",
+  "type": "chat",
+  "tagline": "Welcome to Chat App",
+  "colors": {
+    "primary": "#111827",
+    "secondary": "#16A34A",
+    "background": "#F3F4F6",
+    "text": "#111111"
+  },
+  "font": "Inter",
+  "logoEmoji": "💬",
+  "heroImage": "",
+  "language": "en",
+  "currency": "USD",
+  "sections": [
+    "hero",
+    "products",
+    "reviews",
+    "map",
+    "contact",
+    "about"
+  ],
+  "categories": [
+    "General",
+    "Groups"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "Public Room",
+      "price": 0,
+      "category": "General",
+      "emoji": "💬",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "Private Group",
+      "price": 1,
+      "category": "Groups",
+      "emoji": "🔒",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

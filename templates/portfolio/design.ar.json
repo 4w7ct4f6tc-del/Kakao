@@ -1,0 +1,75 @@
+{
+  "id": "template-portfolio-ar",
+  "name": "معرض أعمال",
+  "type": "portfolio",
+  "tagline": "أهلاً بك في معرض أعمال",
+  "colors": {
+    "primary": "#18181B",
+    "secondary": "#A855F7",
+    "background": "#FAFAFA",
+    "text": "#111111"
+  },
+  "font": "Cairo",
+  "logoEmoji": "🎨",
+  "heroImage": "",
+  "language": "ar",
+  "currency": "BHD",
+  "sections": [
+    "hero",
+    "products",
+    "reviews",
+    "map",
+    "contact",
+    "about"
+  ],
+  "categories": [
+    "تصوير",
+    "تصميم",
+    "فيديو"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "جلسة تصوير",
+      "price": 50,
+      "category": "تصوير",
+      "emoji": "📸",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "تصميم شعار",
+      "price": 40,
+      "category": "تصميم",
+      "emoji": "✏️",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "مونتاج فيديو",
+      "price": 70,
+      "category": "فيديو",
+      "emoji": "🎬",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

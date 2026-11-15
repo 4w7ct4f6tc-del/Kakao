@@ -129,13 +129,68 @@ class _LivePreviewAppState extends State<LivePreviewApp> {
 
   String get _waNumber => d.contact.whatsapp.replaceAll(RegExp(r'[^0-9]'), '');
 
-  void _orderWhatsApp() {
+  void _orderWhatsApp({String name = '', String phone = '', String address = '', String pay = '', String notes = ''}) {
     final lines = cart.entries.map((e) {
       final p = d.products.firstWhere((p) => p.id == e.key);
       return '• ${p.name} x${e.value} = ${money(p.price * e.value)}';
     }).join('\n');
-    final msg = '${tr('طلب جديد من', 'New order from')} ${d.name}\n$lines\n${tr('المجموع', 'Total')}: ${money(total)}';
+    final info = [
+      if (name.isNotEmpty) '${tr('الاسم', 'Name')}: $name',
+      if (phone.isNotEmpty) '${tr('الهاتف', 'Phone')}: $phone',
+      if (address.isNotEmpty) '${tr('العنوان', 'Address')}: $address',
+      if (pay.isNotEmpty) '${tr('الدفع', 'Payment')}: $pay',
+      if (notes.isNotEmpty) '${tr('ملاحظات', 'Notes')}: $notes',
+    ].join('\n');
+    final msg = '${tr('طلب جديد من', 'New order from')} ${d.name}\n$lines\n${tr('المجموع', 'Total')}: ${money(total)}\n$info';
     _open('https://wa.me/$_waNumber?text=${Uri.encodeComponent(msg)}');
+  }
+
+  /// Checkout: customer details + payment method, then the order goes to WhatsApp.
+  void _checkout() {
+    final name = TextEditingController();
+    final phone = TextEditingController();
+    final address = TextEditingController();
+    final notes = TextEditingController();
+    final methods = [tr('الدفع عند الاستلام', 'Cash on delivery'), tr('بطاقة / Apple Pay', 'Card / Apple Pay'), 'BenefitPay'];
+    var pay = methods.first;
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => Directionality(
+          textDirection: ar ? TextDirection.rtl : TextDirection.ltr,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, MediaQuery.of(ctx).viewInsets.bottom + 16),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Text(tr('إتمام الطلب', 'Checkout'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 8),
+              TextField(controller: name, decoration: InputDecoration(labelText: tr('الاسم', 'Name'))),
+              TextField(controller: phone, keyboardType: TextInputType.phone, decoration: InputDecoration(labelText: tr('الهاتف', 'Phone'))),
+              TextField(controller: address, decoration: InputDecoration(labelText: tr('العنوان', 'Address'))),
+              TextField(controller: notes, decoration: InputDecoration(labelText: tr('ملاحظات', 'Notes'))),
+              const SizedBox(height: 8),
+              Wrap(spacing: 6, children: [
+                for (final m in methods)
+                  ChoiceChip(label: Text(m, style: const TextStyle(fontSize: 11)), selected: pay == m, onSelected: (_) => setSheet(() => pay = m)),
+              ]),
+              const SizedBox(height: 8),
+              Text('${tr('المجموع', 'Total')}: ${money(total)}', style: TextStyle(fontWeight: FontWeight.w800, color: d.primaryColor)),
+              const SizedBox(height: 8),
+              FilledButton.icon(
+                style: FilledButton.styleFrom(backgroundColor: const Color(0xFF25D366)),
+                icon: const Icon(Icons.chat, size: 16),
+                label: Text(tr('أرسل الطلب عبر واتساب', 'Send order on WhatsApp')),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _orderWhatsApp(name: name.text, phone: phone.text, address: address.text, pay: pay, notes: notes.text);
+                  setState(() => cart.clear());
+                },
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -511,9 +566,9 @@ class _LivePreviewAppState extends State<LivePreviewApp> {
               width: double.infinity,
               child: FilledButton.icon(
                 style: FilledButton.styleFrom(backgroundColor: const Color(0xFF25D366)),
-                onPressed: _orderWhatsApp,
-                icon: const Icon(Icons.chat, size: 16),
-                label: Text(tr('اطلب عبر واتساب', 'Order on WhatsApp')),
+                onPressed: _checkout,
+                icon: const Icon(Icons.shopping_cart_checkout, size: 16),
+                label: Text(tr('إتمام الطلب', 'Checkout')),
               ),
             ),
           ]),

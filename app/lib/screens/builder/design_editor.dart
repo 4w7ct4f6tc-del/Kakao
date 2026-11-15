@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import '../../models/app_design.dart';
 import '../../services/builder_service.dart';
-import '../../services/vision_service.dart';
+import '../../services/camera_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
 import 'phone_preview.dart';
@@ -36,7 +36,7 @@ class _DesignEditorState extends ConsumerState<DesignEditor> {
   bool get paid => ref.read(planProvider) != 'free';
 
   Future<void> _pickImage(void Function(String url) apply) async {
-    final f = await VisionService.pick(camera: false);
+    final f = await CameraService.pick(camera: false);
     if (f == null) return;
     setState(() => busyImage = 'upload');
     final url = await BuilderService.uploadImage(await f.readAsBytes(), 'image/jpeg');

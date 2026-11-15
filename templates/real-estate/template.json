@@ -1,0 +1,87 @@
+{
+  "type": "realestate",
+  "folder": "real-estate",
+  "emoji": "🏠",
+  "title": {
+    "ar": "عقارات",
+    "en": "Real Estate"
+  },
+  "keywords": [
+    "عقار",
+    "عقارات",
+    "شقق",
+    "فلل",
+    "real estate",
+    "apartment",
+    "villa",
+    "property"
+  ],
+  "colors": {
+    "primary": "#1F2937",
+    "secondary": "#0EA5E9",
+    "background": "#F9FAFB"
+  },
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": {
+    "ar": [
+      "للبيع",
+      "للإيجار",
+      "تجاري"
+    ],
+    "en": [
+      "For sale",
+      "For rent",
+      "Commercial"
+    ]
+  },
+  "products": [
+    {
+      "name": {
+        "ar": "شقة غرفتين",
+        "en": "2BR Apartment"
+      },
+      "price": 350,
+      "emoji": "🏢",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "فيلا",
+        "en": "Villa"
+      },
+      "price": 180000,
+      "emoji": "🏡",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "محل تجاري",
+        "en": "Shop Space"
+      },
+      "price": 600,
+      "emoji": "🏬",
+      "category": 2
+    }
+  ],
+  "screens": [
+    "Home",
+    "Products",
+    "Search",
+    "Cart",
+    "Checkout",
+    "WhatsApp Order",
+    "Booking",
+    "Contact",
+    "Map",
+    "Reviews",
+    "Admin Panel"
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "id": "template-grocery-en",
+  "name": "Grocery",
+  "type": "grocery",
+  "tagline": "Welcome to Grocery",
+  "colors": {
+    "primary": "#166534",
+    "secondary": "#84CC16",
+    "background": "#F7FEE7",
+    "text": "#111111"
+  },
+  "font": "Inter",
+  "logoEmoji": "🛒",
+  "heroImage": "",
+  "language": "en",
+  "currency": "USD",
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "offers",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "Vegetables",
+    "Fruits",
+    "Dairy",
+    "Bakery"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "Tomatoes",
+      "price": 0.6,
+      "category": "Vegetables",
+      "emoji": "🍅",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "Apples",
+      "price": 0.9,
+      "category": "Fruits",
+      "emoji": "🍎",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "Milk",
+      "price": 0.5,
+      "category": "Dairy",
+      "emoji": "🥛",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p3",
+      "name": "Bread",
+      "price": 0.2,
+      "category": "Bakery",
+      "emoji": "🍞",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

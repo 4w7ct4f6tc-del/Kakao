@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import '../../models/templates.dart';
 import '../../services/ai_service.dart';
-import '../../services/vision_service.dart';
+import '../../services/camera_service.dart';
 import '../../services/voice_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
@@ -81,7 +81,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> _attach() async {
-    final f = await VisionService.pick(camera: false);
+    final f = await CameraService.pick(camera: false);
     if (f == null) return;
     final bytes = await f.readAsBytes();
     setState(() => pendingImage = base64Encode(bytes));

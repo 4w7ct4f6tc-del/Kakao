@@ -1,0 +1,73 @@
+{
+  "type": "chat",
+  "folder": "chat-app",
+  "emoji": "💬",
+  "title": {
+    "ar": "تطبيق دردشة",
+    "en": "Chat App"
+  },
+  "keywords": [
+    "دردشة",
+    "شات",
+    "محادثة",
+    "chat",
+    "messenger",
+    "community"
+  ],
+  "colors": {
+    "primary": "#111827",
+    "secondary": "#16A34A",
+    "background": "#F3F4F6"
+  },
+  "sections": [
+    "hero",
+    "products",
+    "reviews",
+    "map",
+    "contact",
+    "about"
+  ],
+  "categories": {
+    "ar": [
+      "عام",
+      "مجموعات"
+    ],
+    "en": [
+      "General",
+      "Groups"
+    ]
+  },
+  "products": [
+    {
+      "name": {
+        "ar": "غرفة عامة",
+        "en": "Public Room"
+      },
+      "price": 0,
+      "emoji": "💬",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "مجموعة خاصة",
+        "en": "Private Group"
+      },
+      "price": 1,
+      "emoji": "🔒",
+      "category": 1
+    }
+  ],
+  "screens": [
+    "Home",
+    "Products",
+    "Search",
+    "Cart",
+    "Checkout",
+    "WhatsApp Order",
+    "Booking",
+    "Contact",
+    "Map",
+    "Reviews",
+    "Admin Panel"
+  ]
+}

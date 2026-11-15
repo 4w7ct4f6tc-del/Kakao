@@ -1,0 +1,75 @@
+{
+  "id": "template-gym-en",
+  "name": "Gym",
+  "type": "gym",
+  "tagline": "Welcome to Gym",
+  "colors": {
+    "primary": "#0F172A",
+    "secondary": "#22C55E",
+    "background": "#F8FAFC",
+    "text": "#111111"
+  },
+  "font": "Inter",
+  "logoEmoji": "🏋️",
+  "heroImage": "",
+  "language": "en",
+  "currency": "USD",
+  "sections": [
+    "hero",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "Memberships",
+    "Personal training",
+    "Supplements"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "Monthly Pass",
+      "price": 25,
+      "category": "Memberships",
+      "emoji": "🎟️",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "Personal Trainer",
+      "price": 15,
+      "category": "Personal training",
+      "emoji": "🏋️",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "Protein",
+      "price": 18,
+      "category": "Supplements",
+      "emoji": "🥤",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

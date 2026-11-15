@@ -1,0 +1,76 @@
+{
+  "id": "template-real-estate-ar",
+  "name": "عقارات",
+  "type": "realestate",
+  "tagline": "أهلاً بك في عقارات",
+  "colors": {
+    "primary": "#1F2937",
+    "secondary": "#0EA5E9",
+    "background": "#F9FAFB",
+    "text": "#111111"
+  },
+  "font": "Cairo",
+  "logoEmoji": "🏠",
+  "heroImage": "",
+  "language": "ar",
+  "currency": "BHD",
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "للبيع",
+    "للإيجار",
+    "تجاري"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "شقة غرفتين",
+      "price": 350,
+      "category": "للإيجار",
+      "emoji": "🏢",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "فيلا",
+      "price": 180000,
+      "category": "للبيع",
+      "emoji": "🏡",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "محل تجاري",
+      "price": 600,
+      "category": "تجاري",
+      "emoji": "🏬",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

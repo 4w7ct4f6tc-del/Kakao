@@ -1,0 +1,97 @@
+{
+  "type": "grocery",
+  "folder": "grocery",
+  "emoji": "🛒",
+  "title": {
+    "ar": "بقالة",
+    "en": "Grocery"
+  },
+  "keywords": [
+    "بقالة",
+    "سوبرماركت",
+    "خضار",
+    "فواكه",
+    "grocery",
+    "supermarket",
+    "market"
+  ],
+  "colors": {
+    "primary": "#166534",
+    "secondary": "#84CC16",
+    "background": "#F7FEE7"
+  },
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "offers",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": {
+    "ar": [
+      "خضار",
+      "فواكه",
+      "ألبان",
+      "مخبوزات"
+    ],
+    "en": [
+      "Vegetables",
+      "Fruits",
+      "Dairy",
+      "Bakery"
+    ]
+  },
+  "products": [
+    {
+      "name": {
+        "ar": "طماط",
+        "en": "Tomatoes"
+      },
+      "price": 0.6,
+      "emoji": "🍅",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "تفاح",
+        "en": "Apples"
+      },
+      "price": 0.9,
+      "emoji": "🍎",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "حليب",
+        "en": "Milk"
+      },
+      "price": 0.5,
+      "emoji": "🥛",
+      "category": 2
+    },
+    {
+      "name": {
+        "ar": "خبز",
+        "en": "Bread"
+      },
+      "price": 0.2,
+      "emoji": "🍞",
+      "category": 3
+    }
+  ],
+  "screens": [
+    "Home",
+    "Products",
+    "Search",
+    "Cart",
+    "Checkout",
+    "WhatsApp Order",
+    "Booking",
+    "Contact",
+    "Map",
+    "Reviews",
+    "Admin Panel"
+  ]
+}

@@ -6,6 +6,7 @@
     "node": "22"
   },
   "scripts": {
+    "start": "node server.js",
     "serve": "firebase emulators:start --only functions,firestore,auth,storage",
     "deploy": "firebase deploy --only functions",
     "test": "node --test"

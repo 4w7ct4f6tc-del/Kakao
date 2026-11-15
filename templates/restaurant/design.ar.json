@@ -1,0 +1,105 @@
+{
+  "id": "template-restaurant-ar",
+  "name": "مطعم",
+  "type": "restaurant",
+  "tagline": "أهلاً بك في مطعم",
+  "colors": {
+    "primary": "#7C2D12",
+    "secondary": "#F59E0B",
+    "background": "#FFFBEB",
+    "text": "#111111"
+  },
+  "font": "Cairo",
+  "logoEmoji": "🍔",
+  "heroImage": "",
+  "language": "ar",
+  "currency": "BHD",
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "offers",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "مقبلات",
+    "رئيسي",
+    "حلويات",
+    "مشروبات"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "برجر لحم",
+      "price": 3.5,
+      "category": "رئيسي",
+      "emoji": "🍔",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "بيتزا",
+      "price": 4.2,
+      "category": "رئيسي",
+      "emoji": "🍕",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "سلطة",
+      "price": 1.8,
+      "category": "مقبلات",
+      "emoji": "🥗",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p3",
+      "name": "كنافة",
+      "price": 2,
+      "category": "حلويات",
+      "emoji": "🍰",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p4",
+      "name": "كرك",
+      "price": 0.3,
+      "category": "مشروبات",
+      "emoji": "☕",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p5",
+      "name": "عصير طازج",
+      "price": 1.2,
+      "category": "مشروبات",
+      "emoji": "🥤",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "id": "template-portfolio-en",
+  "name": "Portfolio",
+  "type": "portfolio",
+  "tagline": "Welcome to Portfolio",
+  "colors": {
+    "primary": "#18181B",
+    "secondary": "#A855F7",
+    "background": "#FAFAFA",
+    "text": "#111111"
+  },
+  "font": "Inter",
+  "logoEmoji": "🎨",
+  "heroImage": "",
+  "language": "en",
+  "currency": "USD",
+  "sections": [
+    "hero",
+    "products",
+    "reviews",
+    "map",
+    "contact",
+    "about"
+  ],
+  "categories": [
+    "Photography",
+    "Design",
+    "Video"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "Photo Session",
+      "price": 50,
+      "category": "Photography",
+      "emoji": "📸",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "Logo Design",
+      "price": 40,
+      "category": "Design",
+      "emoji": "✏️",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "Video Editing",
+      "price": 70,
+      "category": "Video",
+      "emoji": "🎬",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

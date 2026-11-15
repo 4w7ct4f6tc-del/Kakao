@@ -1,0 +1,98 @@
+{
+  "type": "salon",
+  "folder": "salon",
+  "emoji": "💇",
+  "title": {
+    "ar": "صالون",
+    "en": "Salon"
+  },
+  "keywords": [
+    "صالون",
+    "حلاق",
+    "تجميل",
+    "سبا",
+    "salon",
+    "barber",
+    "beauty",
+    "spa",
+    "nails",
+    "مكياج",
+    "makeup"
+  ],
+  "colors": {
+    "primary": "#831843",
+    "secondary": "#F472B6",
+    "background": "#FDF2F8"
+  },
+  "sections": [
+    "hero",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": {
+    "ar": [
+      "شعر",
+      "أظافر",
+      "مكياج"
+    ],
+    "en": [
+      "Hair",
+      "Nails",
+      "Makeup"
+    ]
+  },
+  "products": [
+    {
+      "name": {
+        "ar": "قص شعر",
+        "en": "Haircut"
+      },
+      "price": 5,
+      "emoji": "💇",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "صبغة",
+        "en": "Hair Color"
+      },
+      "price": 20,
+      "emoji": "🎨",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "مناكير",
+        "en": "Manicure"
+      },
+      "price": 8,
+      "emoji": "💅",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "مكياج سهرة",
+        "en": "Evening Makeup"
+      },
+      "price": 25,
+      "emoji": "💄",
+      "category": 2
+    }
+  ],
+  "screens": [
+    "Home",
+    "Products",
+    "Search",
+    "Cart",
+    "Checkout",
+    "WhatsApp Order",
+    "Booking",
+    "Contact",
+    "Map",
+    "Reviews",
+    "Admin Panel"
+  ]
+}

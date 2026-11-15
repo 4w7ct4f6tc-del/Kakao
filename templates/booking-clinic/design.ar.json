@@ -1,0 +1,75 @@
+{
+  "id": "template-booking-clinic-ar",
+  "name": "حجوزات / عيادة",
+  "type": "booking",
+  "tagline": "أهلاً بك في حجوزات / عيادة",
+  "colors": {
+    "primary": "#0E7490",
+    "secondary": "#06B6D4",
+    "background": "#ECFEFF",
+    "text": "#111111"
+  },
+  "font": "Cairo",
+  "logoEmoji": "📅",
+  "heroImage": "",
+  "language": "ar",
+  "currency": "BHD",
+  "sections": [
+    "hero",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "استشارة",
+    "فحص",
+    "متابعة"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "استشارة",
+      "price": 15,
+      "category": "استشارة",
+      "emoji": "🩺",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "فحص شامل",
+      "price": 40,
+      "category": "فحص",
+      "emoji": "🧪",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "تنظيف أسنان",
+      "price": 20,
+      "category": "فحص",
+      "emoji": "🦷",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

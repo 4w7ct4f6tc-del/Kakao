@@ -1,0 +1,84 @@
+{
+  "id": "template-salon-en",
+  "name": "Salon",
+  "type": "salon",
+  "tagline": "Welcome to Salon",
+  "colors": {
+    "primary": "#831843",
+    "secondary": "#F472B6",
+    "background": "#FDF2F8",
+    "text": "#111111"
+  },
+  "font": "Inter",
+  "logoEmoji": "💇",
+  "heroImage": "",
+  "language": "en",
+  "currency": "USD",
+  "sections": [
+    "hero",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "Hair",
+    "Nails",
+    "Makeup"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "Haircut",
+      "price": 5,
+      "category": "Hair",
+      "emoji": "💇",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "Hair Color",
+      "price": 20,
+      "category": "Hair",
+      "emoji": "🎨",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "Manicure",
+      "price": 8,
+      "category": "Nails",
+      "emoji": "💅",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p3",
+      "name": "Evening Makeup",
+      "price": 25,
+      "category": "Makeup",
+      "emoji": "💄",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

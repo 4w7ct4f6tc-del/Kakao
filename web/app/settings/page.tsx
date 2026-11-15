@@ -66,13 +66,15 @@ export default function Settings() {
           <h2 className="mb-3 text-xl font-extrabold">{t('integrations')}</h2>
           {INTEGRATIONS.map(([id, name, kind]) => (
             <div key={id} className="mb-2 flex items-center justify-between rounded-2xl bg-surface p-3">
-              <span>{name} {connected[id] && <span className="text-accent">✓</span>}</span>
+              <span className="flex flex-1 flex-wrap items-center gap-2">{name} {connected[id] && <span className="text-accent">✓</span>}
+                {kind === 'apikey' && draft[`open_${id}`] && !connected[id] && <Input type="password" placeholder="API key / token" value={draft[`int_${id}`] || ''} onChange={(e) => setDraft({ ...draft, [`int_${id}`]: e.target.value })} className="!py-2" />}
+              </span>
               {connected[id] ? (
                 <button className="rounded-xl border border-white/30 px-3 py-1.5" onClick={() => run(() => api('/integrations/disconnect', { provider: id }))}>Disconnect</button>
               ) : (
                 <button className="rounded-xl bg-accent px-3 py-1.5 font-bold" onClick={() => run(async () => {
                   if (kind === 'oauth') { const r = await api<{ url: string }>('/integrations/start', { provider: id }); window.open(r.url, '_blank'); }
-                  else { const key = prompt('API key / token'); if (key) await api('/integrations/apikey', { provider: id, key }); }
+                  else { const key = (draft[`int_${id}`] || '').trim(); if (!key) { setDraft({ ...draft, [`open_${id}`]: '1' }); return; } await api('/integrations/apikey', { provider: id, key }); setDraft({ ...draft, [`int_${id}`]: '', [`open_${id}`]: '' }); }
                 })}>Connect</button>
               )}
             </div>

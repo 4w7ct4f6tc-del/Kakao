@@ -1,0 +1,77 @@
+{
+  "id": "template-school-en",
+  "name": "School",
+  "type": "school",
+  "tagline": "Welcome to School",
+  "colors": {
+    "primary": "#1E3A8A",
+    "secondary": "#FBBF24",
+    "background": "#EFF6FF",
+    "text": "#111111"
+  },
+  "font": "Inter",
+  "logoEmoji": "🏫",
+  "heroImage": "",
+  "language": "en",
+  "currency": "USD",
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact",
+    "about"
+  ],
+  "categories": [
+    "Languages",
+    "Coding",
+    "Math"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "English Course",
+      "price": 45,
+      "category": "Languages",
+      "emoji": "📘",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "Coding Course",
+      "price": 60,
+      "category": "Coding",
+      "emoji": "💻",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "Math Tutoring",
+      "price": 30,
+      "category": "Math",
+      "emoji": "📐",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

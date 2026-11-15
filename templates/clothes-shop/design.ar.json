@@ -1,0 +1,104 @@
+{
+  "id": "template-clothes-shop-ar",
+  "name": "محل ملابس",
+  "type": "clothes",
+  "tagline": "أهلاً بك في محل ملابس",
+  "colors": {
+    "primary": "#111111",
+    "secondary": "#E11D48",
+    "background": "#FFFFFF",
+    "text": "#111111"
+  },
+  "font": "Cairo",
+  "logoEmoji": "👗",
+  "heroImage": "",
+  "language": "ar",
+  "currency": "BHD",
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "offers",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "نسائي",
+    "رجالي",
+    "أطفال",
+    "عبايات"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "فستان سهرة",
+      "price": 35,
+      "category": "نسائي",
+      "emoji": "👗",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "عباية سوداء",
+      "price": 28,
+      "category": "عبايات",
+      "emoji": "🧥",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "قميص رجالي",
+      "price": 12,
+      "category": "رجالي",
+      "emoji": "👔",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p3",
+      "name": "تيشيرت أطفال",
+      "price": 6,
+      "category": "أطفال",
+      "emoji": "👕",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p4",
+      "name": "حذاء رياضي",
+      "price": 22,
+      "category": "رجالي",
+      "emoji": "👟",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p5",
+      "name": "شنطة يد",
+      "price": 18,
+      "category": "نسائي",
+      "emoji": "👜",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

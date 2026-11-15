@@ -1,0 +1,75 @@
+{
+  "id": "template-booking-clinic-en",
+  "name": "Booking / Clinic",
+  "type": "booking",
+  "tagline": "Welcome to Booking / Clinic",
+  "colors": {
+    "primary": "#0E7490",
+    "secondary": "#06B6D4",
+    "background": "#ECFEFF",
+    "text": "#111111"
+  },
+  "font": "Inter",
+  "logoEmoji": "📅",
+  "heroImage": "",
+  "language": "en",
+  "currency": "USD",
+  "sections": [
+    "hero",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "Consultation",
+    "Checkup",
+    "Follow-up"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "Consultation",
+      "price": 15,
+      "category": "Consultation",
+      "emoji": "🩺",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "Full Checkup",
+      "price": 40,
+      "category": "Checkup",
+      "emoji": "🧪",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "Teeth Cleaning",
+      "price": 20,
+      "category": "Checkup",
+      "emoji": "🦷",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "type": "restaurant",
+  "folder": "restaurant",
+  "emoji": "🍔",
+  "title": {
+    "ar": "مطعم",
+    "en": "Restaurant"
+  },
+  "keywords": [
+    "مطعم",
+    "منيو",
+    "أكل",
+    "اكل",
+    "كافيه",
+    "مقهى",
+    "قهوة",
+    "restaurant",
+    "menu",
+    "food",
+    "cafe",
+    "coffee",
+    "burger",
+    "pizza",
+    "قائمة طعام",
+    "مشويات"
+  ],
+  "colors": {
+    "primary": "#7C2D12",
+    "secondary": "#F59E0B",
+    "background": "#FFFBEB"
+  },
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "offers",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": {
+    "ar": [
+      "مقبلات",
+      "رئيسي",
+      "حلويات",
+      "مشروبات"
+    ],
+    "en": [
+      "Starters",
+      "Mains",
+      "Desserts",
+      "Drinks"
+    ]
+  },
+  "products": [
+    {
+      "name": {
+        "ar": "برجر لحم",
+        "en": "Beef Burger"
+      },
+      "price": 3.5,
+      "emoji": "🍔",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "بيتزا",
+        "en": "Pizza"
+      },
+      "price": 4.2,
+      "emoji": "🍕",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "سلطة",
+        "en": "Salad"
+      },
+      "price": 1.8,
+      "emoji": "🥗",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "كنافة",
+        "en": "Kunafa"
+      },
+      "price": 2,
+      "emoji": "🍰",
+      "category": 2
+    },
+    {
+      "name": {
+        "ar": "كرك",
+        "en": "Karak Tea"
+      },
+      "price": 0.3,
+      "emoji": "☕",
+      "category": 3
+    },
+    {
+      "name": {
+        "ar": "عصير طازج",
+        "en": "Fresh Juice"
+      },
+      "price": 1.2,
+      "emoji": "🥤",
+      "category": 3
+    }
+  ],
+  "screens": [
+    "Home",
+    "Products",
+    "Search",
+    "Cart",
+    "Checkout",
+    "WhatsApp Order",
+    "Booking",
+    "Contact",
+    "Map",
+    "Reviews",
+    "Admin Panel"
+  ]
+}

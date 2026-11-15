@@ -12,6 +12,8 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
   const [cat, setCat] = useState<string | null>(null);
   const [day, setDay] = useState<number | null>(null);
   const [slot, setSlot] = useState<string | null>(null);
+  const [checkout, setCheckout] = useState(false);
+  const [form, setForm] = useState({ name: '', phone: '', address: '', notes: '', pay: '' });
   const c = d.colors;
   const money = (v: number) => `${Number.isInteger(v) ? v : v.toFixed(v < 10 ? 3 : 2)} ${d.currency}`;
   const wa = d.contact.whatsapp.replace(/[^0-9]/g, '');
@@ -27,16 +29,29 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
       <div className="flex w-full items-center justify-center rounded-xl" style={{ height: h, background: `linear-gradient(135deg, ${c.primary}2e, ${c.primary}60)`, fontSize: h * 0.42 }}>{p.emoji}</div>
     );
 
+  const payMethods = [tr('الدفع عند الاستلام', 'Cash on delivery'), tr('بطاقة / Apple Pay', 'Card / Apple Pay'), 'BenefitPay'];
   const order = () => {
     const lines = Object.entries(cart).map(([id, n]) => { const p = d.products.find((x) => x.id === id)!; return `• ${p.name} x${n} = ${money(p.price * n)}`; }).join('\n');
-    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(`${tr('طلب جديد من', 'New order from')} ${d.name}\n${lines}\n${tr('المجموع', 'Total')}: ${money(total)}`)}`, '_blank');
+    const info = [
+      form.name && `${tr('الاسم', 'Name')}: ${form.name}`,
+      form.phone && `${tr('الهاتف', 'Phone')}: ${form.phone}`,
+      form.address && `${tr('العنوان', 'Address')}: ${form.address}`,
+      `${tr('الدفع', 'Payment')}: ${form.pay || payMethods[0]}`,
+      form.notes && `${tr('ملاحظات', 'Notes')}: ${form.notes}`,
+    ].filter(Boolean).join('\n');
+    window.open(`https://wa.me/${wa}?text=${encodeURIComponent(`${tr('طلب جديد من', 'New order from')} ${d.name}\n${lines}\n${tr('المجموع', 'Total')}: ${money(total)}\n${info}`)}`, '_blank');
+    setCart({});
+    setCheckout(false);
   };
 
+  const [admin, setAdmin] = useState(false);
+  const [newP, setNewP] = useState({ name: '', price: '' });
   const adminAdd = () => {
-    const name = prompt(tr('اسم المنتج', 'Product name'));
-    if (!name) return;
-    const price = Number(prompt(tr('السعر', 'Price')) || 0);
-    onChange?.({ ...d, products: [...d.products, { id: `a${Date.now()}`, name, price, emoji: d.logoEmoji, category: d.categories[0] || '', image: '' }] });
+    if (!newP.name.trim()) return;
+    onChange?.({ ...d, products: [...d.products, { id: `a${Date.now()}`, name: newP.name.trim(), price: Number(newP.price) || 0, emoji: d.logoEmoji, category: d.categories[0] || '', image: '' }] });
+    setNewP({ name: '', price: '' });
+    setAdmin(false);
+    setTab(1);
   };
 
   const Grid = ({ list }: { list: Product[] }) => (
@@ -137,7 +152,19 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
           </div>
           <div className="p-3.5">
             <div className="flex justify-between font-bold"><span>{tr('المجموع', 'Total')}</span><span style={{ color: c.primary }}>{money(total)}</span></div>
-            <button onClick={order} className="mt-2 w-full rounded-xl bg-[#25D366] py-2.5 font-bold text-white">💬 {tr('اطلب عبر واتساب', 'Order on WhatsApp')}</button>
+            {!checkout ? (
+              <button onClick={() => setCheckout(true)} className="mt-2 w-full rounded-xl py-2.5 font-bold text-white" style={{ background: c.primary }}>🧾 {tr('إتمام الطلب', 'Checkout')}</button>
+            ) : (
+              <div className="mt-2 space-y-1.5">
+                {(['name', 'phone', 'address', 'notes'] as const).map((k) => (
+                  <input key={k} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} placeholder={{ name: tr('الاسم', 'Name'), phone: tr('الهاتف', 'Phone'), address: tr('العنوان', 'Address'), notes: tr('ملاحظات', 'Notes') }[k]} className="w-full rounded-lg bg-black/5 px-2.5 py-1.5 text-[12px] text-black outline-none" />
+                ))}
+                <div className="flex flex-wrap gap-1">
+                  {payMethods.map((m) => <button key={m} onClick={() => setForm({ ...form, pay: m })} className="rounded-full border px-2 py-0.5 text-[10px]" style={(form.pay || payMethods[0]) === m ? { background: c.primary, color: '#fff' } : {}}>{m}</button>)}
+                </div>
+                <button onClick={order} className="w-full rounded-xl bg-[#25D366] py-2.5 font-bold text-white">💬 {tr('أرسل الطلب عبر واتساب', 'Send order on WhatsApp')}</button>
+              </div>
+            )}
           </div>
         </>
       )}
@@ -159,9 +186,20 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
       <div className={`flex items-center gap-2 px-3.5 pb-2.5 ${fullscreen ? 'pt-4' : 'pt-10'}`} style={{ background: c.primary }}>
         <span className="text-xl">{d.logoEmoji}</span>
         <b className="flex-1 truncate text-base text-white">{d.name}</b>
-        {onChange && <button onClick={adminAdd} title="Admin" className="text-white">🛠️</button>}
+        {onChange && <button onClick={() => setAdmin(!admin)} title={tr('لوحة الإدارة', 'Admin Panel')} className="text-white">🛠️</button>}
         <button onClick={() => setTab(2)} className="relative text-white">🛍️{count > 0 && <span className="absolute -end-2 -top-1 rounded-full bg-red-600 px-1 text-[9px]">{count}</span>}</button>
       </div>
+      {admin && (
+        <div className="space-y-1.5 bg-white p-3 text-black shadow">
+          <b className="text-[13px]">{tr('لوحة الإدارة — منتج جديد', 'Admin Panel — new product')}</b>
+          <input value={newP.name} onChange={(e) => setNewP({ ...newP, name: e.target.value })} placeholder={tr('الاسم', 'Name')} className="w-full rounded-lg bg-black/5 px-2.5 py-1.5 text-[12px] outline-none" />
+          <input value={newP.price} onChange={(e) => setNewP({ ...newP, price: e.target.value })} inputMode="decimal" placeholder={tr('السعر', 'Price')} className="w-full rounded-lg bg-black/5 px-2.5 py-1.5 text-[12px] outline-none" />
+          <div className="flex gap-1.5">
+            <button onClick={adminAdd} className="flex-1 rounded-lg py-1.5 text-[12px] font-bold text-white" style={{ background: c.primary }}>{tr('إضافة', 'Add')}</button>
+            <button onClick={() => setAdmin(false)} className="rounded-lg border px-3 text-[12px]">{tr('إلغاء', 'Cancel')}</button>
+          </div>
+        </div>
+      )}
       <div className="flex-1 overflow-auto">{pages[tab]}</div>
       <div className="flex bg-white pb-2.5 pt-1.5">
         {nav.map(([i, l], idx) => <button key={idx} onClick={() => setTab(idx)} className="flex flex-1 flex-col items-center text-[9px]" style={{ color: tab === idx ? c.primary : '#0008' }}><span className="text-base">{i}</span>{l}</button>)}

@@ -1,0 +1,75 @@
+{
+  "id": "template-gym-ar",
+  "name": "نادي رياضي",
+  "type": "gym",
+  "tagline": "أهلاً بك في نادي رياضي",
+  "colors": {
+    "primary": "#0F172A",
+    "secondary": "#22C55E",
+    "background": "#F8FAFC",
+    "text": "#111111"
+  },
+  "font": "Cairo",
+  "logoEmoji": "🏋️",
+  "heroImage": "",
+  "language": "ar",
+  "currency": "BHD",
+  "sections": [
+    "hero",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "اشتراكات",
+    "تدريب شخصي",
+    "مكملات"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "اشتراك شهري",
+      "price": 25,
+      "category": "اشتراكات",
+      "emoji": "🎟️",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "مدرب شخصي",
+      "price": 15,
+      "category": "تدريب شخصي",
+      "emoji": "🏋️",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "بروتين",
+      "price": 18,
+      "category": "مكملات",
+      "emoji": "🥤",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

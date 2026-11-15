@@ -4,7 +4,8 @@ import { NextResponse, type NextRequest } from 'next/server';
 export async function middleware(req: NextRequest) {
   const host = (req.headers.get('host') || '').split(':')[0].toLowerCase();
   const main = (process.env.NEXT_PUBLIC_MAIN_HOSTS || 'localhost').split(',').map((h) => h.trim());
-  const api = process.env.NEXT_PUBLIC_KAKAO_API;
+  const raw = process.env.NEXT_PUBLIC_KAKAO_API || '';
+  const api = raw.startsWith('/') ? process.env.KAKAO_API_ORIGIN : raw;
   if (!api || api.includes('YOUR_') || main.some((h) => host === h || host.endsWith('.vercel.app'))) return NextResponse.next();
   if (req.nextUrl.pathname.startsWith('/_next') || req.nextUrl.pathname.startsWith('/a/')) return NextResponse.next();
   try {

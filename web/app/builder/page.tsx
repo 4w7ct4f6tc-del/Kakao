@@ -82,6 +82,7 @@ function Builder() {
       <h1 className="mb-4 text-3xl font-extrabold">{t('welcome')}</h1>
       <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} rows={4} placeholder={t('hint')} className="w-full rounded-2xl bg-surface p-4 outline-none placeholder:text-muted" />
       <Button accent onClick={() => start()}>✨ {t('next')}</Button>
+      <a href="/templates" className="mt-2 block text-center text-sm text-accent underline">{lang === 'ar' ? 'شوف كل القوالب مباشرة' : 'See all templates live'}</a>
       <div className="mt-4 flex flex-wrap gap-2">
         {TEMPLATES.map((tpl) => (
           <button key={tpl.type} onClick={() => { const p = lang === 'ar' ? `أبي تطبيق ${tpl.title.ar}` : `I want a ${tpl.title.en} app`; setPrompt(p); start(p); }} className="rounded-xl border border-[#444] px-3 py-1.5 text-sm hover:border-accent">

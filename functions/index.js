@@ -11,7 +11,7 @@ const cors = require('cors');
 
 setGlobalOptions({ region: process.env.FUNCTIONS_REGION || 'us-central1', maxInstances: 50 });
 
-const { errorHandler } = require('./src/lib/http');
+const { errorHandler } = require('./lib/http');
 
 const app = express();
 app.set('trust proxy', true);
@@ -22,14 +22,14 @@ app.use(express.urlencoded({ extended: false, limit: '1mb' }));
 
 app.get('/health', (_req, res) => res.json({ ok: true, service: 'kakao-api', time: new Date().toISOString() }));
 
-app.use(require('./src/routes/auth'));
-app.use(require('./src/routes/ai'));
-app.use(require('./src/routes/voice'));
-app.use(require('./src/routes/builder'));
-app.use(require('./src/routes/vision'));
-app.use(require('./src/routes/video'));
-app.use(require('./src/routes/payments'));
-app.use(require('./src/routes/account'));
+app.use(require('./auth'));
+app.use(require('./ai'));
+app.use(require('./voice'));
+app.use(require('./builder'));
+app.use(require('./vision'));
+app.use(require('./video'));
+app.use(require('./payments'));
+app.use(require('./account'));
 
 app.use((_req, res) => res.status(404).json({ error: 'Not found' }));
 app.use(errorHandler);
@@ -39,7 +39,7 @@ exports.api = onRequest({ timeoutSeconds: 300, memory: '1GiB', cors: true }, app
 exports.videoPipeline = onDocumentCreated(
   { document: 'videos/{id}', timeoutSeconds: 540, memory: '1GiB' },
   async (event) => {
-    const { runVideoPipeline } = require('./src/routes/video');
+    const { runVideoPipeline } = require('./video');
     await runVideoPipeline(event.params.id);
   },
 );

@@ -1,0 +1,122 @@
+{
+  "type": "clothes",
+  "folder": "clothes-shop",
+  "emoji": "👗",
+  "title": {
+    "ar": "محل ملابس",
+    "en": "Clothes Shop"
+  },
+  "keywords": [
+    "ملابس",
+    "أزياء",
+    "ازياء",
+    "فساتين",
+    "عبايات",
+    "clothes",
+    "fashion",
+    "boutique",
+    "dress",
+    "abaya",
+    "بوتيك",
+    "ثياب",
+    "كندورة",
+    "shirt"
+  ],
+  "colors": {
+    "primary": "#111111",
+    "secondary": "#E11D48",
+    "background": "#FFFFFF"
+  },
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "offers",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": {
+    "ar": [
+      "نسائي",
+      "رجالي",
+      "أطفال",
+      "عبايات"
+    ],
+    "en": [
+      "Women",
+      "Men",
+      "Kids",
+      "Abayas"
+    ]
+  },
+  "products": [
+    {
+      "name": {
+        "ar": "فستان سهرة",
+        "en": "Evening Dress"
+      },
+      "price": 35,
+      "emoji": "👗",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "عباية سوداء",
+        "en": "Black Abaya"
+      },
+      "price": 28,
+      "emoji": "🧥",
+      "category": 3
+    },
+    {
+      "name": {
+        "ar": "قميص رجالي",
+        "en": "Men's Shirt"
+      },
+      "price": 12,
+      "emoji": "👔",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "تيشيرت أطفال",
+        "en": "Kids T-Shirt"
+      },
+      "price": 6,
+      "emoji": "👕",
+      "category": 2
+    },
+    {
+      "name": {
+        "ar": "حذاء رياضي",
+        "en": "Sneakers"
+      },
+      "price": 22,
+      "emoji": "👟",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "شنطة يد",
+        "en": "Handbag"
+      },
+      "price": 18,
+      "emoji": "👜",
+      "category": 0
+    }
+  ],
+  "screens": [
+    "Home",
+    "Products",
+    "Search",
+    "Cart",
+    "Checkout",
+    "WhatsApp Order",
+    "Booking",
+    "Contact",
+    "Map",
+    "Reviews",
+    "Admin Panel"
+  ]
+}

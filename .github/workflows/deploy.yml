@@ -1,0 +1,62 @@
+# Auto-deploy on every push to main: Vercel (web) + Render (API, video) + Firebase + Cloudflare.
+# Each step runs only when its secret exists, so you can turn targets on one by one.
+#   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID
+#   RENDER_DEPLOY_HOOK_API, RENDER_DEPLOY_HOOK_VIDEO   (Render → service → Settings → Deploy Hook)
+#   FIREBASE_SERVICE_ACCOUNT, FIREBASE_PROJECT_ID      (optional: Firebase Functions + rules)
+#   CLOUDFLARE_API_TOKEN, CLOUDFLARE_ZONE_ID           (purge CDN cache so the same link updates)
+name: Deploy KAKAO
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+  RENDER_DEPLOY_HOOK_API: ${{ secrets.RENDER_DEPLOY_HOOK_API }}
+  RENDER_DEPLOY_HOOK_VIDEO: ${{ secrets.RENDER_DEPLOY_HOOK_VIDEO }}
+  FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+  CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+
+      - name: Vercel (web)
+        if: env.VERCEL_TOKEN != ''
+        working-directory: web
+        run: |
+          npm i -g vercel@latest
+          vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
+          vercel build --prod --token "$VERCEL_TOKEN"
+          vercel deploy --prebuilt --prod --token "$VERCEL_TOKEN"
+
+      - name: Render (API)
+        if: env.RENDER_DEPLOY_HOOK_API != ''
+        run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK_API"
+
+      - name: Render (video service)
+        if: env.RENDER_DEPLOY_HOOK_VIDEO != ''
+        run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK_VIDEO"
+
+      - name: Firebase (functions + rules)
+        if: env.FIREBASE_SERVICE_ACCOUNT != ''
+        run: |
+          echo "$FIREBASE_SERVICE_ACCOUNT" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          (cd functions && npm ci)
+          npx firebase-tools@latest deploy --only functions,firestore,storage --project "$FIREBASE_PROJECT_ID" --non-interactive --force
+
+      - name: Cloudflare cache purge
+        if: env.CLOUDFLARE_API_TOKEN != ''
+        run: |
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'

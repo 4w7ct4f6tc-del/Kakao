@@ -4,9 +4,9 @@ process.env.ENCRYPTION_KEY = require('crypto').randomBytes(32).toString('base64'
 const test = require('node:test');
 const assert = require('node:assert');
 
-const { encrypt, decrypt, signState, verifyState, otpCode } = require('../src/lib/crypto');
-const { autoRoute, modelFor, parseJson, cleanHistory } = require('../src/lib/ai');
-const { normalizeDesign } = require('../src/routes/builder');
+const { encrypt, decrypt, signState, verifyState, otpCode } = require('../lib/crypto');
+const { autoRoute, modelFor, parseJson, cleanHistory } = require('../ai');
+const { normalizeDesign } = require('../builder');
 const { _app } = require('../index');
 
 test('AES-256-GCM round trip', () => {

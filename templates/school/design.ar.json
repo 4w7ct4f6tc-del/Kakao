@@ -1,0 +1,77 @@
+{
+  "id": "template-school-ar",
+  "name": "مدرسة / معهد",
+  "type": "school",
+  "tagline": "أهلاً بك في مدرسة / معهد",
+  "colors": {
+    "primary": "#1E3A8A",
+    "secondary": "#FBBF24",
+    "background": "#EFF6FF",
+    "text": "#111111"
+  },
+  "font": "Cairo",
+  "logoEmoji": "🏫",
+  "heroImage": "",
+  "language": "ar",
+  "currency": "BHD",
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact",
+    "about"
+  ],
+  "categories": [
+    "لغات",
+    "برمجة",
+    "رياضيات"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "دورة إنجليزي",
+      "price": 45,
+      "category": "لغات",
+      "emoji": "📘",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "دورة برمجة",
+      "price": 60,
+      "category": "برمجة",
+      "emoji": "💻",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "تقوية رياضيات",
+      "price": 30,
+      "category": "رياضيات",
+      "emoji": "📐",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

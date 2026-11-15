@@ -1,0 +1,86 @@
+{
+  "type": "portfolio",
+  "folder": "portfolio",
+  "emoji": "🎨",
+  "title": {
+    "ar": "معرض أعمال",
+    "en": "Portfolio"
+  },
+  "keywords": [
+    "معرض",
+    "أعمالي",
+    "مصور",
+    "مصمم",
+    "portfolio",
+    "photographer",
+    "designer",
+    "freelancer"
+  ],
+  "colors": {
+    "primary": "#18181B",
+    "secondary": "#A855F7",
+    "background": "#FAFAFA"
+  },
+  "sections": [
+    "hero",
+    "products",
+    "reviews",
+    "map",
+    "contact",
+    "about"
+  ],
+  "categories": {
+    "ar": [
+      "تصوير",
+      "تصميم",
+      "فيديو"
+    ],
+    "en": [
+      "Photography",
+      "Design",
+      "Video"
+    ]
+  },
+  "products": [
+    {
+      "name": {
+        "ar": "جلسة تصوير",
+        "en": "Photo Session"
+      },
+      "price": 50,
+      "emoji": "📸",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "تصميم شعار",
+        "en": "Logo Design"
+      },
+      "price": 40,
+      "emoji": "✏️",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "مونتاج فيديو",
+        "en": "Video Editing"
+      },
+      "price": 70,
+      "emoji": "🎬",
+      "category": 2
+    }
+  ],
+  "screens": [
+    "Home",
+    "Products",
+    "Search",
+    "Cart",
+    "Checkout",
+    "WhatsApp Order",
+    "Booking",
+    "Contact",
+    "Map",
+    "Reviews",
+    "Admin Panel"
+  ]
+}

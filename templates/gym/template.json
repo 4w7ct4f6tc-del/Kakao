@@ -1,0 +1,87 @@
+{
+  "type": "gym",
+  "folder": "gym",
+  "emoji": "🏋️",
+  "title": {
+    "ar": "نادي رياضي",
+    "en": "Gym"
+  },
+  "keywords": [
+    "جيم",
+    "نادي",
+    "رياضة",
+    "لياقة",
+    "gym",
+    "fitness",
+    "yoga",
+    "workout",
+    "crossfit"
+  ],
+  "colors": {
+    "primary": "#0F172A",
+    "secondary": "#22C55E",
+    "background": "#F8FAFC"
+  },
+  "sections": [
+    "hero",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": {
+    "ar": [
+      "اشتراكات",
+      "تدريب شخصي",
+      "مكملات"
+    ],
+    "en": [
+      "Memberships",
+      "Personal training",
+      "Supplements"
+    ]
+  },
+  "products": [
+    {
+      "name": {
+        "ar": "اشتراك شهري",
+        "en": "Monthly Pass"
+      },
+      "price": 25,
+      "emoji": "🎟️",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "مدرب شخصي",
+        "en": "Personal Trainer"
+      },
+      "price": 15,
+      "emoji": "🏋️",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "بروتين",
+        "en": "Protein"
+      },
+      "price": 18,
+      "emoji": "🥤",
+      "category": 2
+    }
+  ],
+  "screens": [
+    "Home",
+    "Products",
+    "Search",
+    "Cart",
+    "Checkout",
+    "WhatsApp Order",
+    "Booking",
+    "Contact",
+    "Map",
+    "Reviews",
+    "Admin Panel"
+  ]
+}

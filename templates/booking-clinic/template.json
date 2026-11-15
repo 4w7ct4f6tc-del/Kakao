@@ -1,0 +1,87 @@
+{
+  "type": "booking",
+  "folder": "booking-clinic",
+  "emoji": "📅",
+  "title": {
+    "ar": "حجوزات / عيادة",
+    "en": "Booking / Clinic"
+  },
+  "keywords": [
+    "حجز",
+    "عيادة",
+    "موعد",
+    "دكتور",
+    "booking",
+    "clinic",
+    "appointment",
+    "doctor",
+    "dentist"
+  ],
+  "colors": {
+    "primary": "#0E7490",
+    "secondary": "#06B6D4",
+    "background": "#ECFEFF"
+  },
+  "sections": [
+    "hero",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": {
+    "ar": [
+      "استشارة",
+      "فحص",
+      "متابعة"
+    ],
+    "en": [
+      "Consultation",
+      "Checkup",
+      "Follow-up"
+    ]
+  },
+  "products": [
+    {
+      "name": {
+        "ar": "استشارة",
+        "en": "Consultation"
+      },
+      "price": 15,
+      "emoji": "🩺",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "فحص شامل",
+        "en": "Full Checkup"
+      },
+      "price": 40,
+      "emoji": "🧪",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "تنظيف أسنان",
+        "en": "Teeth Cleaning"
+      },
+      "price": 20,
+      "emoji": "🦷",
+      "category": 1
+    }
+  ],
+  "screens": [
+    "Home",
+    "Products",
+    "Search",
+    "Cart",
+    "Checkout",
+    "WhatsApp Order",
+    "Booking",
+    "Contact",
+    "Map",
+    "Reviews",
+    "Admin Panel"
+  ]
+}

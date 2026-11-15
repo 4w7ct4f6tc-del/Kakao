@@ -1,0 +1,88 @@
+{
+  "type": "school",
+  "folder": "school",
+  "emoji": "🏫",
+  "title": {
+    "ar": "مدرسة / معهد",
+    "en": "School"
+  },
+  "keywords": [
+    "مدرسة",
+    "معهد",
+    "دورات",
+    "تعليم",
+    "school",
+    "academy",
+    "courses",
+    "tutor"
+  ],
+  "colors": {
+    "primary": "#1E3A8A",
+    "secondary": "#FBBF24",
+    "background": "#EFF6FF"
+  },
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact",
+    "about"
+  ],
+  "categories": {
+    "ar": [
+      "لغات",
+      "برمجة",
+      "رياضيات"
+    ],
+    "en": [
+      "Languages",
+      "Coding",
+      "Math"
+    ]
+  },
+  "products": [
+    {
+      "name": {
+        "ar": "دورة إنجليزي",
+        "en": "English Course"
+      },
+      "price": 45,
+      "emoji": "📘",
+      "category": 0
+    },
+    {
+      "name": {
+        "ar": "دورة برمجة",
+        "en": "Coding Course"
+      },
+      "price": 60,
+      "emoji": "💻",
+      "category": 1
+    },
+    {
+      "name": {
+        "ar": "تقوية رياضيات",
+        "en": "Math Tutoring"
+      },
+      "price": 30,
+      "emoji": "📐",
+      "category": 2
+    }
+  ],
+  "screens": [
+    "Home",
+    "Products",
+    "Search",
+    "Cart",
+    "Checkout",
+    "WhatsApp Order",
+    "Booking",
+    "Contact",
+    "Map",
+    "Reviews",
+    "Admin Panel"
+  ]
+}

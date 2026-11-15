@@ -1,0 +1,86 @@
+{
+  "id": "template-grocery-ar",
+  "name": "بقالة",
+  "type": "grocery",
+  "tagline": "أهلاً بك في بقالة",
+  "colors": {
+    "primary": "#166534",
+    "secondary": "#84CC16",
+    "background": "#F7FEE7",
+    "text": "#111111"
+  },
+  "font": "Cairo",
+  "logoEmoji": "🛒",
+  "heroImage": "",
+  "language": "ar",
+  "currency": "BHD",
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "offers",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "خضار",
+    "فواكه",
+    "ألبان",
+    "مخبوزات"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "طماط",
+      "price": 0.6,
+      "category": "خضار",
+      "emoji": "🍅",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "تفاح",
+      "price": 0.9,
+      "category": "فواكه",
+      "emoji": "🍎",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "حليب",
+      "price": 0.5,
+      "category": "ألبان",
+      "emoji": "🥛",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p3",
+      "name": "خبز",
+      "price": 0.2,
+      "category": "مخبوزات",
+      "emoji": "🍞",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}

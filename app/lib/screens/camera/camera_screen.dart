@@ -7,7 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/theme.dart';
 import '../../services/ai_service.dart';
-import '../../services/vision_service.dart';
+import '../../services/camera_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
 
@@ -27,7 +27,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
   VisionMode? mode;
 
   Future<void> _run(VisionMode m, {required bool camera}) async {
-    final XFile? f = await VisionService.pick(camera: camera);
+    final XFile? f = await CameraService.pick(camera: camera);
     if (f == null) return;
     final bytes = await f.readAsBytes();
     setState(() {
@@ -37,7 +37,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       mode = m;
     });
     final lang = ref.read(languageProvider);
-    final r = await VisionService.analyze(f, m, lang);
+    final r = await CameraService.analyze(f, m, lang);
     if (!mounted) return;
     setState(() {
       busy = false;
@@ -52,7 +52,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
   Future<void> _choose(VisionMode m) async {
     final t = ref.read(tProvider);
-    if (!VisionService.cameraSupported) return _run(m, camera: false);
+    if (!CameraService.cameraSupported) return _run(m, camera: false);
     final camera = await showModalBottomSheet<bool>(
       context: context,
       builder: (ctx) => SafeArea(
@@ -66,7 +66,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
   }
 
   void _scanQr() {
-    if (!VisionService.scannerSupported) {
+    if (!CameraService.scannerSupported) {
       _choose(VisionMode.document);
       return;
     }

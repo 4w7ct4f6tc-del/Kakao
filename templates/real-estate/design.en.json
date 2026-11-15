@@ -1,0 +1,76 @@
+{
+  "id": "template-real-estate-en",
+  "name": "Real Estate",
+  "type": "realestate",
+  "tagline": "Welcome to Real Estate",
+  "colors": {
+    "primary": "#1F2937",
+    "secondary": "#0EA5E9",
+    "background": "#F9FAFB",
+    "text": "#111111"
+  },
+  "font": "Inter",
+  "logoEmoji": "🏠",
+  "heroImage": "",
+  "language": "en",
+  "currency": "USD",
+  "sections": [
+    "hero",
+    "categories",
+    "products",
+    "booking",
+    "reviews",
+    "map",
+    "contact"
+  ],
+  "categories": [
+    "For sale",
+    "For rent",
+    "Commercial"
+  ],
+  "products": [
+    {
+      "id": "p0",
+      "name": "2BR Apartment",
+      "price": 350,
+      "category": "For rent",
+      "emoji": "🏢",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p1",
+      "name": "Villa",
+      "price": 180000,
+      "category": "For sale",
+      "emoji": "🏡",
+      "image": "",
+      "description": ""
+    },
+    {
+      "id": "p2",
+      "name": "Shop Space",
+      "price": 600,
+      "category": "Commercial",
+      "emoji": "🏬",
+      "image": "",
+      "description": ""
+    }
+  ],
+  "contact": {
+    "whatsapp": "",
+    "instagram": "",
+    "phone": "",
+    "address": "",
+    "email": ""
+  },
+  "domain": "",
+  "status": "draft",
+  "pages": [
+    "home",
+    "products",
+    "cart",
+    "booking",
+    "contact"
+  ]
+}
