@@ -1,5 +1,5 @@
 'use strict';
-const { admin, db } = require('./admin');
+const { admin, db, firebaseReady } = require('./admin');
 
 class HttpError extends Error {
   constructor(status, message, code) {
@@ -14,7 +14,7 @@ const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).cat
 
 async function decodeUser(req) {
   const h = req.headers.authorization || '';
-  if (!h.startsWith('Bearer ')) return null;
+  if (!h.startsWith('Bearer ') || !firebaseReady) return null;
   try {
     return await admin.auth().verifyIdToken(h.slice(7));
   } catch {
@@ -43,7 +43,18 @@ const clientIp = (req) =>
  * Fixed-window rate limit stored in Firestore.
  * @param {string} key unique key, e.g. `otp:+97333...`
  */
+const memoryHits = new Map();
 async function rateLimit(key, max, windowSec) {
+  if (!firebaseReady) {
+    // No Firebase: same fixed window, kept in memory for this server instance.
+    const nowMs = Date.now();
+    const d = memoryHits.get(key);
+    if (!d || d.resetAt < nowMs) { memoryHits.set(key, { count: 1, resetAt: nowMs + windowSec * 1000 }); return; }
+    if (d.count >= max) throw new HttpError(429, 'Too many attempts. Please wait a moment.', 'rate_limit');
+    d.count += 1;
+    if (memoryHits.size > 5000) for (const [k, v] of memoryHits) if (v.resetAt < nowMs) memoryHits.delete(k);
+    return;
+  }
   const ref = db.collection('ratelimits').doc(Buffer.from(key).toString('base64url').slice(0, 300));
   await db.runTransaction(async (tx) => {
     const snap = await tx.get(ref);

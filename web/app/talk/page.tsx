@@ -248,7 +248,7 @@ export default function Discuss() {
           <div className="flex flex-wrap gap-2">{MODES.map(([id, a, e]) => <button key={id} onClick={() => setS({ ...s, mode: id })} className={pill(s.mode === id)}>{ar ? a : e}</button>)}</div>
           <label className="mt-3 flex items-center justify-between rounded-[14px] bg-[#F3F3F3] p-3 text-sm font-semibold">
             {ar ? 'لدغة رفاعية خفيفة (ر ← و في الصوت)' : 'Light Riffa lisp (R → W in speech)'}
-            <input type="checkbox" checked={s.lisp !== false} onChange={(e) => setS({ ...s, lisp: e.target.checked })} className="h-5 w-5 accent-[#16A34A]" />
+            <input type="checkbox" checked={s.lisp !== false} onChange={(e) => setS({ ...s, lisp: e.target.checked })} className="h-5 w-5 accent-[#141210]" />
           </label>
           <Btn v="grey" icon="play" onClick={testVoice} disabled={status !== 'idle'}>{status !== 'idle' ? '…' : (ar ? 'جرّب الصوت' : 'Test voice')}</Btn>
           <Btn v="green" icon="phone" onClick={startCall}>{ar ? 'اتصل' : 'Call'}</Btn>
@@ -261,7 +261,7 @@ export default function Discuss() {
           {msgs.map((m, i) => (
             <div key={i} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
               <span className="mb-0.5 text-[11px] font-bold text-black/50">{label[m.role]}</span>
-              <p className={`max-w-[88%] whitespace-pre-wrap rounded-[16px] px-3.5 py-2.5 leading-7 ${m.role === 'user' ? 'bg-[#4a78b5] text-white' : m.role === 'danu' ? 'bg-[#E8F7EE] text-black' : 'bg-[#F3F3F3] text-black'}`}>{m.content}</p>
+              <p className={`max-w-[88%] whitespace-pre-wrap rounded-[16px] px-3.5 py-2.5 leading-7 ${m.role === 'user' ? 'bg-[#141210] text-white' : m.role === 'danu' ? 'bg-[#E8F7EE] text-black' : 'bg-[#F3F3F3] text-black'}`}>{m.content}</p>
             </div>
           ))}
           <div ref={end} />

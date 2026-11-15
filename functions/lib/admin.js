@@ -1,7 +1,6 @@
 'use strict';
 const { initializeApp, getApps, cert } = require('firebase-admin/app');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
-const { getAuth } = require('firebase-admin/auth');
 const { getStorage } = require('firebase-admin/storage');
 
 if (!getApps().length) {
@@ -13,7 +12,8 @@ if (!getApps().length) {
 }
 
 /** Small facade so routes can call admin.auth() / admin.storage(). */
-const admin = { auth: () => getAuth(), storage: () => getStorage() };
+// Auth is loaded on first use: its token library needs require(ESM), which some hosts lack.
+const admin = { auth: () => require('firebase-admin/auth').getAuth(), storage: () => getStorage() };
 
 const db = getFirestore();
 db.settings({ ignoreUndefinedProperties: true });
@@ -37,4 +37,11 @@ async function uploadBuffer(path, buffer, contentType) {
   return url;
 }
 
-module.exports = { admin, db, env, now, apiUrl, webUrl, uploadBuffer };
+/**
+ * True when Firebase is configured (on Firebase/Google Cloud, or a service account is given).
+ * Without it the API still serves chat, Danu, the builder and voice for guests;
+ * sign-in, saved apps and payments need Firebase.
+ */
+const firebaseReady = !!(process.env.FIREBASE_SERVICE_ACCOUNT || process.env.FIREBASE_CONFIG || process.env.GCLOUD_PROJECT || process.env.K_SERVICE || process.env.FUNCTION_TARGET || process.env.FIRESTORE_EMULATOR_HOST);
+
+module.exports = { admin, db, env, now, apiUrl, webUrl, uploadBuffer, firebaseReady };

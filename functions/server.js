@@ -10,6 +10,6 @@ try { require('fs').readFileSync(`${__dirname}/.env`, 'utf8').split('\n').forEac
   const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
   if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^"|"$/g, '');
 }); } catch {}
-const { _app } = require('./index');
+const _app = require('./app');
 const port = process.env.PORT || 8080;
 _app.listen(port, () => console.log(`KAKAO API on :${port}`));

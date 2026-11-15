@@ -7,7 +7,7 @@ const assert = require('node:assert');
 const { encrypt, decrypt, signState, verifyState, otpCode } = require('../lib/crypto');
 const { autoRoute, modelFor, parseJson, cleanHistory } = require('../ai');
 const { normalizeDesign } = require('../builder');
-const { _app } = require('../index');
+const _app = require('../app');
 
 test('AES-256-GCM round trip', () => {
   const enc = encrypt('sk-secret-123');

@@ -6,34 +6,10 @@
 const { onRequest } = require('firebase-functions/v2/https');
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
 const { setGlobalOptions } = require('firebase-functions/v2');
-const express = require('express');
-const cors = require('cors');
 
 setGlobalOptions({ region: process.env.FUNCTIONS_REGION || 'us-central1', maxInstances: 50 });
 
-const { errorHandler } = require('./lib/http');
-
-const app = express();
-app.set('trust proxy', true);
-app.use(cors({ origin: true }));
-// Stripe needs the raw body: Firebase exposes it as req.rawBody, so JSON parsing is safe.
-app.use(express.json({ limit: '25mb' }));
-app.use(express.urlencoded({ extended: false, limit: '1mb' }));
-
-app.get('/health', (_req, res) => res.json({ ok: true, service: 'kakao-api', time: new Date().toISOString() }));
-
-app.use(require('./auth'));
-app.use(require('./ai'));
-app.use(require('./voice'));
-app.use(require('./talk'));
-app.use(require('./builder'));
-app.use(require('./vision'));
-app.use(require('./video'));
-app.use(require('./payments'));
-app.use(require('./account'));
-
-app.use((_req, res) => res.status(404).json({ error: 'Not found' }));
-app.use(errorHandler);
+const app = require('./app');
 
 exports.api = onRequest({ timeoutSeconds: 300, memory: '1GiB', cors: true }, app);
 

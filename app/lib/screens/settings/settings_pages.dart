@@ -82,7 +82,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
             value: prefs.getBool('notif_${it.$1}') ?? true,
-            activeThumbColor: K.blue,
+            activeThumbColor: KT.ink,
             title: Text(ar ? it.$2 : it.$3, style: const TextStyle(fontSize: 17)),
             onChanged: (v) async {
               await prefs.setBool('notif_${it.$1}', v);
@@ -113,7 +113,7 @@ class PrivacyPage extends ConsumerWidget {
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           value: bio,
-          activeThumbColor: K.blue,
+          activeThumbColor: KT.ink,
           title: Text(t('biometricLock'), style: const TextStyle(fontSize: 17)),
           onChanged: (v) async {
             if (v && !await BiometricService.authenticate(t('biometricLock'))) return;
@@ -144,7 +144,7 @@ class AppearancePage extends ConsumerWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: current == id ? K.blue : const Color(0xFFD6D9DE), width: 2),
+                border: Border.all(color: current == id ? KT.ink : const Color(0xFFD6D9DE), width: 2),
               ),
               child: Column(children: [
                 Container(
@@ -238,7 +238,7 @@ class _DanuPageState extends ConsumerState<DanuPage> {
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           value: g.lisp,
-          activeThumbColor: K.blue,
+          activeThumbColor: KT.ink,
           title: Text(ar ? 'لدغة رفاعية خفيفة (ر ← و في الصوت)' : 'Light Riffa lisp (R → W in speech)', style: const TextStyle(fontWeight: FontWeight.w600)),
           onChanged: (v) => setState(() => g = g.copyWith(lisp: v)),
         ),

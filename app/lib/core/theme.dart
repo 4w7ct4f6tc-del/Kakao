@@ -19,7 +19,7 @@ ThemeData buildTheme(String lang, {bool dark = false}) {
     scaffoldBackgroundColor: dark ? KColors.background : Colors.white,
     colorScheme: dark
         ? const ColorScheme.dark(primary: KColors.accent, secondary: KColors.accent, surface: KColors.surface, onPrimary: Colors.white)
-        : const ColorScheme.light(primary: Color(0xFF4A78B5), secondary: Color(0xFF4A78B5), surface: Colors.white, onPrimary: Colors.white),
+        : const ColorScheme.light(primary: Color(0xFF141210), secondary: Color(0xFF141210), surface: Colors.white, onPrimary: Colors.white),
   );
   final textTheme = rtlFamily
       ? GoogleFonts.cairoTextTheme(base.textTheme)

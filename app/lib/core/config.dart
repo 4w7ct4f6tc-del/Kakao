@@ -9,13 +9,13 @@ class AppConfig {
   /// Base URL of the Firebase Functions HTTPS API (functions/index.js -> `api`).
   static const String apiBaseUrl = String.fromEnvironment(
     'KAKAO_API',
-    defaultValue: 'https://YOUR_REGION-YOUR_PROJECT_ID.cloudfunctions.net/api',
+    defaultValue: 'https://kakao-api-seven.vercel.app',
   );
 
   /// Public web app (Next.js on Vercel). Published apps live at `$webBaseUrl/a/<id>`.
   static const String webBaseUrl = String.fromEnvironment(
     'KAKAO_WEB',
-    defaultValue: 'https://YOUR_WEB_DOMAIN',
+    defaultValue: 'https://kakao-phi.vercel.app',
   );
 
   static bool get apiConfigured => !apiBaseUrl.contains('YOUR_');

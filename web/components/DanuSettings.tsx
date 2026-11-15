@@ -41,7 +41,7 @@ export default function DanuSettings() {
       {row(ar ? 'الوضع' : 'Mode', MODES, 'mode')}
       <label className="mt-5 flex items-center justify-between rounded-[14px] border p-3 text-sm font-semibold" style={{ borderColor: 'var(--outline-border)' }}>
         {ar ? 'لدغة رفاعية خفيفة (ر ← و في الصوت)' : 'Light Riffa lisp (R → W in speech)'}
-        <input type="checkbox" checked={g.lisp !== false} onChange={(e) => setG({ ...g, lisp: e.target.checked })} className="h-5 w-5 accent-[#4a78b5]" />
+        <input type="checkbox" checked={g.lisp !== false} onChange={(e) => setG({ ...g, lisp: e.target.checked })} className="h-5 w-5 accent-[#141210]" />
       </label>
       <Btn v="grey" icon="play" onClick={test} disabled={busy}>{busy ? '…' : (ar ? 'جرّب الصوت' : 'Test voice')}</Btn>
       <Btn icon="check" disabled={JSON.stringify(g) === JSON.stringify(saved)} onClick={() => { saveGirl(g); setSaved(g); setNote(ar ? 'تم الحفظ' : 'Saved'); }}>{ar ? 'اعتمد' : 'Save'}</Btn>

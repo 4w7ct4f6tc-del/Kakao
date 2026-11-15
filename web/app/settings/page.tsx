@@ -179,7 +179,7 @@ export default function Settings() {
           {NOTIFS.map(([id, a, e]) => (
             <label key={id} className="flex items-center justify-between border-b py-4 text-[17px]" style={{ borderColor: 'var(--line)' }}>
               {ar ? a : e}
-              <input type="checkbox" checked={!!notifs[id]} onChange={(ev) => { setNotifs({ ...notifs, [id]: ev.target.checked }); store.set(`notif_${id}`, ev.target.checked ? '1' : '0'); }} className="h-5 w-5 accent-[#4a78b5]" />
+              <input type="checkbox" checked={!!notifs[id]} onChange={(ev) => { setNotifs({ ...notifs, [id]: ev.target.checked }); store.set(`notif_${id}`, ev.target.checked ? '1' : '0'); }} className="h-5 w-5 accent-[#141210]" />
             </label>
           ))}
           <p className="mt-3 text-xs" style={{ color: 'var(--muted)' }}>{ar ? 'الإشعارات توصل للجوال بعد ربط Firebase Cloud Messaging.' : 'Push notifications arrive once Firebase Cloud Messaging is connected.'}</p>

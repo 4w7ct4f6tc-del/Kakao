@@ -6,7 +6,7 @@
 const Anthropic = require('@anthropic-ai/sdk').default;
 const OpenAI = require('openai').default;
 const express = require('express');
-const { db, env, now } = require('./lib/admin');
+const { db, env, now, firebaseReady } = require('./lib/admin');
 const { HttpError, wrap, optionalAuth, rateLimit, clientIp } = require('./lib/http');
 const { decrypt } = require('./lib/crypto');
 const { getPlan } = require('./lib/users');
@@ -295,8 +295,8 @@ r.post('/translate/batch', wrap(async (req, res) => {
   const target = String(req.body.target || '').replace(/[^a-zA-Z-]/g, '').slice(0, 8);
   const texts = req.body.texts || {};
   if (!target) throw new HttpError(400, 'target required');
-  const cacheRef = db.collection('i18n').doc(target);
-  const cached = await cacheRef.get();
+  const cacheRef = firebaseReady ? db.collection('i18n').doc(target) : null;
+  const cached = cacheRef ? await cacheRef.get() : { exists: false };
   if (cached.exists && Object.keys(cached.data().texts || {}).length >= Object.keys(texts).length) {
     return res.json({ texts: cached.data().texts });
   }
@@ -304,7 +304,7 @@ r.post('/translate/batch', wrap(async (req, res) => {
     engine: 'chatgpt',
     prompt: `Translate the VALUES of this JSON object from English into the language with code "${target}". Keep keys, keep brand names (KAkAo, Google, Apple, WhatsApp, ChatGPT, Claude, Gemini, Meta AI) unchanged. Return the JSON object only.\n${JSON.stringify(texts)}`,
   });
-  await cacheRef.set({ texts: data, updatedAt: now() });
+  if (cacheRef) await cacheRef.set({ texts: data, updatedAt: now() });
   res.json({ texts: data });
 }));
 

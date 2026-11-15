@@ -126,7 +126,7 @@ export default function VoiceCard() {
         {slider(ar ? 'مستوى الصوت' : 'Volume', 'volume', 0, 1, 0.05, `${Math.round(draft.volume * 100)}%`)}
         <label className="mt-3 flex items-center justify-between text-sm font-semibold">
           {ar ? 'قراءة الردود تلقائياً' : 'Auto-read replies'}
-          <input type="checkbox" checked={draft.autoRead} onChange={(e) => set({ autoRead: e.target.checked })} className="h-5 w-5 accent-[#16A34A]" />
+          <input type="checkbox" checked={draft.autoRead} onChange={(e) => set({ autoRead: e.target.checked })} className="h-5 w-5 accent-[#141210]" />
         </label>
         <Btn icon="play" onClick={test} disabled={busy === 'test'}>{busy === 'test' ? '…' : (ar ? 'جرّب الصوت' : 'Test voice')}</Btn>
         <Btn v="green" icon="check" onClick={confirm} disabled={!changed}>{ar ? 'اعتمد هذا الصوت' : 'Use this voice'}</Btn>
@@ -137,7 +137,7 @@ export default function VoiceCard() {
         <h2 className="flex items-center gap-2 text-lg font-extrabold"><Icon name="mic" />{ar ? 'استنسخ صوتي (30 ثانية)' : 'Clone my voice (30 sec)'}</h2>
         <p className="text-sm text-black/60">{ar ? 'اقرأ أي كلام بصوتك الطبيعي لمدة 30 ثانية في مكان هادئ. التسجيل يوقف لحاله.' : 'Read anything in your natural voice for 30 seconds in a quiet place. Recording stops by itself.'}</p>
         <label className="mt-3 flex items-center gap-3 rounded-[14px] bg-[#F3F3F3] p-3 text-sm font-semibold">
-          <input type="checkbox" checked={consent} disabled={elapsed >= 0} onChange={(e) => setConsent(e.target.checked)} className="h-5 w-5 accent-[#16A34A]" />
+          <input type="checkbox" checked={consent} disabled={elapsed >= 0} onChange={(e) => setConsent(e.target.checked)} className="h-5 w-5 accent-[#141210]" />
           {ar ? 'هذا صوتي وأوافق على استنساخه' : 'This is my voice and I consent to cloning it'}
         </label>
         {elapsed >= 0 && (

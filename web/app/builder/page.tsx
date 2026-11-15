@@ -201,7 +201,7 @@ function Builder() {
           <h2 className="text-lg font-extrabold">{t('consent')}</h2>
           {[t('terms'), t('privacy'), t('payment')].map((label, i) => (
             <label key={i} className="mt-2.5 flex items-center gap-3 rounded-[14px] bg-[#F3F3F3] p-3.5 font-semibold">
-              <input type="checkbox" checked={consent[i]} onChange={(e) => setConsent(consent.map((c, j) => (j === i ? e.target.checked : c)))} className="h-5 w-5 accent-[#16A34A]" />
+              <input type="checkbox" checked={consent[i]} onChange={(e) => setConsent(consent.map((c, j) => (j === i ? e.target.checked : c)))} className="h-5 w-5 accent-[#141210]" />
               {label}
             </label>
           ))}
