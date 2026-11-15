@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { Brand } from '@/lib/brand';
 import { useLang } from '@/lib/i18n';
+import Icon, { type IconName } from './Icon';
 
 /*
  * KAKAO design (copied from the owner's design):
@@ -92,7 +93,7 @@ const V: Record<Variant, string> = {
   grey: 'bg-[#E5E5E5] text-black',
 };
 
-export function Btn({ children, onClick, v = 'black', disabled, className = '' }: { children: ReactNode; onClick?: () => void; v?: Variant; disabled?: boolean; className?: string }) {
+export function Btn({ children, onClick, v = 'black', disabled, className = '', icon }: { children: ReactNode; onClick?: () => void; v?: Variant; disabled?: boolean; className?: string; icon?: IconName }) {
   return (
     <button
       type="button"
@@ -100,6 +101,7 @@ export function Btn({ children, onClick, v = 'black', disabled, className = '' }
       onClick={onClick}
       className={`mt-2.5 flex min-h-[54px] w-full items-center justify-center gap-2 rounded-[14px] px-4 text-[17px] font-bold transition active:scale-[0.99] disabled:opacity-40 ${V[v]} ${className}`}
     >
+      {icon && <Icon name={icon} />}
       {children}
     </button>
   );

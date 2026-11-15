@@ -58,7 +58,7 @@ class _DevicesScreenState extends ConsumerState<DevicesScreen> {
       else ...[
         for (final a in approvals)
           KCard(children: [
-            Text('🔐 ${a['deviceName'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+            Row(children: [const Icon(Icons.lock_outline, size: 18), const SizedBox(width: 6), Text('${a['deviceName'] ?? ''}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16))]),
             Text('${a['code'] ?? ''}  •  ${a['ip'] ?? ''}', style: const TextStyle(color: Colors.black54, fontSize: 18, letterSpacing: 4)),
             Row(children: [
               Expanded(child: KBtn(t('approve'), v: KVariant.green, onTap: () => _decide(a['id'], true))),
@@ -78,7 +78,7 @@ class _DevicesScreenState extends ConsumerState<DevicesScreen> {
               margin: const EdgeInsets.only(top: 10),
               decoration: BoxDecoration(color: K.soft, borderRadius: BorderRadius.circular(14)),
               child: ListTile(
-                leading: const Text('📱', style: TextStyle(fontSize: 22)),
+                leading: const Icon(Icons.smartphone, color: Colors.black),
                 title: Text('${d['name']}', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
                 subtitle: Text('${d['lastSeen'] ?? ''}', style: const TextStyle(color: Colors.black54)),
                 trailing: IconButton(

@@ -107,13 +107,13 @@ class _IntegrationsScreenState extends ConsumerState<IntegrationsScreen> with Wi
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(color: K.soft, borderRadius: BorderRadius.circular(14)),
             child: Row(children: [
-              Text(i.icon, style: const TextStyle(fontSize: 24)),
+              Icon(i.connected ? Icons.link : Icons.link_off, color: i.connected ? K.green : Colors.black45),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(i.name, style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w700)),
                   Text(
-                    i.connected ? '✅ ${t('connected')}' : (i.kind == 'oauth' ? 'OAuth' : 'API key'),
+                    i.connected ? t('connected') : (i.kind == 'oauth' ? 'OAuth' : 'API key'),
                     style: const TextStyle(color: Colors.black54, fontSize: 12),
                   ),
                 ]),

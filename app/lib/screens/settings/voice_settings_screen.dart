@@ -135,13 +135,13 @@ class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
     final arUi = ref.watch(languageProvider) == 'ar';
     final changed = draft != saved;
     final accents = <(String, String)>[
-      ('auto', arUi ? '🌐 تلقائي حسب لغتك' : '🌐 Auto by language'),
-      ('bahraini', arUi ? '🇧🇭 بحريني' : '🇧🇭 Bahraini Arabic'),
-      ('en_us', '🇺🇸 English US'),
-      ('en_uk', '🇬🇧 English UK'),
-      ('fr', '🇫🇷 Français'),
-      ('hi', '🇮🇳 हिन्दी'),
-      if (draft.isClone) (draft.voice, arUi ? '🎙️ صوتي' : '🎙️ My voice'),
+      ('auto', arUi ? 'تلقائي حسب لغتك' : 'Auto by language'),
+      ('bahraini', arUi ? 'بحريني' : 'Bahraini Arabic'),
+      ('en_us', 'English US'),
+      ('en_uk', 'English UK'),
+      ('fr', 'Français'),
+      ('hi', 'हिन्दी'),
+      if (draft.isClone) (draft.voice, arUi ? 'صوتي' : 'My voice'),
     ];
     Widget slider(String label, double value, double min, double max, ValueChanged<double> onChanged, {int? divisions}) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,7 +157,7 @@ class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
         Text(arUi ? 'صوت إنسان حقيقي — ElevenLabs و OpenAI' : 'Real human voice — ElevenLabs & OpenAI', style: const TextStyle(color: Colors.black54)),
         const SizedBox(height: 12),
         KPills<String>(
-          items: [('male', arUi ? '👨 رجالي' : '👨 Male'), ('female', arUi ? '👩 نسائي' : '👩 Female')],
+          items: [('male', arUi ? 'رجالي' : 'Male'), ('female', arUi ? 'نسائي' : 'Female')],
           selected: draft.gender,
           onSelect: (g) => setState(() => draft = draft.copyWith(gender: g)),
         ),
@@ -185,8 +185,8 @@ class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
           title: Text(t('autoRead'), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
           onChanged: (v) => setState(() => draft = draft.copyWith(autoRead: v)),
         ),
-        KBtn('▶ ${t('testVoice')}', busy: testing, onTap: _test),
-        KBtn(arUi ? '✅ اعتمد هذا الصوت' : '✅ Use this voice', v: KVariant.green, busy: saving, onTap: changed ? _confirm : null),
+        KBtn(t('testVoice'), icon: Icons.play_arrow, busy: testing, onTap: _test),
+        KBtn(arUi ? 'اعتمد هذا الصوت' : 'Use this voice', icon: Icons.check, v: KVariant.green, busy: saving, onTap: changed ? _confirm : null),
         if (!changed)
           Padding(
             padding: const EdgeInsets.only(top: 6),
@@ -194,7 +194,7 @@ class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
           ),
       ]),
       KCard(children: [
-        Text(arUi ? '👩 صوت البنت' : '👩 Girl voice', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+        Text(arUi ? 'صوت البنت' : 'Girl voice', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
         const SizedBox(height: 4),
         Text(arUi ? 'بنت حقيقية بكل اللهجات العربية — للرد الصوتي والمحادثة والقصص والإعلانات.' : 'A real girl voice in every Arabic dialect — for voice replies, conversation, stories and ads.',
             style: const TextStyle(color: Colors.black54)),
@@ -204,8 +204,8 @@ class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
         KPills<String>(items: [for (final d in girlStyles) (d.$1, arUi ? d.$2 : d.$3)], selected: girl.style, onSelect: (v) => setState(() => girl = girl.copyWith(style: v))),
         Padding(padding: const EdgeInsets.only(top: 12, bottom: 8), child: Text(arUi ? 'السرعة' : 'Speed', style: const TextStyle(fontWeight: FontWeight.w700))),
         KPills<String>(items: [for (final d in girlSpeeds) (d.$1, arUi ? d.$2 : d.$3)], selected: girl.speed, onSelect: (v) => setState(() => girl = girl.copyWith(speed: v))),
-        KBtn(arUi ? '▶ جرّب الصوت' : '▶ Test voice', busy: testingGirl, onTap: _testGirl),
-        KBtn(arUi ? '✅ اعتمد صوت البنت' : '✅ Use this girl voice', v: KVariant.green, onTap: girl == girlSaved ? null : () async {
+        KBtn(arUi ? 'جرّب الصوت' : 'Test voice', icon: Icons.play_arrow, busy: testingGirl, onTap: _testGirl),
+        KBtn(arUi ? 'اعتمد صوت البنت' : 'Use this girl voice', icon: Icons.check, v: KVariant.green, onTap: girl == girlSaved ? null : () async {
           await girl.save();
           setState(() => girlSaved = girl);
           if (context.mounted) toast(context, t('saved'));
@@ -232,18 +232,23 @@ class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
           ),
           Padding(
             padding: const EdgeInsets.only(top: 6),
-            child: Text('🔴 $elapsed / $cloneSeconds', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w700)),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              const Icon(Icons.fiber_manual_record, color: Color(0xFFDC2626), size: 14),
+              const SizedBox(width: 6),
+              Text('$elapsed / $cloneSeconds', style: const TextStyle(fontWeight: FontWeight.w700)),
+            ]),
           ),
         ],
         KBtn(
-          recording ? '⏹ ${t('stop')}' : '🎙️ ${t('record')} (30s)',
+          recording ? t('stop') : '${t('record')} (30s)',
+          icon: recording ? Icons.stop : Icons.mic_none,
           busy: cloning,
           onTap: !consent ? null : (recording ? _finishClone : _startClone),
         ),
         if (draft.isClone)
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: Text(arUi ? '✅ صوتك المستنسخ جاهز — اختاره فوق وجربه' : '✅ Your cloned voice is ready — pick it above and test it',
+            child: Text(arUi ? 'صوتك المستنسخ جاهز — اختاره فوق وجربه' : 'Your cloned voice is ready — pick it above and test it',
                 textAlign: TextAlign.center, style: const TextStyle(color: K.green, fontWeight: FontWeight.w700)),
           ),
       ]),

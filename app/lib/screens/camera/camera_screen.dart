@@ -89,11 +89,11 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
         Text(t('camera'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
         const SizedBox(height: 4),
         Text(t('enterPhoto'), style: const TextStyle(color: Colors.black54)),
-        KBtn('✨ ${t('buildFromPhoto')}', v: KVariant.green, onTap: busy ? null : () => _choose(VisionMode.buildApp)),
-        KBtn('🌐 ${t('translatePhoto')}', onTap: busy ? null : () => _choose(VisionMode.translate)),
-        KBtn('🔳 ${t('scanQr')}', onTap: busy ? null : _scanQr),
-        KBtn('📄 ${t('scanDoc')}', v: KVariant.grey, onTap: busy ? null : () => _choose(VisionMode.document)),
-        KBtn('🪪 ${t('idCard')}', v: KVariant.grey, onTap: busy ? null : () => _choose(VisionMode.idCard)),
+        KBtn(t('buildFromPhoto'), icon: Icons.auto_awesome_outlined, v: KVariant.green, onTap: busy ? null : () => _choose(VisionMode.buildApp)),
+        KBtn(t('translatePhoto'), icon: Icons.translate, onTap: busy ? null : () => _choose(VisionMode.translate)),
+        KBtn(t('scanQr'), icon: Icons.qr_code_scanner, onTap: busy ? null : _scanQr),
+        KBtn(t('scanDoc'), icon: Icons.description_outlined, v: KVariant.grey, onTap: busy ? null : () => _choose(VisionMode.document)),
+        KBtn(t('idCard'), icon: Icons.badge_outlined, v: KVariant.grey, onTap: busy ? null : () => _choose(VisionMode.idCard)),
       ]),
       if (preview != null || busy)
         KCard(children: [
@@ -121,18 +121,18 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
             ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [for (final e in r.fields.entries) Text('${e.key}: ${e.value}')])
             : SelectableText(r.text.isEmpty ? t('empty') : r.text, style: const TextStyle(color: Colors.black, height: 1.6)),
       ),
-      KBtn('📋 ${t('copy')}', v: KVariant.grey, onTap: () {
+      KBtn(t('copy'), icon: Icons.copy, v: KVariant.grey, onTap: () {
         Clipboard.setData(ClipboardData(text: r.text));
         toast(context, t('copied'));
       }),
       if (r.text.startsWith('http'))
-        KBtn('🔗 ${t('openLink')}', v: KVariant.grey, onTap: () => launchUrl(Uri.parse(r.text), mode: LaunchMode.externalApplication)),
-      KBtn('🌐 ${t('translate')}', v: KVariant.grey, onTap: () async {
+        KBtn(t('openLink'), icon: Icons.open_in_new, v: KVariant.grey, onTap: () => launchUrl(Uri.parse(r.text), mode: LaunchMode.externalApplication)),
+      KBtn(t('translate'), icon: Icons.translate, v: KVariant.grey, onTap: () async {
         final tr = await AiService.translate(r.text, ref.read(languageProvider));
         setState(() => result = VisionResult(text: tr, fields: r.fields));
       }),
       if (r.text.isNotEmpty)
-        KBtn('✨ ${t('useInBuilder')}', onTap: () {
+        KBtn(t('useInBuilder'), icon: Icons.auto_awesome_outlined, onTap: () {
           ref.read(builderSeedProvider.notifier).set(BuilderSeed(prompt: r.text));
           ref.read(tabProvider.notifier).set(1);
           Navigator.pop(context);

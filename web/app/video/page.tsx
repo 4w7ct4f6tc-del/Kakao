@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import Icon from '@/components/Icon';
 import { Btn, Card, Shell, TextArea } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
 import { detectLang, useLang } from '@/lib/i18n';
@@ -7,7 +8,6 @@ import { loadVoice, speak } from '@/lib/voice';
 
 type Scene = { narration: string; imageUrl?: string; emoji?: string };
 type Job = { status: string; progress: number; videoUrl?: string; scenes: Scene[]; error?: string };
-const EMOJI = ['🌅', '🚶', '🏙️', '💡', '⚡', '❤️', '🌙', '🎉', '🌊', '🏁'];
 
 export default function VideoPage() {
   const { t, lang, observe } = useLang();
@@ -26,7 +26,7 @@ export default function VideoPage() {
     setMsg('');
     setJob(null);
     // Instant storyboard while the real 1080p video renders.
-    setBoard(story.split(/(?<=[.!؟?])\s+|\n+/).filter(Boolean).slice(0, 10).map((p, i) => ({ narration: p, emoji: EMOJI[i] })));
+    setBoard(story.split(/(?<=[.!؟?])\s+|\n+/).filter(Boolean).slice(0, 10).map((p) => ({ narration: p })));
     try {
       const { id } = await api<{ id: string }>('/video/create', { story, lang, length: 'short', voice: loadVoice().voice, gender: loadVoice().gender });
       clearInterval(timer.current);
@@ -55,7 +55,7 @@ export default function VideoPage() {
     <Shell>
       <Card>
         <TextArea rows={6} value={story} onChange={(e) => setStory(e.target.value)} placeholder={t('storyPh')} />
-        <Btn onClick={make}>{t('makeVideo2')}</Btn>
+        <Btn icon="film" onClick={make}>{t('makeVideo2')}</Btn>
         {msg && <p className="mt-2 text-sm text-black/60">{msg}</p>}
         {job && job.status !== 'done' && (
           <div className="mt-3">
@@ -66,9 +66,9 @@ export default function VideoPage() {
         )}
         {job?.videoUrl && (
           <>
-            <p className="mt-4 text-center text-lg font-extrabold">{t('videoDone')}</p>
+            <p className="mt-4 flex items-center justify-center gap-2 text-lg font-extrabold"><Icon name="checkCircle" className="text-[#16A34A]" />{t('videoDone')}</p>
             <video src={job.videoUrl} controls className="mt-2 w-full rounded-[14px]" />
-            <Btn v="grey" onClick={() => window.open(job.videoUrl, '_blank')}>⬇️ MP4</Btn>
+            <Btn v="grey" icon="download" onClick={() => window.open(job.videoUrl, '_blank')}>MP4</Btn>
           </>
         )}
       </Card>
@@ -76,13 +76,13 @@ export default function VideoPage() {
         <Card>
           <div className="flex items-center justify-between">
             <b>{t('storyboard')} • {board.length}</b>
-            <button onClick={play} className="rounded-full bg-black px-4 py-2 text-sm font-bold text-white">▶ {ar ? 'شغّل' : 'Play'}</button>
+            <button onClick={play} className="flex items-center gap-1.5 rounded-full bg-black px-4 py-2 text-sm font-bold text-white"><Icon name="play" size={14} />{ar ? 'شغّل' : 'Play'}</button>
           </div>
           <div className="mt-3 space-y-2.5">
             {board.map((s, i) => (
               <div key={i} className={`overflow-hidden rounded-[14px] bg-[#F3F3F3] ring-2 ${playing === i ? 'ring-[#16A34A]' : 'ring-transparent'}`}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                {s.imageUrl ? <img src={s.imageUrl} alt="" className="aspect-video w-full object-cover" /> : <div className="flex aspect-video items-center justify-center bg-[#222] text-5xl">{s.emoji || '🎬'}</div>}
+                {s.imageUrl ? <img src={s.imageUrl} alt="" className="aspect-video w-full object-cover" /> : <div className="flex aspect-video items-center justify-center bg-[#222] text-white/50"><Icon name="film" size={40} /></div>}
                 <p className="p-3 text-sm leading-7">{s.narration}</p>
               </div>
             ))}

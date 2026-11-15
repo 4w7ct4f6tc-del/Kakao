@@ -30,9 +30,9 @@ class SettingsTab extends ConsumerWidget {
         KBtn(t('plans'), v: KVariant.grey, onTap: () => go(const PlansScreen())),
       ]),
       KCard(children: [
-        KBtn('🔊 ${t('voice')}', onTap: () => go(const VoiceSettingsScreen())),
-        KBtn('🔗 ${t('integrations')}', onTap: () => go(const IntegrationsScreen())),
-        KBtn('🔑 ${t('apiKeys')}', onTap: () => go(const ApiKeysScreen())),
+        KBtn(t('voice'), icon: Icons.volume_up_outlined, onTap: () => go(const VoiceSettingsScreen())),
+        KBtn(t('integrations'), icon: Icons.link, onTap: () => go(const IntegrationsScreen())),
+        KBtn(t('apiKeys'), icon: Icons.key_outlined, onTap: () => go(const ApiKeysScreen())),
       ]),
       KCard(children: [
         Text(t('security'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
@@ -46,8 +46,8 @@ class SettingsTab extends ConsumerWidget {
             await ref.read(bioLockProvider.notifier).set(v);
           },
         ),
-        KBtn('📱 ${t('devices')}', v: KVariant.grey, onTap: () => go(const DevicesScreen())),
-        KBtn('❓ ${t('smartQuestions')}', v: KVariant.grey, onTap: () => go(const QuestionsScreen())),
+        KBtn(t('devices'), icon: Icons.devices_outlined, v: KVariant.grey, onTap: () => go(const DevicesScreen())),
+        KBtn(t('smartQuestions'), icon: Icons.help_outline, v: KVariant.grey, onTap: () => go(const QuestionsScreen())),
         if (user != null)
           KBtn(t('signOut'), v: KVariant.grey, onTap: () async {
             await ref.read(guestProvider.notifier).set(false);

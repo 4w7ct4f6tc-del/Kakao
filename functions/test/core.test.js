@@ -116,5 +116,5 @@ test('دانو: Riffa lisp only in speech, backstory guard tags, hangup summary'
   assert.strictEqual(h.hangup, true);
   assert.strictEqual(h.summary, 'اتفقنا على محل ورد');
   assert.strictEqual(P.extractActions('بمشي [[FAMILY]]').family, true);
-  assert.ok(P.ai1Prompt({}).includes('💡 اقتراح مني'));
+  assert.ok(P.ai1Prompt({}).includes('اقتراح مني:'));
 });

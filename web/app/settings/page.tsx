@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Btn, Card, Input, Shell } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
+import Icon from '@/components/Icon';
 import { useLang } from '@/lib/i18n';
 import VoiceCard from '@/components/VoiceCard';
 
@@ -63,7 +64,7 @@ export default function Settings() {
         {INTEGRATIONS.map(([id, name, kind]) => (
           <div key={id} className="mt-2 rounded-[14px] bg-[#F3F3F3] p-3">
             <div className="flex items-center justify-between gap-2">
-              <span className="font-semibold">{name} {connected[id] ? <span className="text-[#16A34A]">✓</span> : null}</span>
+              <span className="font-semibold">{name} {connected[id] ? <Icon name="check" size={16} className="text-[#16A34A]" /> : null}</span>
               {connected[id] ? (
                 <button className="rounded-[10px] bg-[#E5E5E5] px-3 py-2 text-sm font-bold" onClick={() => run(() => api('/integrations/disconnect', { provider: id }))}>{ar ? 'فصل' : 'Disconnect'}</button>
               ) : (
@@ -87,7 +88,7 @@ export default function Settings() {
         <h2 className="text-lg font-extrabold">{t('keys')}</h2>
         {BYOK.map(([id, name]) => (
           <div key={id} className="mt-2">
-            <p className="text-sm font-semibold">{name} {keys[id] && <span className="text-[#16A34A]">✓</span>}</p>
+            <p className="text-sm font-semibold">{name} {keys[id] && <Icon name="check" size={16} className="text-[#16A34A]" />}</p>
             <div className="flex gap-2">
               <Input type="password" value={draft[id] || ''} onChange={(e) => setDraft({ ...draft, [id]: e.target.value })} />
               <button className="mt-2.5 rounded-[14px] bg-black px-4 font-bold text-white" onClick={() => run(async () => { await api('/keys', { provider: id, key: draft[id] }); setDraft({ ...draft, [id]: '' }); })}>{t('save')}</button>

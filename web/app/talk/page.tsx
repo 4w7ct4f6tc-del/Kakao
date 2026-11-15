@@ -7,6 +7,7 @@ import { api } from '@/lib/api';
 import {
   DEFAULT_GIRL, DIALECTS, discuss, type DMsg, type DanuReply, type GirlSettings, loadGirl, MODES, playVoice, saveGirl, SPEEDS, stopSpeaking, STYLES,
 } from '@/lib/girl';
+import Icon from '@/components/Icon';
 import { useLang } from '@/lib/i18n';
 
 type Status = 'idle' | 'thinking' | 'speaking' | 'listening';
@@ -52,7 +53,7 @@ async function listenOnce(onLevel: (v: number) => void, stopRef: { current: (() 
 
 /**
  * نقاش — AI 1 chats and thinks with you ("اقتراح مني / اقتراح منك").
- * 📞 اتصلوا حق دانو → دانو joins: a three-way voice discussion in her dialect (default Bahraini Riffa).
+ * "اتصلوا حق دانو" → دانو joins: a three-way voice discussion in her dialect (default Bahraini Riffa).
  */
 export default function Discuss() {
   const { lang } = useLang();
@@ -151,7 +152,7 @@ export default function Discuss() {
     await turn('reply');
   }
 
-  /** 🎤 interrupts دانو if she is talking, then listens until you stop. */
+  /** The mic button interrupts دانو if she is talking, then listens until you stop. */
   async function listen() {
     stopSpeaking();
     clearTimeout(nudgeTimer.current);
@@ -202,20 +203,20 @@ export default function Discuss() {
 
   const pill = (on: boolean) => `rounded-full px-3.5 py-2 text-sm font-bold ${on ? 'bg-black text-white' : 'bg-[#E5E5E5] text-black'}`;
   const name = (list: [string, string, string][] | [string, string, string, number][], id: string) => list.find((x) => x[0] === id)?.[ar ? 1 : 2];
-  const statusText = { idle: ar ? 'اضغط 🎤 وتكلم' : 'Tap 🎤 and talk', thinking: ar ? 'يفكرون…' : 'Thinking…', speaking: ar ? 'دانو تتكلم… اضغط 🎤 تقاطعها' : 'Danu is talking… tap 🎤 to interrupt', listening: ar ? 'أسمعك…' : 'Listening…' }[status];
+  const statusText = { idle: ar ? 'اضغط المايك وتكلم' : 'Tap the mic and talk', thinking: ar ? 'يفكرون…' : 'Thinking…', speaking: ar ? 'دانو تتكلم… اضغط المايك تقاطعها' : 'Danu is talking… tap the mic to interrupt', listening: ar ? 'أسمعك…' : 'Listening…' }[status];
   const dialectChips = <div className="flex flex-wrap gap-2">{DIALECTS.map(([id, a, e]) => <button key={id} onClick={() => { setS({ ...s, dialect: id }); setPicker(false); }} className={pill(s.dialect === id)}>{ar ? a : e}</button>)}</div>;
-  const label = { user: ar ? 'أنت' : 'You', ai1: ar ? '🤖 المساعد' : '🤖 Assistant', danu: ar ? '📞 دانو' : '📞 Danu' };
+  const label = { user: ar ? 'أنت' : 'You', ai1: ar ? 'المساعد' : 'Assistant', danu: ar ? 'دانو' : 'Danu' };
 
   return (
     <Shell>
       {prank && <Prank onDone={onPrankDone} />}
       <Card>
         <div className="flex items-center justify-between gap-2">
-          <h2 className="text-lg font-extrabold">💬 {ar ? 'ناقش فكرتك' : 'Discuss your idea'}</h2>
+          <h2 className="flex items-center gap-2 text-lg font-extrabold"><Icon name="chat" />{ar ? 'ناقش فكرتك' : 'Discuss your idea'}</h2>
           {call ? (
-            <button onClick={() => hangUp(null)} className="rounded-full bg-[#DC2626] px-3.5 py-2 text-sm font-bold text-white">{ar ? 'إنهاء المكالمة' : 'End call'}</button>
+            <button onClick={() => hangUp(null)} className="flex items-center gap-1.5 rounded-full bg-[#DC2626] px-3.5 py-2 text-sm font-bold text-white"><Icon name="phone" size={16} className="rotate-[135deg]" />{ar ? 'إنهاء المكالمة' : 'End call'}</button>
           ) : (
-            <button onClick={() => setSetup(!setup)} className="rounded-full bg-[#16A34A] px-3.5 py-2 text-sm font-bold text-white">📞 {ar ? 'اتصلوا حق دانو' : 'Call Danu'}</button>
+            <button onClick={() => setSetup(!setup)} className="flex items-center gap-1.5 rounded-full bg-[#16A34A] px-3.5 py-2 text-sm font-bold text-white"><Icon name="phone" size={16} />{ar ? 'اتصلوا حق دانو' : 'Call Danu'}</button>
           )}
         </div>
         <div className="mt-3 flex flex-wrap gap-2">{AIS.map(([id, n]) => <button key={id} onClick={() => setEngine(id)} className={pill(engine === id)}>{n}</button>)}</div>
@@ -233,7 +234,7 @@ export default function Discuss() {
 
       {setup && !call && (
         <Card>
-          <h3 className="font-extrabold">📞 {ar ? 'قبل لا تتصل بدانو' : 'Before you call Danu'}</h3>
+          <h3 className="font-extrabold">{ar ? 'قبل لا تتصل بدانو' : 'Before you call Danu'}</h3>
           <p className="text-sm text-black/60">{ar ? 'دانو — بنت الرفاع: شديدة وحنونة ومشاغبة، وأذكى وحدة في المكالمة.' : 'Danu — a girl from Riffa: strict, sweet, mischievous, and the smartest one on the call.'}</p>
           <p className="mb-2 mt-3 text-sm font-bold">1. {ar ? 'اللهجة' : 'Dialect'}</p>
           {dialectChips}
@@ -247,8 +248,8 @@ export default function Discuss() {
             {ar ? 'لدغة رفاعية خفيفة (ر ← و في الصوت)' : 'Light Riffa lisp (R → W in speech)'}
             <input type="checkbox" checked={s.lisp !== false} onChange={(e) => setS({ ...s, lisp: e.target.checked })} className="h-5 w-5 accent-[#16A34A]" />
           </label>
-          <Btn v="grey" onClick={testVoice} disabled={status !== 'idle'}>{status !== 'idle' ? '…' : `▶ ${ar ? 'جرّب الصوت' : 'Test voice'}`}</Btn>
-          <Btn v="green" onClick={startCall}>📞 {ar ? 'اتصل' : 'Call'}</Btn>
+          <Btn v="grey" icon="play" onClick={testVoice} disabled={status !== 'idle'}>{status !== 'idle' ? '…' : (ar ? 'جرّب الصوت' : 'Test voice')}</Btn>
+          <Btn v="green" icon="phone" onClick={startCall}>{ar ? 'اتصل' : 'Call'}</Btn>
         </Card>
       )}
 
@@ -265,14 +266,14 @@ export default function Discuss() {
         </div>
         {summary !== null && (
           <div className="mt-3 rounded-[14px] border border-[#E5E5E5] p-3">
-            <p className="text-sm font-extrabold">📋 {ar ? 'زبدة المكالمة' : 'Call summary'}</p>
+            <p className="flex items-center gap-1.5 text-sm font-extrabold"><Icon name="clipboard" size={16} />{ar ? 'زبدة المكالمة' : 'Call summary'}</p>
             <p className="mt-1 text-sm text-black/70">{summary}</p>
           </div>
         )}
         {(actions.build || actions.video) && (
           <div className="grid grid-cols-2 gap-2.5">
-            {actions.build && <Btn v="green" onClick={() => router.push(`/builder?prompt=${encodeURIComponent(actions.build!)}`)}>✨ {ar ? 'افتح المصنع' : 'Open builder'}</Btn>}
-            {actions.video && <Btn v="green" onClick={() => router.push('/video')}>🎬 {ar ? 'افتح الفيديو' : 'Open video'}</Btn>}
+            {actions.build && <Btn v="green" icon="sparkles" onClick={() => router.push(`/builder?prompt=${encodeURIComponent(actions.build!)}`)}>{ar ? 'افتح المصنع' : 'Open builder'}</Btn>}
+            {actions.video && <Btn v="green" icon="film" onClick={() => router.push('/video')}>{ar ? 'افتح الفيديو' : 'Open video'}</Btn>}
           </div>
         )}
         {call && (
@@ -283,14 +284,14 @@ export default function Discuss() {
               className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full text-3xl text-white transition ${status === 'listening' ? 'bg-[#16A34A]' : 'bg-black'}`}
               style={{ boxShadow: status === 'listening' ? `0 0 0 ${6 + level * 22}px rgba(22,163,74,0.25)` : status === 'speaking' ? '0 0 0 8px rgba(0,0,0,0.12)' : 'none' }}
             >
-              🎤
+              <Icon name="mic" size={34} />
             </button>
             <p className="mt-2 text-sm font-semibold text-black/70">{statusText}</p>
           </div>
         )}
         <div className="mt-2 flex gap-2">
           <Input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { handsFree.current = false; send(text); setText(''); } }} placeholder={call ? (ar ? 'تكلم أو اكتب…' : 'Talk or type…') : (ar ? 'اكتب فكرتك…' : 'Write your idea…')} />
-          <button onClick={() => { handsFree.current = false; send(text); setText(''); }} className="mt-2.5 rounded-[14px] bg-black px-4 font-bold text-white" aria-label="send">↑</button>
+          <button onClick={() => { handsFree.current = false; send(text); setText(''); }} className="mt-2.5 rounded-[14px] bg-black px-4 font-bold text-white" aria-label="send"><Icon name="send" /></button>
         </div>
         {status === 'thinking' && <div className="mt-2 h-1 w-16 animate-pulse rounded bg-[#16A34A]" />}
         {note && <p className="mt-2 text-center text-xs text-black/60">{note}</p>}

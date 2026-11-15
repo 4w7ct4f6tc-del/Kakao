@@ -1,6 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import type { Design, Product } from '@/lib/design';
+import Icon, { type IconName } from './Icon';
 
 /** Interactive renderer for a JSON design — used in the builder preview AND the published app. */
 export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Design; onChange?: (d: Design) => void; fullscreen?: boolean }) {
@@ -70,27 +71,28 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
   );
 
   const Title = ({ s }: { s: string }) => <h3 className="px-3.5 pb-2 pt-4 text-[15px] font-extrabold">{s}</h3>;
-  const Cta = ({ label, onClick }: { label: string; onClick: () => void }) => (
-    <button onClick={onClick} className="mx-3.5 my-1 flex w-[calc(100%-28px)] items-center justify-between rounded-2xl border p-3 text-start font-semibold" style={{ borderColor: `${c.primary}55` }}>
-      {label}<span style={{ color: c.primary }}>{ar ? '‹' : '›'}</span>
+  const Cta = ({ label, icon, onClick }: { label: string; icon: IconName; onClick: () => void }) => (
+    <button onClick={onClick} className="mx-3.5 my-1 flex w-[calc(100%-28px)] items-center gap-2 rounded-2xl border p-3 text-start font-semibold" style={{ borderColor: `${c.primary}55` }}>
+      <span style={{ color: c.primary }}><Icon name={icon} size={18} /></span>
+      <span className="flex-1">{label}</span><span style={{ color: c.primary }}>{ar ? '‹' : '›'}</span>
     </button>
   );
   const reviews = ar ? [['سارة', 'خدمة ممتازة وتوصيل سريع'], ['محمد', 'الجودة رهيبة'], ['فاطمة', 'أنصح فيه بقوة']] : [['Sara', 'Great service and fast delivery'], ['Ali', 'Amazing quality'], ['Mona', 'Highly recommended']];
   const Reviews = () => (
     <div className="flex gap-2 overflow-x-auto px-3.5">
-      {reviews.map(([n, r]) => <div key={n} className="min-w-[170px] rounded-2xl bg-white p-2.5 text-[11px] shadow"><b className="text-black/85">⭐⭐⭐⭐⭐ {n}</b><p className="text-black/55">{r}</p></div>)}
+      {reviews.map(([n, r]) => <div key={n} className="min-w-[170px] rounded-2xl bg-white p-2.5 text-[11px] shadow"><b className="flex items-center gap-0.5 text-black/85"><span className="flex text-[#F59E0B]">{[0, 1, 2, 3, 4].map((k) => <Icon key={k} name="star" size={11} />)}</span> {n}</b><p className="text-black/55">{r}</p></div>)}
     </div>
   );
   const Map = () => (
     <a target="_blank" rel="noreferrer" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(d.contact.address || d.name)}`} className="mx-3.5 flex h-[90px] items-center justify-center rounded-2xl" style={{ background: `${c.primary}14` }}>
-      📍 {d.contact.address || tr('افتح الخريطة', 'Open map')}
+      <Icon name="pin" size={18} className="me-1.5" />{d.contact.address || tr('افتح الخريطة', 'Open map')}
     </a>
   );
   const ContactBtns = () => (
     <div>
-      <Cta label={`💬 ${tr('واتساب', 'WhatsApp')} ${d.contact.whatsapp}`} onClick={() => window.open(`https://wa.me/${wa}`, '_blank')} />
-      <Cta label={`📸 @${d.contact.instagram.replace('@', '')}`} onClick={() => window.open(`https://instagram.com/${d.contact.instagram.replace('@', '')}`, '_blank')} />
-      {d.contact.phone && <Cta label={`📞 ${d.contact.phone}`} onClick={() => (window.location.href = `tel:${d.contact.phone}`)} />}
+      <Cta icon="chat" label={`${tr('واتساب', 'WhatsApp')} ${d.contact.whatsapp}`} onClick={() => window.open(`https://wa.me/${wa}`, '_blank')} />
+      <Cta icon="instagram" label={`@${d.contact.instagram.replace('@', '')}`} onClick={() => window.open(`https://instagram.com/${d.contact.instagram.replace('@', '')}`, '_blank')} />
+      {d.contact.phone && <Cta icon="phone" label={d.contact.phone} onClick={() => (window.location.href = `tel:${d.contact.phone}`)} />}
     </div>
   );
 
@@ -111,9 +113,9 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
       case 'products':
         return <div key={s}><Title s={tr('الأكثر طلباً', 'Popular')} /><Grid list={d.products.slice(0, 4)} /></div>;
       case 'offers':
-        return <div key={s} className="m-3.5 rounded-2xl p-3.5 font-bold text-white" style={{ background: c.secondary }}>🔥 {tr('خصم 20% على أول طلب', '20% off your first order')}</div>;
+        return <div key={s} className="m-3.5 rounded-2xl p-3.5 font-bold text-white" style={{ background: c.secondary }}><span className="flex items-center gap-2"><Icon name="flame" size={18} />{tr('خصم 20% على أول طلب', '20% off your first order')}</span></div>;
       case 'booking':
-        return <Cta key={s} label={`📅 ${tr('احجز موعدك', 'Book an appointment')}`} onClick={() => setTab(3)} />;
+        return <Cta key={s} icon="calendar" label={tr('احجز موعدك', 'Book an appointment')} onClick={() => setTab(3)} />;
       case 'reviews':
         return <div key={s}><Title s={tr('آراء العملاء', 'Reviews')} /><Reviews /></div>;
       case 'map':
@@ -140,20 +142,20 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
       <Grid list={filtered} />
     </div>,
     <div key="c" className="flex h-full flex-col">
-      {count === 0 ? <div className="m-auto text-center"><div className="text-5xl">🛒</div>{tr('السلة فاضية', 'Your cart is empty')}</div> : (
+      {count === 0 ? <div className="m-auto text-center"><div className="mb-2 flex justify-center opacity-40"><Icon name="cart" size={44} /></div>{tr('السلة فاضية', 'Your cart is empty')}</div> : (
         <>
           <div className="flex-1 space-y-2 overflow-auto p-3.5">
             {Object.entries(cart).map(([id, n]) => { const p = d.products.find((x) => x.id === id)!; return (
               <div key={id} className="flex items-center gap-2">
                 <div className="w-11"><Img p={p} h={44} /></div>
                 <div className="flex-1 text-[13px]">{p.name}<div className="text-[12px]" style={{ color: c.primary }}>{money(p.price * n)}</div></div>
-                <button onClick={() => setCart((x) => { const y = { ...x }; if (n <= 1) delete y[id]; else y[id] = n - 1; return y; })}>➖</button>{n}<button onClick={() => add(p)}>➕</button>
+                <button onClick={() => setCart((x) => { const y = { ...x }; if (n <= 1) delete y[id]; else y[id] = n - 1; return y; })} aria-label="minus"><Icon name="minus" size={16} /></button>{n}<button onClick={() => add(p)} aria-label="plus"><Icon name="plus" size={16} /></button>
               </div>); })}
           </div>
           <div className="p-3.5">
             <div className="flex justify-between font-bold"><span>{tr('المجموع', 'Total')}</span><span style={{ color: c.primary }}>{money(total)}</span></div>
             {!checkout ? (
-              <button onClick={() => setCheckout(true)} className="mt-2 w-full rounded-xl py-2.5 font-bold text-white" style={{ background: c.primary }}>🧾 {tr('إتمام الطلب', 'Checkout')}</button>
+              <button onClick={() => setCheckout(true)} className="mt-2 w-full rounded-xl py-2.5 font-bold text-white" style={{ background: c.primary }}><span className="flex items-center justify-center gap-2"><Icon name="receipt" size={18} />{tr('إتمام الطلب', 'Checkout')}</span></button>
             ) : (
               <div className="mt-2 space-y-1.5">
                 {(['name', 'phone', 'address', 'notes'] as const).map((k) => (
@@ -162,7 +164,7 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
                 <div className="flex flex-wrap gap-1">
                   {payMethods.map((m) => <button key={m} onClick={() => setForm({ ...form, pay: m })} className="rounded-full border px-2 py-0.5 text-[10px]" style={(form.pay || payMethods[0]) === m ? { background: c.primary, color: '#fff' } : {}}>{m}</button>)}
                 </div>
-                <button onClick={order} className="w-full rounded-xl bg-[#25D366] py-2.5 font-bold text-white">💬 {tr('أرسل الطلب عبر واتساب', 'Send order on WhatsApp')}</button>
+                <button onClick={order} className="w-full rounded-xl bg-[#25D366] py-2.5 font-bold text-white"><span className="flex items-center justify-center gap-2"><Icon name="chat" size={18} />{tr('أرسل الطلب عبر واتساب', 'Send order on WhatsApp')}</span></button>
               </div>
             )}
           </div>
@@ -179,16 +181,16 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
     <div key="ct" className="space-y-3 py-3.5"><ContactBtns /><Map /><Reviews /></div>,
   ];
 
-  // Owner's design: 🏪 Home | 👕 Products | 🛒 Cart | 📞 Contact (booking opens from Home).
-  const nav: [string, string, number][] = [['🏪', tr('الرئيسية', 'Home'), 0], ['👕', tr('المنتجات', 'Products'), 1], ['🛒', tr('السلة', 'Cart'), 2], ['📞', tr('تواصل', 'Contact'), 4]];
+  // Home | Products | Cart | Contact (booking opens from Home).
+  const nav: [IconName, string, number][] = [['home', tr('الرئيسية', 'Home'), 0], ['shirt', tr('المنتجات', 'Products'), 1], ['cart', tr('السلة', 'Cart'), 2], ['phone', tr('تواصل', 'Contact'), 4]];
 
   return (
     <div dir={ar ? 'rtl' : 'ltr'} className={`flex flex-col text-[13px] ${fullscreen ? 'min-h-screen' : 'h-full'}`} style={{ background: c.background, color: c.text, fontFamily: `${d.font}, Cairo, Inter, sans-serif` }}>
       <div className={`flex items-center gap-2 px-3.5 pb-2.5 ${fullscreen ? 'pt-4' : 'pt-10'}`} style={{ background: c.primary }}>
         <span className="text-xl">{d.logoEmoji}</span>
         <b className="flex-1 truncate text-base text-white">{d.name}</b>
-        {onChange && <button onClick={() => setAdmin(!admin)} title={tr('لوحة الإدارة', 'Admin Panel')} className="text-white">🛠️</button>}
-        <button onClick={() => setTab(2)} className="relative text-white">🛍️{count > 0 && <span className="absolute -end-2 -top-1 rounded-full bg-red-600 px-1 text-[9px]">{count}</span>}</button>
+        {onChange && <button onClick={() => setAdmin(!admin)} title={tr('لوحة الإدارة', 'Admin Panel')} className="text-white"><Icon name="wrench" size={18} /></button>}
+        <button onClick={() => setTab(2)} className="relative text-white" aria-label="cart"><Icon name="bag" size={18} />{count > 0 && <span className="absolute -end-2 -top-1 rounded-full bg-red-600 px-1 text-[9px]">{count}</span>}</button>
       </div>
       {admin && (
         <div className="space-y-1.5 bg-white p-3 text-black shadow">
@@ -203,7 +205,7 @@ export default function PreviewApp({ d, onChange, fullscreen = false }: { d: Des
       )}
       <div className="flex-1 overflow-auto">{pages[tab]}</div>
       <div className="flex bg-white pb-2.5 pt-1.5">
-        {nav.map(([i, l, idx]) => <button key={idx} onClick={() => setTab(idx)} className="flex flex-1 flex-col items-center text-[10px] font-semibold" style={{ color: tab === idx ? c.primary : '#0008' }}><span className="text-base">{i}</span>{l}</button>)}
+        {nav.map(([i, l, idx]) => <button key={idx} onClick={() => setTab(idx)} className="flex flex-1 flex-col items-center text-[10px] font-semibold" style={{ color: tab === idx ? c.primary : '#0008' }}><Icon name={i} size={18} />{l}</button>)}
       </div>
     </div>
   );

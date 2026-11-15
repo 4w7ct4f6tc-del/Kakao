@@ -26,14 +26,14 @@ export default function Templates() {
         <div className="mt-3 flex flex-wrap gap-2">
           {TEMPLATES.map((t) => (
             <button key={t.type} onClick={() => setActive(t.type)} className={`rounded-full px-3.5 py-2 text-sm font-bold ${active === t.type ? 'bg-black text-white' : 'bg-[#E5E5E5] text-black'}`}>
-              {t.emoji} {t.title[l]}
+              {t.title[l]}
             </button>
           ))}
         </div>
       </Card>
       <Card>
         <PhoneFrame><PreviewApp key={active + lang} d={design} onChange={setDesign} /></PhoneFrame>
-        <Btn v="green" onClick={() => router.push(`/builder?prompt=${encodeURIComponent(prompt)}`)}>✨ {l === 'ar' ? 'استخدم هذا القالب' : 'Use this template'}</Btn>
+        <Btn v="green" onClick={() => router.push(`/builder?prompt=${encodeURIComponent(prompt)}`)} icon="sparkles">{l === 'ar' ? 'استخدم هذا القالب' : 'Use this template'}</Btn>
       </Card>
     </Shell>
   );

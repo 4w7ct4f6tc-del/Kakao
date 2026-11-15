@@ -151,13 +151,13 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
         const SizedBox(height: 12),
         Text('${t('chosenAI')}: $aiName', style: const TextStyle(fontWeight: FontWeight.w600)),
         KInput(text, t('examplePh'), lines: 4),
-        KBtn(t('buildBtn'), busy: busy == 'build', onTap: _build),
+        KBtn(t('buildBtn'), icon: Icons.auto_awesome_outlined, busy: busy == 'build', onTap: _build),
         Row(children: [
-          Expanded(child: KBtn(t('cameraBtn'), v: KVariant.grey, fontSize: 15, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen())))),
+          Expanded(child: KBtn(t('cameraBtn'), icon: Icons.photo_camera_outlined, v: KVariant.grey, fontSize: 15, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen())))),
           const SizedBox(width: 10),
-          Expanded(child: KBtn(t('voiceBtn'), v: KVariant.grey, fontSize: 15, busy: busy == 'voice', onTap: _voiceReply)),
+          Expanded(child: KBtn(t('voiceBtn'), icon: Icons.volume_up_outlined, v: KVariant.grey, fontSize: 15, busy: busy == 'voice', onTap: _voiceReply)),
         ]),
-        KBtn(ar ? '💬 ناقش فكرتك • 📞 دانو' : '💬 Discuss your idea • 📞 Danu', v: KVariant.grey, fontSize: 15,
+        KBtn(ar ? 'ناقش فكرتك مع دانو' : 'Discuss your idea with Danu', icon: Icons.chat_bubble_outline, v: KVariant.grey, fontSize: 15,
             onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DiscussScreen()))),
         if (reply.isNotEmpty)
           Container(
@@ -174,7 +174,7 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
                 ActionChip(
                   backgroundColor: K.soft,
                   side: BorderSide.none,
-                  label: Text('${tpl.emoji} ${tpl.title[ar ? 'ar' : 'en']}', style: const TextStyle(color: Colors.black, fontSize: 12)),
+                  label: Text('${tpl.title[ar ? 'ar' : 'en']}', style: const TextStyle(color: Colors.black, fontSize: 12)),
                   onPressed: () {
                     text.text = ar ? 'أبي تطبيق ${tpl.title['ar']}' : 'I want a ${tpl.title['en']} app';
                     _build();
@@ -214,7 +214,7 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
           ),
           ),
         ),
-        KBtn(t('approveFull'), v: KVariant.green, onTap: _approve),
+        KBtn(t('approveFull'), icon: Icons.check, v: KVariant.green, onTap: _approve),
       ]);
 
   Widget _expand(String title, Widget child) => Container(
@@ -254,10 +254,10 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
 
   Widget _connectCard(String Function(String) t) => KCard(children: [
         Text(t('connectTitle'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-        KInput(whatsapp, '💬 ${t('whatsapp')}', keyboard: TextInputType.phone),
-        KInput(instagram, '📸 ${t('instagram')}'),
-        KInput(domain, '🌐 ${t('domain')}'),
-        KBtn(t('publish'), v: KVariant.green, busy: busy == 'publish', onTap: _publish),
+        KInput(whatsapp, t('whatsapp'), keyboard: TextInputType.phone),
+        KInput(instagram, t('instagram')),
+        KInput(domain, t('domain')),
+        KBtn(t('publish'), icon: Icons.rocket_launch_outlined, v: KVariant.green, busy: busy == 'publish', onTap: _publish),
         KBtn(t('back'), v: KVariant.grey, onTap: () => setState(() => step = _Step.consent)),
       ]);
 
@@ -265,7 +265,7 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
     final r = result!;
     final link = r.customDomain != null ? 'https://${r.customDomain}' : r.url;
     return KCard(align: CrossAxisAlignment.center, children: [
-      const Text('🎉', style: TextStyle(fontSize: 48)),
+      const Icon(Icons.check_circle_outline, size: 56, color: K.green),
       Text(t('published'), style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
       const SizedBox(height: 12),
       QrImageView(data: link, size: 190),

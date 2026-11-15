@@ -6,6 +6,7 @@ import PreviewApp, { PhoneFrame } from '@/components/PreviewApp';
 import { Btn, Card, Input, Shell, TextArea } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
 import { ALL_SECTIONS, type Design, localDesign, TEMPLATES } from '@/lib/design';
+import Icon from '@/components/Icon';
 import { useLang } from '@/lib/i18n';
 import { loadGirl, parseRequest, playVoice, talk } from '@/lib/girl';
 
@@ -61,7 +62,7 @@ function Builder() {
     setDesign(localDesign(text || t('examplePh'), lang, a.name, a.colors, a.sell));
   }
 
-  /** 🔊 Real girl voice reply: dialect / type / mode come from the voice settings or from the text itself
+  /** Real voice reply: dialect / type / mode come from the voice settings or from the text itself
    *  ("سوي لي إعلان لمحلي باللهجة المصرية بنت تضحك" → Egyptian, laughing, ad). */
   async function voiceReply() {
     const content = text.trim();
@@ -115,19 +116,19 @@ function Builder() {
         </div>
         <p className="mt-3 text-sm font-semibold">{t('chosenAI')}: {AIS.find((x) => x[0] === ai)![1]}</p>
         <TextArea rows={4} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('examplePh')} />
-        <Btn onClick={() => build()} disabled={busy === 'build'}>{busy === 'build' ? '…' : t('buildBtn')}</Btn>
+        <Btn icon="sparkles" onClick={() => build()} disabled={busy === 'build'}>{busy === 'build' ? '…' : t('buildBtn')}</Btn>
         <div className="grid grid-cols-2 gap-2.5">
-          <Btn v="grey" className="!text-[15px]" onClick={() => file.current?.click()} disabled={busy === 'camera'}>{busy === 'camera' ? '…' : t('cameraBtn')}</Btn>
-          <Btn v="grey" className="!text-[15px]" onClick={voiceReply} disabled={busy === 'voice'}>{busy === 'voice' ? '…' : t('voiceBtn')}</Btn>
+          <Btn v="grey" icon="camera" className="!text-[15px]" onClick={() => file.current?.click()} disabled={busy === 'camera'}>{busy === 'camera' ? '…' : t('cameraBtn')}</Btn>
+          <Btn v="grey" icon="volume" className="!text-[15px]" onClick={voiceReply} disabled={busy === 'voice'}>{busy === 'voice' ? '…' : t('voiceBtn')}</Btn>
         </div>
-        <Btn v="grey" onClick={() => router.push('/talk')}>💬 {ar ? 'ناقش فكرتك • 📞 دانو' : 'Discuss your idea • 📞 Danu'}</Btn>
+        <Btn v="grey" icon="chat" onClick={() => router.push('/talk')}>{ar ? 'ناقش فكرتك مع دانو' : 'Discuss your idea with Danu'}</Btn>
         <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={(e) => e.target.files?.[0] && camera(e.target.files[0])} />
         {reply && <p className="mt-3 whitespace-pre-wrap rounded-[14px] bg-[#F3F3F3] p-3 leading-7">{reply}</p>}
         {msg && <p className="mt-2 text-sm text-black/60">{msg}</p>}
         {!design && (
           <div className="mt-3 flex flex-wrap gap-1.5">
             {TEMPLATES.slice(0, 6).map((tpl) => (
-              <button key={tpl.type} onClick={() => { const p = ar ? `أبي تطبيق ${tpl.title.ar}` : `I want a ${tpl.title.en} app`; setText(p); build(p); }} className="rounded-full bg-[#F3F3F3] px-3 py-1.5 text-xs font-semibold">{tpl.emoji} {ar ? tpl.title.ar : tpl.title.en}</button>
+              <button key={tpl.type} onClick={() => { const p = ar ? `أبي تطبيق ${tpl.title.ar}` : `I want a ${tpl.title.en} app`; setText(p); build(p); }} className="rounded-full bg-[#F3F3F3] px-3 py-1.5 text-xs font-semibold">{ar ? tpl.title.ar : tpl.title.en}</button>
             ))}
           </div>
         )}
@@ -144,7 +145,7 @@ function Builder() {
             <Input placeholder={t('q3')} value={answers.sell} onChange={(e) => answer('sell', e.target.value)} />
           </details>
           <details className="mt-2.5 rounded-[14px] bg-[#F3F3F3] p-3">
-            <summary className="cursor-pointer text-sm font-bold">✏️ {ar ? 'عدّل التصميم' : 'Edit the design'}</summary>
+            <summary className="cursor-pointer text-sm font-bold"><Icon name="pencil" size={16} className="me-1.5 align-[-3px]" />{ar ? 'عدّل التصميم' : 'Edit the design'}</summary>
             <Input value={design.name} onChange={(e) => setDesign({ ...design, name: e.target.value })} placeholder={t('q1')} />
             {(['primary', 'secondary', 'background'] as const).map((k) => (
               <div key={k} className="mt-3">
@@ -171,13 +172,13 @@ function Builder() {
                   <span>{p.emoji}</span>
                   <input value={p.name} onChange={(e) => setDesign({ ...design, products: design.products.map((x) => (x.id === p.id ? { ...x, name: e.target.value } : x)) })} className="min-w-0 flex-1 rounded-[10px] bg-white px-2.5 py-2 text-sm outline-none" />
                   <input value={p.price} inputMode="decimal" onChange={(e) => setDesign({ ...design, products: design.products.map((x) => (x.id === p.id ? { ...x, price: Number(e.target.value) || 0 } : x)) })} className="w-20 rounded-[10px] bg-white px-2.5 py-2 text-sm outline-none" />
-                  <button aria-label="delete" onClick={() => setDesign({ ...design, products: design.products.filter((x) => x.id !== p.id) })} className="px-1">🗑️</button>
+                  <button aria-label="delete" onClick={() => setDesign({ ...design, products: design.products.filter((x) => x.id !== p.id) })} className="px-1 text-black/60"><Icon name="trash" size={18} /></button>
                 </div>
               ))}
               <button onClick={() => setDesign({ ...design, products: [...design.products, { id: `n${Date.now()}`, name: t('addProduct'), price: 1, emoji: design.logoEmoji, category: design.categories[0] || '', image: '' }] })} className="w-full rounded-[10px] bg-white py-2 text-sm font-bold">+ {t('addProduct')}</button>
             </div>
           </details>
-          <Btn v="green" onClick={() => { api('/apps/save', { design }).catch(() => {}); setStep('consent'); }}>{t('approveFull')}</Btn>
+          <Btn v="green" icon="check" onClick={() => { api('/apps/save', { design }).catch(() => {}); setStep('consent'); }}>{t('approveFull')}</Btn>
         </Card>
       )}
 
@@ -198,11 +199,11 @@ function Builder() {
       {step === 'connect' && (
         <Card>
           <h2 className="text-lg font-extrabold">{t('connect')}</h2>
-          <Input placeholder={`💬 ${t('whatsapp')}`} value={contact.whatsapp} onChange={(e) => setContact({ ...contact, whatsapp: e.target.value })} />
-          <Input placeholder={`📸 ${t('instagram')}`} value={contact.instagram} onChange={(e) => setContact({ ...contact, instagram: e.target.value })} />
-          <Input placeholder={`🌐 ${t('domain')}`} value={contact.domain} onChange={(e) => setContact({ ...contact, domain: e.target.value })} />
+          <Input placeholder={t('whatsapp')} value={contact.whatsapp} onChange={(e) => setContact({ ...contact, whatsapp: e.target.value })} />
+          <Input placeholder={t('instagram')} value={contact.instagram} onChange={(e) => setContact({ ...contact, instagram: e.target.value })} />
+          <Input placeholder={t('domain')} value={contact.domain} onChange={(e) => setContact({ ...contact, domain: e.target.value })} />
           {msg && <p className="mt-2 text-sm text-black/60">{msg}</p>}
-          <Btn v="green" onClick={publish} disabled={busy === 'publish'}>{busy === 'publish' ? '…' : `🚀 ${t('publish')}`}</Btn>
+          <Btn v="green" icon="rocket" onClick={publish} disabled={busy === 'publish'}>{busy === 'publish' ? '…' : t('publish')}</Btn>
           <Btn v="grey" onClick={() => setStep('consent')}>{t('back')}</Btn>
         </Card>
       )}
@@ -211,7 +212,7 @@ function Builder() {
         const link = result.customDomain ? `https://${result.customDomain}` : result.url;
         return (
           <Card className="text-center">
-            <div className="text-5xl">🎉</div>
+            <div className="flex justify-center text-[#16A34A]"><Icon name="checkCircle" size={56} /></div>
             <h2 className="text-2xl font-black">{t('published')}</h2>
             <div className="mx-auto my-4 w-fit"><QRCodeSVG value={link} size={190} /></div>
             <p className="break-all font-semibold text-[#16A34A]">{link}</p>

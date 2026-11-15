@@ -61,7 +61,7 @@ class _ApiKeysScreenState extends ConsumerState<ApiKeysScreen> {
             padding: const EdgeInsets.only(top: 14),
             child: Row(children: [
               Expanded(child: Text(p.$2, style: const TextStyle(fontWeight: FontWeight.w700))),
-              if (status[p.$1] == true) Text('✅ ${t('saved')}', style: const TextStyle(color: K.green, fontWeight: FontWeight.w700)),
+              if (status[p.$1] == true) const Icon(Icons.check_circle, color: K.green, size: 20),
             ]),
           ),
           KInput(controllers[p.$1]!, p.$3, obscure: true),

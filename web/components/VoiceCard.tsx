@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import Icon from '@/components/Icon';
 import { Btn, Card } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
 import { useLang } from '@/lib/i18n';
@@ -8,7 +9,7 @@ import { DEFAULT_GIRL, DIALECTS, type GirlSettings, loadGirl, playVoice, saveGir
 
 const CLONE_SECONDS = 30;
 
-/** 🔊 Real voice settings: gender, accent, speed, pitch, volume, ▶ test, ✅ confirm, 30-second voice clone. */
+/** Real voice settings: gender, accent, speed, pitch, volume, test, confirm, 30-second voice clone. */
 export default function VoiceCard() {
   const { lang } = useLang();
   const ar = lang === 'ar';
@@ -46,7 +47,7 @@ export default function VoiceCard() {
   async function confirm() {
     await saveVoice(draft);
     setSaved(draft);
-    setNote(ar ? '✅ تم اعتماد الصوت' : '✅ Voice saved');
+    setNote(ar ? 'تم اعتماد الصوت' : 'Voice saved');
   }
 
   async function startClone() {
@@ -66,7 +67,7 @@ export default function VoiceCard() {
           setDraft(next);
           await saveVoice(next);
           setSaved(next);
-          setNote(ar ? '✅ صوتك المستنسخ جاهز' : '✅ Your cloned voice is ready');
+          setNote(ar ? 'صوتك المستنسخ جاهز' : 'Your cloned voice is ready');
         } catch (e) {
           setNote(friendly(e, lang));
         }
@@ -92,9 +93,9 @@ export default function VoiceCard() {
 
   const pill = (on: boolean) => `rounded-full px-3.5 py-2 text-sm font-bold ${on ? 'bg-black text-white' : 'bg-[#E5E5E5] text-black'}`;
   const accents: [string, string][] = [
-    ['auto', ar ? '🌐 تلقائي حسب لغتك' : '🌐 Auto by language'], ['bahraini', ar ? '🇧🇭 بحريني' : '🇧🇭 Bahraini Arabic'],
-    ['en_us', '🇺🇸 English US'], ['en_uk', '🇬🇧 English UK'], ['fr', '🇫🇷 Français'], ['hi', '🇮🇳 हिन्दी'],
-    ...(draft.voice.startsWith('clone:') ? [[draft.voice, ar ? '🎙️ صوتي' : '🎙️ My voice'] as [string, string]] : []),
+    ['auto', ar ? 'تلقائي حسب لغتك' : 'Auto by language'], ['bahraini', ar ? 'بحريني' : 'Bahraini Arabic'],
+    ['en_us', 'English US'], ['en_uk', 'English UK'], ['fr', 'Français'], ['hi', 'हिन्दी'],
+    ...(draft.voice.startsWith('clone:') ? [[draft.voice, ar ? 'صوتي' : 'My voice'] as [string, string]] : []),
   ];
   const slider = (label: string, key: 'speed' | 'pitch' | 'volume', min: number, max: number, step: number, show: string) => (
     <label className="mt-3 block text-sm font-semibold">
@@ -106,11 +107,11 @@ export default function VoiceCard() {
   return (
     <>
       <Card>
-        <h2 className="text-lg font-extrabold">🔊 {ar ? 'الصوت' : 'Voice'}</h2>
+        <h2 className="flex items-center gap-2 text-lg font-extrabold"><Icon name="volume" />{ar ? 'الصوت' : 'Voice'}</h2>
         <p className="text-sm text-black/60">{ar ? 'صوت إنسان حقيقي — ElevenLabs و OpenAI' : 'Real human voice — ElevenLabs & OpenAI'}</p>
         <div className="mt-3 flex gap-2">
-          <button onClick={() => set({ gender: 'male' })} className={pill(draft.gender === 'male')}>👨 {ar ? 'رجالي' : 'Male'}</button>
-          <button onClick={() => set({ gender: 'female' })} className={pill(draft.gender === 'female')}>👩 {ar ? 'نسائي' : 'Female'}</button>
+          <button onClick={() => set({ gender: 'male' })} className={pill(draft.gender === 'male')}>{ar ? 'رجالي' : 'Male'}</button>
+          <button onClick={() => set({ gender: 'female' })} className={pill(draft.gender === 'female')}>{ar ? 'نسائي' : 'Female'}</button>
         </div>
         <div className="mt-2.5 flex flex-wrap gap-2">
           {accents.map(([id, label]) => <button key={id} onClick={() => set({ voice: id })} className={pill(draft.voice === id)}>{label}</button>)}
@@ -127,13 +128,13 @@ export default function VoiceCard() {
           {ar ? 'قراءة الردود تلقائياً' : 'Auto-read replies'}
           <input type="checkbox" checked={draft.autoRead} onChange={(e) => set({ autoRead: e.target.checked })} className="h-5 w-5 accent-[#16A34A]" />
         </label>
-        <Btn onClick={test} disabled={busy === 'test'}>{busy === 'test' ? '…' : `▶ ${ar ? 'جرّب الصوت' : 'Test voice'}`}</Btn>
-        <Btn v="green" onClick={confirm} disabled={!changed}>{ar ? '✅ اعتمد هذا الصوت' : '✅ Use this voice'}</Btn>
+        <Btn icon="play" onClick={test} disabled={busy === 'test'}>{busy === 'test' ? '…' : (ar ? 'جرّب الصوت' : 'Test voice')}</Btn>
+        <Btn v="green" icon="check" onClick={confirm} disabled={!changed}>{ar ? 'اعتمد هذا الصوت' : 'Use this voice'}</Btn>
         {!changed && <p className="mt-1.5 text-center text-xs text-black/50">{ar ? 'هذا صوتك الحالي' : 'This is your current voice'}</p>}
         {note && <p className="mt-2 text-center text-sm text-black/60">{note}</p>}
       </Card>
       <Card>
-        <h2 className="text-lg font-extrabold">👩 {ar ? 'صوت البنت' : 'Girl voice'}</h2>
+        <h2 className="flex items-center gap-2 text-lg font-extrabold"><Icon name="user" />{ar ? 'صوت البنت' : 'Girl voice'}</h2>
         <p className="text-sm text-black/60">{ar ? 'بنت حقيقية بكل اللهجات العربية — للرد الصوتي والمحادثة والقصص والإعلانات.' : 'A real girl voice in every Arabic dialect — for voice replies, conversation, stories and ads.'}</p>
         <p className="mb-2 mt-3 text-sm font-bold">{ar ? 'اللهجة' : 'Dialect'}</p>
         <div className="flex flex-wrap gap-2">{DIALECTS.map(([id, a, e]) => <button key={id} onClick={() => setGirl({ ...girl, dialect: id })} className={pill(girl.dialect === id)}>{ar ? a : e}</button>)}</div>
@@ -141,11 +142,11 @@ export default function VoiceCard() {
         <div className="flex flex-wrap gap-2">{STYLES.map(([id, a, e]) => <button key={id} onClick={() => setGirl({ ...girl, style: id })} className={pill(girl.style === id)}>{ar ? a : e}</button>)}</div>
         <p className="mb-2 mt-3 text-sm font-bold">{ar ? 'السرعة' : 'Speed'}</p>
         <div className="flex flex-wrap gap-2">{SPEEDS.map(([id, a, e]) => <button key={id} onClick={() => setGirl({ ...girl, speed: id })} className={pill(girl.speed === id)}>{ar ? a : e}</button>)}</div>
-        <Btn onClick={testGirl} disabled={busy === 'girl'}>{busy === 'girl' ? '…' : `▶ ${ar ? 'جرّب الصوت' : 'Test voice'}`}</Btn>
-        <Btn v="green" disabled={JSON.stringify(girl) === JSON.stringify(girlSaved)} onClick={() => { saveGirl(girl); setGirlSaved(girl); setNote(ar ? '✅ تم اعتماد صوت البنت' : '✅ Girl voice saved'); }}>{ar ? '✅ اعتمد صوت البنت' : '✅ Use this girl voice'}</Btn>
+        <Btn icon="play" onClick={testGirl} disabled={busy === 'girl'}>{busy === 'girl' ? '…' : (ar ? 'جرّب الصوت' : 'Test voice')}</Btn>
+        <Btn v="green" icon="check" disabled={JSON.stringify(girl) === JSON.stringify(girlSaved)} onClick={() => { saveGirl(girl); setGirlSaved(girl); setNote(ar ? 'تم اعتماد صوت البنت' : 'Girl voice saved'); }}>{ar ? 'اعتمد صوت البنت' : 'Use this girl voice'}</Btn>
       </Card>
       <Card>
-        <h2 className="text-lg font-extrabold">🎙️ {ar ? 'استنسخ صوتي (30 ثانية)' : 'Clone my voice (30 sec)'}</h2>
+        <h2 className="flex items-center gap-2 text-lg font-extrabold"><Icon name="mic" />{ar ? 'استنسخ صوتي (30 ثانية)' : 'Clone my voice (30 sec)'}</h2>
         <p className="text-sm text-black/60">{ar ? 'اقرأ أي كلام بصوتك الطبيعي لمدة 30 ثانية في مكان هادئ. التسجيل يوقف لحاله.' : 'Read anything in your natural voice for 30 seconds in a quiet place. Recording stops by itself.'}</p>
         <label className="mt-3 flex items-center gap-3 rounded-[14px] bg-[#F3F3F3] p-3 text-sm font-semibold">
           <input type="checkbox" checked={consent} disabled={elapsed >= 0} onChange={(e) => setConsent(e.target.checked)} className="h-5 w-5 accent-[#16A34A]" />
@@ -154,11 +155,11 @@ export default function VoiceCard() {
         {elapsed >= 0 && (
           <>
             <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-[#E5E5E5]"><div className="h-full bg-black transition-all" style={{ width: `${(elapsed / CLONE_SECONDS) * 100}%` }} /></div>
-            <p className="mt-1 text-center font-bold">🔴 {elapsed} / {CLONE_SECONDS}</p>
+            <p className="mt-1 flex items-center justify-center gap-2 font-bold"><span className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-[#DC2626]" />{elapsed} / {CLONE_SECONDS}</p>
           </>
         )}
-        <Btn disabled={!consent || busy === 'clone'} onClick={elapsed >= 0 ? stopClone : startClone}>
-          {busy === 'clone' ? '…' : elapsed >= 0 ? `⏹ ${ar ? 'إيقاف' : 'Stop'}` : `🎙️ ${ar ? 'سجّل' : 'Record'} (30s)`}
+        <Btn icon={elapsed >= 0 ? 'stop' : 'mic'} disabled={!consent || busy === 'clone'} onClick={elapsed >= 0 ? stopClone : startClone}>
+          {busy === 'clone' ? '…' : elapsed >= 0 ? (ar ? 'إيقاف' : 'Stop') : `${ar ? 'سجّل' : 'Record'} (30s)`}
         </Btn>
       </Card>
     </>

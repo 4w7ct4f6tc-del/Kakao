@@ -211,10 +211,11 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
     return ref.watch(languageProvider) == 'ar' ? it.$2 : it.$3;
   }
 
-  Widget _chip(String label, Color bg, VoidCallback onTap) => FilledButton(
+  Widget _chip(String label, Color bg, VoidCallback onTap, {IconData? icon}) => FilledButton.icon(
         style: FilledButton.styleFrom(backgroundColor: bg, shape: const StadiumBorder(), padding: const EdgeInsets.symmetric(horizontal: 14)),
         onPressed: onTap,
-        child: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
+        icon: icon == null ? null : Icon(icon, size: 18),
+        label: Text(label, style: const TextStyle(fontWeight: FontWeight.w700)),
       );
 
   @override
@@ -222,21 +223,23 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
     final arUi = ref.watch(languageProvider) == 'ar';
     final ai = ref.watch(aiChoiceProvider);
     final statusText = switch (status) {
-      _Status.idle => arUi ? 'اضغط 🎤 وتكلم' : 'Tap 🎤 and talk',
+      _Status.idle => arUi ? 'اضغط المايك وتكلم' : 'Tap the mic and talk',
       _Status.thinking => arUi ? 'يفكرون…' : 'Thinking…',
-      _Status.speaking => arUi ? 'دانو تتكلم… اضغط 🎤 تقاطعها' : 'Danu is talking… tap 🎤 to interrupt',
+      _Status.speaking => arUi ? 'دانو تتكلم… اضغط المايك تقاطعها' : 'Danu is talking… tap the mic to interrupt',
       _Status.listening => arUi ? 'أسمعك…' : 'Listening…',
     };
-    final names = {'user': arUi ? 'أنت' : 'You', 'ai1': arUi ? '🤖 المساعد' : '🤖 Assistant', 'danu': arUi ? '📞 دانو' : '📞 Danu'};
+    final names = {'user': arUi ? 'أنت' : 'You', 'ai1': arUi ? 'المساعد' : 'Assistant', 'danu': arUi ? 'دانو' : 'Danu'};
     Widget label(String t) => Padding(padding: const EdgeInsets.only(top: 14, bottom: 8), child: Text(t, style: const TextStyle(fontWeight: FontWeight.w700)));
 
     return KPage(children: [
       KCard(children: [
         Row(children: [
-          Expanded(child: Text(arUi ? '💬 ناقش فكرتك' : '💬 Discuss your idea', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800))),
+          const Icon(Icons.chat_bubble_outline, color: Colors.black),
+          const SizedBox(width: 8),
+          Expanded(child: Text(arUi ? 'ناقش فكرتك' : 'Discuss your idea', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800))),
           call
-              ? _chip(arUi ? 'إنهاء المكالمة' : 'End call', const Color(0xFFDC2626), () => _hangUp(null, showSummary: false))
-              : _chip(arUi ? '📞 اتصلوا حق دانو' : '📞 Call Danu', K.green, () => setState(() => setup = !setup)),
+              ? _chip(arUi ? 'إنهاء المكالمة' : 'End call', const Color(0xFFDC2626), () => _hangUp(null, showSummary: false), icon: Icons.call_end)
+              : _chip(arUi ? 'اتصلوا حق دانو' : 'Call Danu', K.green, () => setState(() => setup = !setup), icon: Icons.phone_outlined),
         ]),
         const SizedBox(height: 12),
         KPills<AiEngine>(items: _ais, selected: ai, onSelect: (e) => ref.read(aiChoiceProvider.notifier).set(e)),
@@ -262,7 +265,7 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
       ]),
       if (setup && !call)
         KCard(children: [
-          Text(arUi ? '📞 قبل لا تتصل بدانو' : '📞 Before you call Danu', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+          Text(arUi ? 'قبل لا تتصل بدانو' : 'Before you call Danu', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
           Text(arUi ? 'دانو — بنت الرفاع: شديدة وحنونة ومشاغبة، وأذكى وحدة في المكالمة.' : 'Danu — a girl from Riffa: strict, sweet, mischievous, and the smartest one on the call.',
               style: const TextStyle(color: Colors.black54)),
           label(arUi ? '1. اللهجة' : '1. Dialect'),
@@ -280,8 +283,8 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
             title: Text(arUi ? 'لدغة رفاعية خفيفة (ر ← و في الصوت)' : 'Light Riffa lisp (R → W in speech)', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
             onChanged: (v) => _set(s.copyWith(lisp: v)),
           ),
-          KBtn(arUi ? '▶ جرّب الصوت' : '▶ Test voice', v: KVariant.grey, busy: status != _Status.idle, onTap: _test),
-          KBtn(arUi ? '📞 اتصل' : '📞 Call', v: KVariant.green, onTap: _startCall),
+          KBtn(arUi ? 'جرّب الصوت' : 'Test voice', icon: Icons.play_arrow, v: KVariant.grey, busy: status != _Status.idle, onTap: _test),
+          KBtn(arUi ? 'اتصل' : 'Call', icon: Icons.phone_outlined, v: KVariant.green, onTap: _startCall),
         ]),
       KCard(children: [
         ConstrainedBox(
@@ -323,7 +326,7 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(border: Border.all(color: K.grey), borderRadius: BorderRadius.circular(14)),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(arUi ? '📋 زبدة المكالمة' : '📋 Call summary', style: const TextStyle(fontWeight: FontWeight.w800)),
+              Text(arUi ? 'زبدة المكالمة' : 'Call summary', style: const TextStyle(fontWeight: FontWeight.w800)),
               const SizedBox(height: 4),
               Text(summary!, style: const TextStyle(color: Colors.black87)),
             ]),
@@ -332,7 +335,7 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
           Row(children: [
             if (buildPrompt != null)
               Expanded(
-                child: KBtn(arUi ? '✨ افتح المصنع' : '✨ Open builder', v: KVariant.green, onTap: () {
+                child: KBtn(arUi ? 'افتح المصنع' : 'Open builder', icon: Icons.auto_awesome_outlined, v: KVariant.green, onTap: () {
                   ref.read(builderSeedProvider.notifier).set(BuilderSeed(prompt: buildPrompt));
                   ref.read(tabProvider.notifier).set(1);
                   Navigator.pop(context);
@@ -341,7 +344,7 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
             if (buildPrompt != null && videoPrompt != null) const SizedBox(width: 10),
             if (videoPrompt != null)
               Expanded(
-                child: KBtn(arUi ? '🎬 افتح الفيديو' : '🎬 Open video', v: KVariant.green, onTap: () {
+                child: KBtn(arUi ? 'افتح الفيديو' : 'Open video', icon: Icons.movie_outlined, v: KVariant.green, onTap: () {
                   ref.read(tabProvider.notifier).set(2);
                   Navigator.pop(context);
                 }),
@@ -365,7 +368,7 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
                     if (status == _Status.speaking) BoxShadow(color: Colors.black.withValues(alpha: 0.12), spreadRadius: 8),
                   ],
                 ),
-                child: const Text('🎤', style: TextStyle(fontSize: 34)),
+                child: const Icon(Icons.mic_none, color: Colors.white, size: 36),
               ),
             ),
           ),

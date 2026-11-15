@@ -219,7 +219,7 @@ class DiscussService {
   static String _offlineAi1(List<Map<String, String>> h) {
     final last = h.lastWhere((m) => m['role'] == 'user', orElse: () => const {'content': ''})['content'] ?? '';
     final short = last.length > 60 ? last.substring(0, 60) : last;
-    return 'فهمت فكرتك: "$short". الفكرة زينة، وأقترح نبدأ بأبسط نسخة منها ونجربها بسرعة.\n💡 اقتراح مني: نسوي معاينة في المصنع خلال دقيقة.\n🫵 اقتراح منك: شنو أهم شي تبيه يكون فيها؟';
+    return 'فهمت فكرتك: "$short". الفكرة زينة، وأقترح نبدأ بأبسط نسخة منها ونجربها بسرعة.\nاقتراح مني: نسوي معاينة في المصنع خلال دقيقة.\nاقتراح منك: شنو أهم شي تبيه يكون فيها؟';
   }
 
   static final _family = RegExp(r'(أمج|امج|أمك|امك|أبوج|ابوج|أبوك|ابوك|أهلج|اهلج|طلاق|تطلقوا|والدتج|والدج)');

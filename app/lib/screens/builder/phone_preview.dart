@@ -255,12 +255,12 @@ class _LivePreviewAppState extends State<LivePreviewApp> {
       );
 
   Widget _bottomNav() {
-    // Owner's design: 🏪 Home | 👕 Products | 🛒 Cart | 📞 Contact (booking opens from Home).
+    // Home | Products | Cart | Contact (booking opens from Home).
     final items = [
-      ('🏪', tr('الرئيسية', 'Home'), 0),
-      ('👕', tr('المنتجات', 'Products'), 1),
-      ('🛒', tr('السلة', 'Cart'), 2),
-      ('📞', tr('تواصل', 'Contact'), 4),
+      (Icons.home_outlined, tr('الرئيسية', 'Home'), 0),
+      (Icons.checkroom_outlined, tr('المنتجات', 'Products'), 1),
+      (Icons.shopping_cart_outlined, tr('السلة', 'Cart'), 2),
+      (Icons.phone_outlined, tr('تواصل', 'Contact'), 4),
     ];
     return Container(
       color: Colors.white,
@@ -274,7 +274,7 @@ class _LivePreviewAppState extends State<LivePreviewApp> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(it.$1, style: const TextStyle(fontSize: 17)),
+                    Icon(it.$1, size: 20, color: tab == it.$3 ? d.primaryColor : Colors.black45),
                     Text(it.$2, style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: tab == it.$3 ? d.primaryColor : Colors.black45)),
                   ],
                 ),
@@ -379,7 +379,7 @@ class _LivePreviewAppState extends State<LivePreviewApp> {
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(color: d.secondaryColor, borderRadius: BorderRadius.circular(16)),
             child: Row(children: [
-              const Text('🔥', style: TextStyle(fontSize: 24)),
+              const Icon(Icons.local_fire_department_outlined, color: Colors.white),
               const SizedBox(width: 10),
               Expanded(child: Text(tr('خصم 20% على أول طلب', '20% off your first order'), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700))),
             ]),
@@ -515,7 +515,7 @@ class _LivePreviewAppState extends State<LivePreviewApp> {
   Widget _cartPage() {
     if (cart.isEmpty) {
       return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Text('🛒', style: TextStyle(fontSize: 48)),
+        const Icon(Icons.shopping_cart_outlined, size: 48, color: Colors.black26),
         Text(tr('السلة فاضية', 'Your cart is empty')),
       ]));
     }
@@ -683,7 +683,11 @@ class _LivePreviewAppState extends State<LivePreviewApp> {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)]),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('⭐⭐⭐⭐⭐ ${r.$1}', style: const TextStyle(color: Colors.black87, fontSize: 11, fontWeight: FontWeight.w700)),
+                Row(children: [
+                  for (var k = 0; k < 5; k++) const Icon(Icons.star_rounded, size: 12, color: Color(0xFFF59E0B)),
+                  const SizedBox(width: 4),
+                  Text(r.$1, style: const TextStyle(color: Colors.black87, fontSize: 11, fontWeight: FontWeight.w700)),
+                ]),
                 const SizedBox(height: 4),
                 Text(r.$2, style: const TextStyle(color: Colors.black54, fontSize: 11)),
               ]),

@@ -62,7 +62,7 @@ class _PlansScreenState extends ConsumerState<PlansScreen> {
           ]),
           const SizedBox(height: 8),
           for (final f in p.$4)
-            Padding(padding: const EdgeInsets.symmetric(vertical: 2), child: Text('✓ $f', style: const TextStyle(color: Colors.black87))),
+            Padding(padding: const EdgeInsets.symmetric(vertical: 2), child: Row(children: [const Icon(Icons.check, size: 16, color: K.green), const SizedBox(width: 6), Expanded(child: Text(f, style: const TextStyle(color: Colors.black87)))])),
           if (current == p.$1)
             Padding(
               padding: const EdgeInsets.only(top: 12),
@@ -71,7 +71,7 @@ class _PlansScreenState extends ConsumerState<PlansScreen> {
           else if (p.$1 != 'free') ...[
             KBtn('Card • Apple Pay • Google Pay', v: KVariant.green, busy: busy == '${p.$1}-stripe', onTap: () => _pay(p.$1, 'stripe')),
             Row(children: [
-              Expanded(child: KBtn('BenefitPay 🇧🇭', v: KVariant.grey, busy: busy == '${p.$1}-benefitpay', onTap: () => _pay(p.$1, 'benefitpay'))),
+              Expanded(child: KBtn('BenefitPay', v: KVariant.grey, busy: busy == '${p.$1}-benefitpay', onTap: () => _pay(p.$1, 'benefitpay'))),
               const SizedBox(width: 10),
               Expanded(child: KBtn('PayPal', v: KVariant.grey, busy: busy == '${p.$1}-paypal', onTap: () => _pay(p.$1, 'paypal'))),
             ]),

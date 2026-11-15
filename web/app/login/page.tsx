@@ -86,7 +86,7 @@ export default function Login() {
           <Btn v="green" disabled={busy === 'send'} onClick={() => run('send', async () => { const r = await api<{ sentVia: string[] }>('/otp/send', { phone, lang }); setSent(r.sentVia); })}>
             {busy === 'send' ? '…' : t('sendActivation')}
           </Btn>
-          {sent && <p className="mt-2 text-center text-sm text-black/60">✓ {sent.join(' + ')}</p>}
+          {sent && <p className="mt-2 text-center text-sm text-black/60">{sent.join(' + ')}</p>}
           <Input inputMode="numeric" value={code} onChange={(e) => setCode(e.target.value)} placeholder={t('codePh')} aria-label={t('codePh')} className="text-center tracking-[6px]" />
           <Btn disabled={busy === 'code'} onClick={() => run('code', async () => { const r = await api<{ token: string }>('/otp/verify', { phone, code }); await signInWithCustomToken(needAuth(), r.token); })}>
             {busy === 'code' ? '…' : t('loginCode')}
@@ -111,7 +111,7 @@ export default function Login() {
           </Btn>
           {recSent && (
             <>
-              <p className="mt-2 text-sm text-black/60">✓ {recSent.join(' • ')}</p>
+              <p className="mt-2 text-sm text-black/60">{recSent.join(' • ')}</p>
               <Input inputMode="numeric" value={recCode} onChange={(e) => setRecCode(e.target.value)} placeholder={t('codePh')} className="text-center tracking-[6px]" />
               <Btn disabled={busy === 'rv'} onClick={() => run('rv', async () => { const r = await api<{ token: string }>('/recovery/otp/verify', { identifier: ident, code: recCode }); await recovered(r.token); })}>{t('loginCode')}</Btn>
             </>
@@ -120,15 +120,15 @@ export default function Login() {
             const { id } = await api<{ id: string }>('/recovery/magic', { email: ident });
             setMsg(ar ? 'افتح الرابط من إيميلك — بندخلك هنا تلقائياً' : 'Open the link in your email — you will be signed in here');
             await poll(`/recovery/magic/poll?id=${id}`);
-          })}>✨ {ar ? 'رابط سحري على إيميلي' : 'Magic link to my email'}</Btn>
+          })}>{ar ? 'رابط سحري على إيميلي' : 'Magic link to my email'}</Btn>
           <Btn v="grey" disabled={busy === 'rd'} onClick={() => run('rd', async () => {
             const r = await api<{ id: string; code: string }>('/recovery/approval/request', { identifier: ident, deviceName: 'Web' });
             setApproval(r.code);
             await poll(`/recovery/approval/poll?id=${r.id}`);
-          })}>📱 {ar ? 'موافقة من جهازي الثاني' : 'Approve from my other device'}</Btn>
+          })}>{ar ? 'موافقة من جهازي الثاني' : 'Approve from my other device'}</Btn>
           {approval && <p className="mt-2 text-center text-3xl font-black tracking-[8px]">{approval}</p>}
           <Btn v="grey" disabled={busy === 'rq'} onClick={() => run('rq', async () => { const r = await api<{ questions: string[] }>('/recovery/questions/get', { identifier: ident }); setQuestions(r.questions); })}>
-            ❓ {ar ? 'أسئلتي الذكية' : 'My smart questions'}
+            {ar ? 'أسئلتي الذكية' : 'My smart questions'}
           </Btn>
           {questions.map((q, i) => (
             <div key={i}>

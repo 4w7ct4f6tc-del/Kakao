@@ -171,7 +171,7 @@ function offlineDanu(event: string, history: DMsg[], st: DiscussState, s: GirlSe
 
 function offlineAi1(history: DMsg[]): string {
   const last = [...history].reverse().find((m) => m.role === 'user')?.content || '';
-  return `فهمت فكرتك: "${last.slice(0, 60)}". الفكرة زينة، وأقترح نبدأ بأبسط نسخة منها ونجربها بسرعة.\n💡 اقتراح مني: نسوي معاينة في المصنع خلال دقيقة.\n🫵 اقتراح منك: شنو أهم شي تبيه يكون فيها؟`;
+  return `فهمت فكرتك: "${last.slice(0, 60)}". الفكرة زينة، وأقترح نبدأ بأبسط نسخة منها ونجربها بسرعة.\nاقتراح مني: نسوي معاينة في المصنع خلال دقيقة.\nاقتراح منك: شنو أهم شي تبيه يكون فيها؟`;
 }
 
 export async function discuss(event: 'reply' | 'join' | 'nudge', call: boolean, s: GirlSettings, history: DMsg[], st: DiscussState, engine = 'claude'): Promise<DiscussReply> {

@@ -67,7 +67,7 @@ class _LoginTabState extends ConsumerState<LoginTab> {
       if (sentVia != null)
         Padding(
           padding: const EdgeInsets.only(top: 8),
-          child: Text('✓ ${sentVia!.join(' + ')}', textAlign: TextAlign.center, style: const TextStyle(color: Colors.black54)),
+          child: Text(sentVia!.join(' + '), textAlign: TextAlign.center, style: const TextStyle(color: Colors.black54)),
         ),
       KInput(code, t('codePh'), keyboard: TextInputType.number, center: true),
       KBtn(t('loginCode'), busy: busy == 'code', onTap: () => _run('code', () async {

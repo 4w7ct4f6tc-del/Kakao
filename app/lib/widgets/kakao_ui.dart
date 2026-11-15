@@ -142,7 +142,8 @@ class KBtn extends StatelessWidget {
   final KVariant v;
   final bool busy;
   final double fontSize;
-  const KBtn(this.label, {super.key, this.onTap, this.v = KVariant.black, this.busy = false, this.fontSize = 17});
+  final IconData? icon;
+  const KBtn(this.label, {super.key, this.onTap, this.v = KVariant.black, this.busy = false, this.fontSize = 17, this.icon});
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +164,10 @@ class KBtn extends StatelessWidget {
           onPressed: busy ? null : onTap,
           child: busy
               ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2.5, color: fg))
-              : Text(label, textAlign: TextAlign.center, maxLines: 2, style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w700)),
+              : Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  if (icon != null) ...[Icon(icon, size: 20), const SizedBox(width: 8)],
+                  Flexible(child: Text(label, textAlign: TextAlign.center, maxLines: 2, style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.w700))),
+                ]),
         ),
       ),
     );

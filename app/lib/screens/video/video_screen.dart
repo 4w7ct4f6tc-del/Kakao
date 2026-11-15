@@ -101,7 +101,7 @@ class _VideoTabState extends ConsumerState<VideoTab> {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       KCard(children: [
         KInput(story, t('storyPh'), lines: 6),
-        KBtn(t('makeVideo2'), onTap: _make),
+        KBtn(t('makeVideo2'), icon: Icons.movie_outlined, onTap: _make),
         if (msg != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(msg!, style: const TextStyle(color: Colors.black54))),
         if (job != null && job!.status != 'done') ...[
           const SizedBox(height: 12),
@@ -128,7 +128,7 @@ class _VideoTabState extends ConsumerState<VideoTab> {
                 ),
               ),
             ),
-          KBtn('⬇️ MP4', v: KVariant.grey, onTap: () => launchUrl(Uri.parse(job!.videoUrl!), mode: LaunchMode.externalApplication)),
+          KBtn('MP4', icon: Icons.download, v: KVariant.grey, onTap: () => launchUrl(Uri.parse(job!.videoUrl!), mode: LaunchMode.externalApplication)),
         ],
       ]),
       if (board.isNotEmpty)
@@ -138,7 +138,7 @@ class _VideoTabState extends ConsumerState<VideoTab> {
             FilledButton(
               style: FilledButton.styleFrom(backgroundColor: Colors.black, shape: const StadiumBorder()),
               onPressed: _play,
-              child: Text('▶ ${ar ? 'شغّل' : 'Play'}'),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.play_arrow, size: 18), const SizedBox(width: 4), Text(ar ? 'شغّل' : 'Play')]),
             ),
           ]),
           for (var i = 0; i < board.length; i++)
@@ -155,7 +155,7 @@ class _VideoTabState extends ConsumerState<VideoTab> {
                   aspectRatio: 16 / 9,
                   child: board[i].imageUrl != null
                       ? Image.network(board[i].imageUrl!, fit: BoxFit.cover)
-                      : Container(color: const Color(0xFF222222), alignment: Alignment.center, child: Text(board[i].emoji, style: const TextStyle(fontSize: 48))),
+                      : Container(color: const Color(0xFF222222), alignment: Alignment.center, child: const Icon(Icons.movie_outlined, size: 44, color: Colors.white38)),
                 ),
                 Padding(padding: const EdgeInsets.all(12), child: Text(board[i].text, style: const TextStyle(color: Colors.black, height: 1.6))),
               ]),

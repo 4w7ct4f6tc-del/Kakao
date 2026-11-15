@@ -74,8 +74,8 @@ class AiService {
           : 'Great! I prepared an instant preview. Tap "Build this app" below and we will finish with 3 quick questions.';
     }
     return ar
-        ? 'وصلتني رسالتك ✅\nعندك 3 خيارات الحين:\n1) ابنِ تطبيق من فكرتك في المنشئ\n2) حوّل قصة لفيديو في تبويب الفيديو\n3) صوّر أي شي بالكاميرا ونحوله لتطبيق\n(اربط مفاتيح الذكاء الاصطناعي في الإعدادات للردود الكاملة)'
-        : 'Got your message ✅\nYou have 3 options right now:\n1) Build an app from your idea in Builder\n2) Turn a story into a video in Video\n3) Snap anything with the camera and turn it into an app\n(Connect AI keys in Settings for full answers)';
+        ? 'وصلتني رسالتك.\nعندك 3 خيارات الحين:\n1) ابنِ تطبيق من فكرتك في المنشئ\n2) حوّل قصة لفيديو في تبويب الفيديو\n3) صوّر أي شي بالكاميرا ونحوله لتطبيق\n(اربط مفاتيح الذكاء الاصطناعي في الإعدادات للردود الكاملة)'
+        : 'Got your message.\nYou have 3 options right now:\n1) Build an app from your idea in Builder\n2) Turn a story into a video in Video\n3) Snap anything with the camera and turn it into an app\n(Connect AI keys in Settings for full answers)';
   }
 
   static Future<String> translate(String text, String target) async {
