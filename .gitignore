@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.local
+functions/.env
+functions/.env.*
+!functions/.env.example
+web/.next/
+web/.env.local
+.DS_Store
+*.log
+service-account*.json
