@@ -118,6 +118,9 @@ class VoiceService {
   }
 
   static bool _cancelListen = false;
+
+  /// True when the last recording had shouting (used by دانو: "هي هي، تكلم بالعدال").
+  static bool lastWasLoud = false;
   static void cancelListening() => _cancelListen = true;
 
   /// Records until the user stops talking (1.3 s of silence after speech).
@@ -128,11 +131,13 @@ class VoiceService {
     final started = DateTime.now();
     var lastVoice = DateTime.now();
     var spoke = false;
+    var loudFrames = 0;
     final done = Completer<void>();
     final sub = _recorder.onAmplitudeChanged(const Duration(milliseconds: 120)).listen((amp) {
       final level = ((amp.current + 60) / 60).clamp(0.0, 1.0);
       onLevel?.call(level);
       final now = DateTime.now();
+      if (amp.current > -10) loudFrames++;
       if (amp.current > -38) {
         spoke = true;
         lastVoice = now;
@@ -147,6 +152,7 @@ class VoiceService {
     await sub.cancel();
     final bytes = await stopRecording();
     onLevel?.call(0);
+    lastWasLoud = loudFrames >= 4;
     return spoke ? bytes : null;
   }
 

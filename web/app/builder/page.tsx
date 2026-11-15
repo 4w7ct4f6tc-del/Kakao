@@ -120,7 +120,7 @@ function Builder() {
           <Btn v="grey" className="!text-[15px]" onClick={() => file.current?.click()} disabled={busy === 'camera'}>{busy === 'camera' ? '…' : t('cameraBtn')}</Btn>
           <Btn v="grey" className="!text-[15px]" onClick={voiceReply} disabled={busy === 'voice'}>{busy === 'voice' ? '…' : t('voiceBtn')}</Btn>
         </div>
-        <Btn v="grey" onClick={() => router.push('/talk')}>🎤 {ar ? 'تكلم مع بنت خعخعو' : 'Talk with the KAkAo girl'}</Btn>
+        <Btn v="grey" onClick={() => router.push('/talk')}>💬 {ar ? 'ناقش فكرتك • 📞 دانو' : 'Discuss your idea • 📞 Danu'}</Btn>
         <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={(e) => e.target.files?.[0] && camera(e.target.files[0])} />
         {reply && <p className="mt-3 whitespace-pre-wrap rounded-[14px] bg-[#F3F3F3] p-3 leading-7">{reply}</p>}
         {msg && <p className="mt-2 text-sm text-black/60">{msg}</p>}

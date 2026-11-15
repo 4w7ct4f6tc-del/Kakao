@@ -3,7 +3,7 @@ import { api } from './api';
 
 /** Same lists as functions/persona.js. */
 export const DIALECTS: [string, string, string][] = [
-  ['bahraini', 'بحريني', 'Bahraini'], ['saudi_najdi', 'سعودي نجدي', 'Saudi Najdi'], ['saudi_hijazi', 'سعودي حجازي', 'Saudi Hijazi'],
+  ['bahraini_riffa', 'بحريني رفاعي', 'Bahraini Riffa'], ['bahraini', 'بحريني', 'Bahraini'], ['saudi_najdi', 'سعودي نجدي', 'Saudi Najdi'], ['saudi_hijazi', 'سعودي حجازي', 'Saudi Hijazi'],
   ['emirati', 'إماراتي', 'Emirati'], ['kuwaiti', 'كويتي', 'Kuwaiti'], ['qatari', 'قطري', 'Qatari'], ['omani', 'عماني', 'Omani'],
   ['egyptian', 'مصري', 'Egyptian'], ['moroccan', 'مغربي', 'Moroccan'], ['algerian', 'جزائري', 'Algerian'], ['tunisian', 'تونسي', 'Tunisian'],
   ['jordanian', 'أردني', 'Jordanian'], ['palestinian', 'فلسطيني', 'Palestinian'], ['lebanese', 'لبناني', 'Lebanese'], ['syrian', 'سوري', 'Syrian'],
@@ -16,8 +16,8 @@ export const STYLES: [string, string, string][] = [
 export const MODES: [string, string, string][] = [['chat', 'محادثة', 'Chat'], ['story', 'قصة', 'Story'], ['ad', 'إعلان', 'Ad']];
 export const SPEEDS: [string, string, string, number][] = [['slow', 'بطيء', 'Slow', 0.85], ['normal', 'عادي', 'Normal', 1], ['fast', 'سريع', 'Fast', 1.15]];
 
-export type GirlSettings = { dialect: string; style: string; mode: string; speed: string };
-export const DEFAULT_GIRL: GirlSettings = { dialect: 'bahraini', style: 'friendly', mode: 'chat', speed: 'normal' };
+export type GirlSettings = { dialect: string; style: string; mode: string; speed: string; lisp?: boolean };
+export const DEFAULT_GIRL: GirlSettings = { dialect: 'bahraini_riffa', style: 'friendly', mode: 'chat', speed: 'normal', lisp: true };
 export type Msg = { role: 'user' | 'assistant'; content: string };
 export type TalkReply = {
   text: string; audio: string | null; action: null | 'insult' | 'prank'; comebackText: string | null; comebackAudio: string | null;
@@ -31,7 +31,7 @@ export function saveGirl(g: GirlSettings) { try { localStorage.setItem('girl', J
 
 /** Same parser as the server, so the buttons update instantly. */
 const KEYS: Record<string, string[]> = {
-  saudi_hijazi: ['حجازي', 'جدة'], bahraini: ['بحريني', 'البحرين'], saudi_najdi: ['نجدي', 'سعودي'], emirati: ['إماراتي', 'اماراتي'],
+  saudi_hijazi: ['حجازي', 'جدة'], bahraini_riffa: ['رفاعي', 'الرفاع'], bahraini: ['بحريني', 'البحرين'], saudi_najdi: ['نجدي', 'سعودي'], emirati: ['إماراتي', 'اماراتي'],
   kuwaiti: ['كويتي'], qatari: ['قطري'], omani: ['عماني'], egyptian: ['مصري', 'المصرية'], moroccan: ['مغربي'], algerian: ['جزائري'],
   tunisian: ['تونسي'], jordanian: ['أردني', 'اردني'], palestinian: ['فلسطيني'], lebanese: ['لبناني'], syrian: ['سوري'],
   iraqi: ['عراقي'], yemeni: ['يمني'], sudanese: ['سوداني'],
@@ -49,6 +49,7 @@ export function parseRequest(text: string): Partial<GirlSettings> {
 
 /** Offline preview lines (real conversation needs the AI keys). */
 const GREET: Record<string, string> = {
+  bahraini_riffa: 'هلا هلا! أنا هني، شنو عندك اليوم؟ قول بسرعة قبل لا أمل.',
   bahraini: 'هلا والله يالحلو! أنا بنت خعخعو. شنو مسوي اليوم؟ ولا تقول لي ما سويت شي!',
   saudi_najdi: 'هلا والله! أنا بنت خعخعو. وش عندك اليوم؟ لا تقول لي مافي شي ترى أعرفك!',
   saudi_hijazi: 'أهلين! أنا بنت خعخعو. إيش عندك اليوم؟ قول بسرعة قبل ما أزعل!',
@@ -128,4 +129,57 @@ export function playVoice(audio: string | null, text: string, s: GirlSettings, v
     u.onerror = () => resolve('device');
     speechSynthesis.speak(u);
   });
+}
+
+// ================================================================ نقاش ثلاثي: AI 1 + دانو
+export type Role = 'user' | 'ai1' | 'danu';
+export type DMsg = { role: Role; content: string };
+export type DanuReply = TalkReply & { family?: boolean; hangup?: boolean; summary?: string | null };
+export type DiscussReply = { ai1: { text: string } | null; danu: DanuReply | null; settings: GirlSettings; offline?: boolean };
+export type DiscussState = { strikes: number; familyAsks: number; loud: boolean; turns: number };
+
+const FAMILY = /(أمج|امج|أمك|امك|أبوج|ابوج|أبوك|ابوك|أهلج|اهلج|طلاق|تطلقوا|ليش تطلق|والدتج|والدج)/;
+const SILLY = /^(كم 1\+1|1\+1|هلا|السلام عليكم)\??$/;
+
+function offlineDanu(event: string, history: DMsg[], st: DiscussState, s: GirlSettings): DanuReply {
+  const last = [...history].reverse().find((m) => m.role === 'user')?.content || '';
+  const base: DanuReply = { text: '', audio: null, action: null, comebackText: null, comebackAudio: null, build: null, video: null, settings: s, offline: true };
+  if (event === 'join') return { ...base, text: 'هلا هلا! منو متصل؟ أنا دانو من الرفاع. شفت فكرتكم… خلوني أصلحها لكم، صيدني يالحلو.' };
+  if (event === 'nudge') return { ...base, text: 'وينك؟ سكت؟ زعلت؟ ترى أنا أمزح وياك!' };
+  if (RUDE.test(last)) {
+    if (st.strikes === 0) return { ...base, action: 'insult', text: 'هاي المرة بمشيها، مرة ثانية لا تقولي ذكاء اصطناعي.' };
+    return { ...base, action: 'prank', text: 'إذا انت تغلط، أنا أعلمك شلون أفرمت تلفون!', comebackText: 'تعال أتغشمر بس، خلك محترم يالحلو.' };
+  }
+  if (FAMILY.test(last)) {
+    if (st.familyAsks === 0) return { ...base, family: true, text: 'أتفشل أقول، بس باختصار أمي صادت أبوي مع الخدامة. خلنا في فكرتك أحسن.' };
+    if (st.familyAsks === 1) return { ...base, family: true, text: 'بمشي.' };
+    return { ...base, hangup: true, text: 'قلت لك بمشي، باي.', summary: 'اتفقنا نكمل فكرتك بعدين، والموضوع هذا مسكر.' };
+  }
+  if (/وين حرف الراء/.test(last)) return { ...base, text: 'عصوم شاله يبي يعاقبني، قالي بوجعه إذا جفت شاطرة.' };
+  if (/وين في الرفاع/.test(last)) return { ...base, text: 'تبي أعطيك رقم أبوي بعد؟ ركز في اللي انت فيه، أي هاي اللي ناقص بعد.' };
+  if (/وين بيتج|وين ساكنة|وين تسكنين/.test(last)) return { ...base, text: 'مالت الرفاع.' };
+  if (/^\s*(لا|لاء)\s*$/.test(last) && history.some((m) => m.role === 'danu' && m.content.includes('وين بيتنا'))) {
+    return { ...base, text: 'أي الحين صرت شطور، تعلمت من الدرس حبيبي، كل يوم تعال خذلك درس لين تتعلم إني رفاعية مالعب، بس فعل.' };
+  }
+  if (SILLY.test(last.trim())) return { ...base, text: 'مقعدني من الرقاد عشان هاي السؤال؟ هلون يعني، خلنا في شي يستاهل.' };
+  if (/(ما فهمت|مافهمت)/.test(last)) return { ...base, text: 'عادي، كلنا ما نفهم أول مرة. تعال أخفف عليك الموضوع، أنا معاك، أنا أحتويك.' };
+  if (st.loud) return { ...base, text: 'هي هي، تكلم بالعدال! … أي هالون شاطر، كمل كمل.' };
+  if (st.turns >= 3 && st.turns % 4 === 3) return { ...base, text: 'مللتوني، أنا سلي خلاني أتعرف على إنسان وذكاء اصطناعي، معلوماتكم قديمة.' };
+  if (st.turns === 2) return { ...base, text: 'المساعد قال كلام حلو، بس أنا عندي أذكى منه: خله بسيط وبسرعة. تعال صج تبي أقولك وين بيتنا؟' };
+  return { ...base, text: 'فكرة حلوة، بس عدلها شوي: ابدأ بشي صغير وجربه، وبعدين كبّره. ضبطني أضبطك!' };
+}
+
+function offlineAi1(history: DMsg[]): string {
+  const last = [...history].reverse().find((m) => m.role === 'user')?.content || '';
+  return `فهمت فكرتك: "${last.slice(0, 60)}". الفكرة زينة، وأقترح نبدأ بأبسط نسخة منها ونجربها بسرعة.\n💡 اقتراح مني: نسوي معاينة في المصنع خلال دقيقة.\n🫵 اقتراح منك: شنو أهم شي تبيه يكون فيها؟`;
+}
+
+export async function discuss(event: 'reply' | 'join' | 'nudge', call: boolean, s: GirlSettings, history: DMsg[], st: DiscussState, engine = 'claude'): Promise<DiscussReply> {
+  try {
+    return await api<DiscussReply>('/discuss', { event, call, ...s, messages: history, ...st, engine }, { retries: 0 });
+  } catch {
+    const ai1 = event === 'reply' ? { text: offlineAi1(history) } : null;
+    const withAi1: DMsg[] = ai1 ? [...history, { role: 'ai1', content: ai1.text }] : history;
+    return { ai1, danu: call ? offlineDanu(event, withAi1, st, s) : null, settings: s, offline: true };
+  }
 }

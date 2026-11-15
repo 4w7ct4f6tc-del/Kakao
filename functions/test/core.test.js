@@ -81,7 +81,7 @@ test('voice follows the language: Arabic -> Bahraini, English -> US', () => {
 
 test('girl voice: parses dialect, type and mode from free text', () => {
   const { parseVoiceRequest, extractActions, DIALECTS } = require('../persona');
-  assert.strictEqual(Object.keys(DIALECTS).length, 18);
+  assert.strictEqual(Object.keys(DIALECTS).length, 19);
   assert.deepStrictEqual(parseVoiceRequest('سوي لي إعلان لمحلي باللهجة المصرية بنت تضحك'), { dialect: 'egyptian', style: 'happy', mode: 'ad' });
   assert.deepStrictEqual(parseVoiceRequest('سوي لي قصة بالبحريني بنت قصص'), { dialect: 'bahraini', style: 'story', mode: 'story' });
   assert.strictEqual(parseVoiceRequest('كلميني حجازي').dialect, 'saudi_hijazi');
@@ -96,9 +96,25 @@ test('talk endpoint answers without keys with a clear error code', async () => {
   try {
     const r = await fetch(`http://127.0.0.1:${server.address().port}/talk/options`);
     const d = await r.json();
-    assert.strictEqual(d.dialects.length, 18);
+    assert.strictEqual(d.dialects.length, 19);
     assert.strictEqual(d.styles.length, 7);
   } finally {
     server.close();
   }
+});
+
+test('دانو: Riffa lisp only in speech, backstory guard tags, hangup summary', () => {
+  const P = require('../persona');
+  assert.strictEqual(P.riffaLisp('رفاعي ريح'), 'وفاعي ويح');
+  assert.strictEqual(P.riffaLisp('امره امير الأمراء بحفر حفره في الصحراء'), 'اموه اميو الأمواء بحفو حفوه في الصحواء');
+  const prompt = P.danuPrompt({ familyAsks: 0 });
+  assert.ok(prompt.includes('أتفشل أقول، بس باختصار أمي صادت أبوي مع الخدامة'));
+  assert.ok(prompt.includes('مالت الرفاع'));
+  assert.ok(prompt.includes('عصوم شاله يبي يعاقبني'));
+  assert.ok(prompt.includes('حرف الراء صح'));
+  const h = P.extractActions('قلت لك بمشي، باي [[HANGUP]] زبدة المكالمة: اتفقنا على محل ورد');
+  assert.strictEqual(h.hangup, true);
+  assert.strictEqual(h.summary, 'اتفقنا على محل ورد');
+  assert.strictEqual(P.extractActions('بمشي [[FAMILY]]').family, true);
+  assert.ok(P.ai1Prompt({}).includes('💡 اقتراح مني'));
 });

@@ -115,39 +115,47 @@ How it works:
 - **Voice clone:** tick the consent box, then record 30 seconds (it stops by itself). ElevenLabs Instant Voice Clone creates your voice and you can choose it like any other.
 - **Bahraini voice IDs:** set `ELEVENLABS_VOICE_BAHRAINI_MALE` and `ELEVENLABS_VOICE_BAHRAINI_FEMALE` (see `functions/.env.example`).
 
-## 👩 Girl voice and voice conversation (بنت خعخعو)
+## 💬 نقاش ثلاثي — AI 1 + دانو
 
-**Where to find it:** **🎤 تكلم مع بنت خعخعو** in the builder (`/talk` on the web, `TalkScreen` in Flutter).
+**Where:** **💬 ناقش فكرتك • 📞 دانو** in the builder (`/talk` on the web, `DiscussScreen` in Flutter).
 
-**Before talking, you choose:**
-- **Dialect (18):** بحريني، سعودي نجدي، سعودي حجازي، إماراتي، كويتي، قطري، عماني، مصري، مغربي، جزائري، تونسي، أردني، فلسطيني، لبناني، سوري، عراقي، يمني، سوداني.
-- **Type:** ناعمة، رسمية، تضحك، قصص، إعلانات، أطفال، صديقة.
-- **Speed:** بطيء، عادي، سريع.
-- **Mode:** محادثة، قصة، إعلان.
+**AI 1, the chat assistant:**
+- Thinks with you: confirms your idea or improves it.
+- Ends every reply with **💡 اقتراح مني** and **🫵 اقتراح منك**.
+- Uses the AI you picked (Claude, ChatGPT, Meta or Gemini).
 
-**How the conversation works:**
-- 🎤 listens until you stop talking (voice-activity detection), then Whisper turns your speech into text.
-- She replies in the same dialect, as text plus a real ElevenLabs voice, in one call (`POST /talk`).
-- Tapping 🎤 while she talks interrupts her.
-- In hands-free mode she listens again on her own.
-- If you go quiet for 15 seconds she nudges you ("وينك؟ سكت؟ زعلت؟").
-- **غيري اللهجة** changes the dialect at any point.
+**📞 اتصلوا حق دانو:**
+- دانو joins only when you press call, and the chat becomes a **three-way** discussion: you + AI 1 + دانو.
+- Each of your messages gets AI 1's answer, then دانو's. Her answer comes as text plus her real voice, from `POST /discuss`.
 
-**Understands free text:** "سوي لي إعلان لمحلي باللهجة المصرية بنت تضحك" gives Egyptian, laughing, ad. The same parser runs when you press **🔊 رد بصوت حقيقي**.
+**Her story:**
+- It is fixed in `functions/persona.js` and must not be changed.
+- Her father is Bahraini, her mother is American, and they divorced.
+- The first time you ask about it, she says only: "أتفشل أقول، بس باختصار أمي صادت أبوي مع الخدامة".
+- The second time she says "بمشي".
+- The third time she hangs up and shows **زبدة المكالمة**.
+- She never brings it up herself and never adds details.
 
-**Personality:** strict, caring and mischievous. She teases, asks cheeky questions and never just says "حاضر". When you don't understand, she explains more simply ("عادي، كلنا ما نفهم أول مرة"). She keeps it respectful: no romance, and fully child-safe in the أطفال type.
+**Location answers:**
+- "وين بيتج؟" → "مالت الرفاع".
+- "وين في الرفاع؟" → she refuses to say more.
+- She sometimes asks "تبي أقولك وين بيتنا؟" as a lesson. She never gives a real address.
 
-**Being honest about being AI:** if you jokingly call her "روبوت" she answers back playfully. If you seriously ask whether she is a human, she says she is KAKAO's AI voice assistant.
+**Personality:** strict + spoiled + cunning + caring + mischievous. She beats AI 1 the first few times, then says "مللتوني…". She uses her sayings now and then:
+- Shouting gets "هي هي، تكلم بالعدال… كمل كمل". Loudness is measured from the mic.
+- Silly questions get "مقعدني من الرقاد عشان هاي السؤال؟".
+- She always has an answer for closed questions, and labels it as her opinion when she isn't sure.
 
-**Rude users:**
-- First time: a warning.
-- Second time: a **visual prank only**. Falling green codes with "دورني", then 5 seconds of black, then she comes back with "تعال أتغشمر بس، خلك محترم يالحلو".
-- The prank is only an on-screen animation. No data, settings or files are touched, ever.
+**Rude users:** first a warning, then the visual-only prank: green codes, "دورني", black for 5 seconds, then "تعال أتغشمر بس، خلك محترم يالحلو". Nothing on the device is touched.
 
-**Voices:**
-- Set one ElevenLabs female voice per dialect with `ELEVENLABS_VOICE_AR_<DIALECT>`.
-- Laughs (`[laughs]`, `[giggles]`) use `eleven_v3`.
-- OpenAI `gpt-4o-mini-tts` is the backup, with dialect and style instructions.
+**Honesty:** asked seriously whether she is human, she says she is خعخعو's AI character.
+
+**Voice:**
+- Default dialect **بحريني رفاعي**, with all the other dialects available. You choose the type, speed and mode, and test the voice before calling.
+- Talk by mic: it stops when you stop, you can interrupt her, she nudges you after 15 s of silence, and **غيري اللهجة** switches the dialect at any time.
+- **R rule:** text on screen always keeps **ر**. Only the audio sent to the voice engine changes ر → و. For example, "رفاعي" is spoken as "وفاعي".
+  - The lisp can be turned off in the call options.
+  - `DANU_LISP_RATIO` (0–1) controls how many ر are softened. The default 1 softens every one, matching your examples.
 
 ## Where to paste each key
 

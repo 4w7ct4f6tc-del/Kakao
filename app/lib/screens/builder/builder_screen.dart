@@ -16,7 +16,7 @@ import '../../state/providers.dart';
 import '../../widgets/common.dart' show toast, friendlyError;
 import '../../widgets/kakao_ui.dart';
 import '../camera/camera_screen.dart';
-import '../talk/talk_screen.dart';
+import '../talk/discuss_screen.dart';
 import '../settings/plans_screen.dart';
 import 'design_editor.dart';
 import 'phone_preview.dart';
@@ -157,8 +157,8 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
           const SizedBox(width: 10),
           Expanded(child: KBtn(t('voiceBtn'), v: KVariant.grey, fontSize: 15, busy: busy == 'voice', onTap: _voiceReply)),
         ]),
-        KBtn(ar ? '🎤 تكلم مع بنت خعخعو' : '🎤 Talk with the KAkAo girl', v: KVariant.grey, fontSize: 15,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TalkScreen()))),
+        KBtn(ar ? '💬 ناقش فكرتك • 📞 دانو' : '💬 Discuss your idea • 📞 Danu', v: KVariant.grey, fontSize: 15,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DiscussScreen()))),
         if (reply.isNotEmpty)
           Container(
             margin: const EdgeInsets.only(top: 12),
