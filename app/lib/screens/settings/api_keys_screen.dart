@@ -19,7 +19,6 @@ class ApiKeysScreen extends ConsumerStatefulWidget {
 class _ApiKeysScreenState extends ConsumerState<ApiKeysScreen> {
   static const providers = [
     ('openai', 'OpenAI (ChatGPT, DALL·E, Whisper, TTS)', 'sk-...'),
-    ('anthropic', 'Anthropic (Claude)', 'sk-ant-...'),
     ('gemini', 'Google Gemini', 'AIza...'),
     ('meta', 'Meta Llama (Groq / Together)', 'gsk_...'),
     ('elevenlabs', 'ElevenLabs (voice)', 'xi-...'),

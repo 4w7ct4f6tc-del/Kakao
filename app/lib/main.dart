@@ -9,7 +9,7 @@ import 'core/i18n.dart';
 import 'core/theme.dart';
 import 'firebase_options.dart';
 import 'screens/lock_screen.dart';
-import 'screens/shell.dart';
+import 'screens/home_screen.dart';
 import 'state/providers.dart';
 import 'widgets/kakao_ui.dart';
 
@@ -69,7 +69,7 @@ class _RootGateState extends ConsumerState<RootGate> {
     final bioLock = ref.watch(bioLockProvider);
     return auth.when(
       loading: () => Scaffold(backgroundColor: KT.bg, body: const Center(child: CircularProgressIndicator())),
-      error: (_, _) => const MainShell(),
+      error: (_, _) => const HomeScreen(),
       data: (user) {
         // Open on دخول when signed out, on مصنع when signed in.
         if (!tabChosen) {
@@ -79,7 +79,7 @@ class _RootGateState extends ConsumerState<RootGate> {
         if (user != null && bioLock && !unlocked) {
           return LockScreen(onUnlocked: () => setState(() => unlocked = true));
         }
-        return const MainShell();
+        return const HomeScreen();
       },
     );
   }

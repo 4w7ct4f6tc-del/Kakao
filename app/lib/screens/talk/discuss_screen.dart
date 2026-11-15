@@ -34,7 +34,7 @@ class _DiscussScreenState extends ConsumerState<DiscussScreen> {
   int nudges = 0;
   Timer? nudgeTimer;
 
-  static const _ais = [(AiEngine.claude, 'Claude'), (AiEngine.chatgpt, 'ChatGPT'), (AiEngine.meta, 'Meta'), (AiEngine.gemini, 'Gemini')];
+  static const _ais = [(AiEngine.meta, 'Meta'), (AiEngine.chatgpt, 'ChatGPT'), (AiEngine.gemini, 'Gemini')];
 
   bool get ar => ref.read(languageProvider) == 'ar';
 

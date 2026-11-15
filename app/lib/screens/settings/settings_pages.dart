@@ -52,7 +52,7 @@ class AiModelPage extends ConsumerWidget {
         Text(ar ? 'الذكاء الافتراضي للمصنع والنقاش. تقدر تغيّره بأي وقت.' : 'Default AI for the builder and discussions. Change it anytime.', style: TextStyle(color: KT.muted)),
         const SizedBox(height: 12),
         KPills<AiEngine>(
-          items: const [(AiEngine.claude, 'Claude'), (AiEngine.chatgpt, 'ChatGPT'), (AiEngine.meta, 'Meta'), (AiEngine.gemini, 'Gemini')],
+          items: const [(AiEngine.meta, 'Meta'), (AiEngine.chatgpt, 'ChatGPT'), (AiEngine.gemini, 'Gemini')],
           logos: true,
           selected: ai,
           onSelect: (e) => ref.read(aiChoiceProvider.notifier).set(e),

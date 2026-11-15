@@ -44,14 +44,14 @@ class _PlansScreenState extends ConsumerState<PlansScreen> {
     final ar = ref.watch(languageProvider) == 'ar';
     final plans = [
       ('free', t('free'), ar ? '0' : r'$0', ar
-          ? ['دردشة بلا حدود (Meta AI + Claude أساسي)', '3 تطبيقات تجريبية', 'تصاميم أساسية', 'معاينة مباشرة', 'ربط موقع واحد']
-          : ['Unlimited chat (Meta AI + basic Claude)', '3 trial apps', 'Basic designs', 'Live preview', '1 site connection']),
+          ? ['دردشة بلا حدود (Meta AI)', '3 تطبيقات تجريبية', 'تصاميم أساسية', 'معاينة مباشرة', 'ربط موقع واحد']
+          : ['Unlimited chat (Meta AI)', '3 trial apps', 'Basic designs', 'Live preview', '1 site connection']),
       ('pro', t('pro'), ar ? '3.9 د.ب / شهر' : r'$9.99 / mo', ar
           ? ['تطبيقات بلا حدود', 'صوت حقيقي', 'كاميرا ذكية', 'كل الربط', 'دومين خاص', 'نشر فوري', 'ChatGPT كامل']
           : ['Unlimited apps', 'Real voice', 'Smart camera', 'All integrations', 'Custom domain', 'Instant publish', 'Full ChatGPT']),
       ('ultra', t('ultra'), ar ? '9.9 د.ب / شهر' : r'$24.99 / mo', ar
-          ? ['كل مزايا برو', 'كل الذكاءات: ChatGPT + Claude Ultra + Gemini Pro', 'أولوية قصوى', 'دومين مشمول', 'قصة إلى فيديو 1080p', 'استنساخ الصوت']
-          : ['Everything in Pro', 'All AIs: ChatGPT + Claude Ultra + Gemini Pro', 'Ultra priority', 'Domain included', 'Story to 1080p video', 'Voice clone']),
+          ? ['كل مزايا برو', 'كل الذكاءات: ChatGPT + Meta + Gemini Pro', 'أولوية قصوى', 'دومين مشمول', 'قصة إلى فيديو 1080p', 'استنساخ الصوت']
+          : ['Everything in Pro', 'All AIs: ChatGPT + Meta + Gemini Pro', 'Ultra priority', 'Domain included', 'Story to 1080p video', 'Voice clone']),
     ];
     return KPage(children: [
       for (final p in plans)

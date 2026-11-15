@@ -15,6 +15,7 @@ import '../../services/voice_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart' show toast, friendlyError;
 import '../../widgets/kakao_ui.dart';
+import '../../widgets/kakao_frame.dart';
 import '../camera/camera_screen.dart';
 import '../talk/discuss_screen.dart';
 import '../settings/plans_screen.dart';
@@ -22,6 +23,54 @@ import 'design_editor.dart';
 import 'phone_preview.dart';
 
 enum _Step { build, consent, connect, done }
+
+/// The builder page in the owner's design: top bar, the white card, the grey bottom box.
+class BuilderScreen extends ConsumerStatefulWidget {
+  final String? prompt;
+  const BuilderScreen({super.key, this.prompt});
+  @override
+  ConsumerState<BuilderScreen> createState() => _BuilderScreenState();
+}
+
+class _BuilderScreenState extends ConsumerState<BuilderScreen> {
+  final tab = GlobalKey<_BuilderTabState>();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.prompt != null) WidgetsBinding.instance.addPostFrameCallback((_) => tab.currentState?._start(widget.prompt!));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ar = ref.watch(languageProvider) == 'ar';
+    return Scaffold(
+      backgroundColor: KC.bg,
+      drawer: const KMenu(),
+      appBar: const KTopBar(band: false),
+      body: Column(children: [
+        Expanded(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 460),
+              child: ListView(padding: const EdgeInsets.fromLTRB(16, 0, 16, 16), children: [BuilderTab(key: tab)]),
+            ),
+          ),
+        ),
+        KBottomBox(
+          home: false,
+          onSend: (p) => tab.currentState?._start(p),
+          onVoice: () => tab.currentState?._voiceReply(),
+          plus: [
+            (Icons.photo_camera_outlined, ar ? 'الكاميرا' : 'Camera', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen()))),
+            (Icons.movie_outlined, ar ? 'قصة إلى فيديو' : 'Story to video', () => kGo(context, ref, 'video')),
+            (Icons.settings_outlined, ar ? 'الإعدادات' : 'Settings', () => kGo(context, ref, 'settings')),
+          ],
+        ),
+      ]),
+    );
+  }
+}
 
 /// مصنع — AI pills · selected AI · one box · ✨ build · 📷 camera · 🔊 real voice reply ·
 /// live phone preview · ✅ approve → consent → connect → publish (link + QR).
@@ -47,7 +96,12 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
   final consent = [false, false, false];
   PublishResult? result;
 
-  static const _ais = [(AiEngine.claude, 'Claude'), (AiEngine.chatgpt, 'ChatGPT'), (AiEngine.meta, 'Meta'), (AiEngine.gemini, 'Gemini')];
+  static const _ais = [(AiEngine.meta, 'Meta'), (AiEngine.chatgpt, 'ChatGPT'), (AiEngine.gemini, 'Gemini')];
+
+  void _start(String p) {
+    text.text = p;
+    _build();
+  }
 
   String get _prompt => text.text.trim().isEmpty ? ref.read(tProvider)('examplePh').split(':').last.trim() : text.text.trim();
 
@@ -144,83 +198,143 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
     final ai = ref.watch(aiChoiceProvider);
     final ar = ref.watch(languageProvider) == 'ar';
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      KCard(children: [
-      KLabel(ar ? 'اختر نموذج الذكاء' : 'Select AI model'),
-      Row(children: [
-        for (final (i, m) in _ais.indexed) ...[
-          if (i > 0) const SizedBox(width: 6),
-          Expanded(child: _aiPill(m.$1, m.$2, ai == m.$1)),
-        ],
-      ]),
-      const SizedBox(height: 22),
-      KInput(text, t('examplePh'), lines: 3, center: true),
-      const SizedBox(height: 8),
-      KBtn(t('buildBtn'), icon: Icons.auto_awesome_outlined, wide: false, busy: busy == 'build', onTap: _build),
-      const SizedBox(height: 18),
-      Row(children: [
-        Expanded(child: KBtn(ar ? 'الكاميرا' : 'Camera', icon: Icons.photo_camera_outlined, v: KVariant.grey, fontSize: 14, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen())))),
-        const SizedBox(width: 8),
-        Expanded(child: KBtn(ar ? 'صوت' : 'Voice', icon: Icons.volume_up_outlined, v: KVariant.grey, fontSize: 14, busy: busy == 'voice', onTap: _voiceReply)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: KBtn(ar ? 'دانو' : 'Danu', icon: Icons.chat_bubble_outline, v: KVariant.grey, accentText: true, fontSize: 14,
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DiscussScreen()))),
-        ),
-      ]),
-      if (reply.isNotEmpty)
-        Container(
-          margin: const EdgeInsets.only(top: 14),
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(color: K.soft, borderRadius: BorderRadius.circular(14)),
-          child: SelectableText(reply, style: const TextStyle(color: Colors.black, height: 1.6)),
-        ),
-      if (design == null) ...[
-        KLabel(ar ? 'القوالب' : 'Templates'),
-        Wrap(spacing: 10, runSpacing: 10, alignment: WrapAlignment.center, children: [
-          for (final tpl in templates.take(6))
-            InkWell(
-              borderRadius: BorderRadius.circular(14),
-              onTap: () {
-                text.text = ar ? 'أبي تطبيق ${tpl.title['ar']}' : 'I want a ${tpl.title['en']} app';
-                _build();
-              },
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 11),
-                decoration: BoxDecoration(color: KT.chipBg, border: Border.all(color: KT.outlineBorder), borderRadius: BorderRadius.circular(14)),
-                child: Text('${tpl.title[ar ? 'ar' : 'en']}', style: const TextStyle(color: Colors.black, fontSize: 16)),
+    final lbl = TextStyle(color: KC.ink, fontSize: 13, fontWeight: FontWeight.w500, letterSpacing: ar ? 0 : 2.8);
+    Widget tile(String label, VoidCallback onTap, {bool on = false, Color? bg}) => Material(
+          color: on ? KC.ink : (bg ?? KC.grey),
+          elevation: on ? 3 : 0,
+          shadowColor: Colors.black38,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: onTap,
+            child: SizedBox(
+              height: 54,
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    child: Text(label, style: TextStyle(color: on ? Colors.white : KC.ink, fontSize: 16, fontWeight: FontWeight.w500)),
+                  ),
+                ),
               ),
             ),
+          ),
+        );
+    Widget outlined(IconData icon, String label, VoidCallback? onTap, bool isBusy) => Material(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: const BorderSide(color: Color(0xFFDEDDDA))),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: isBusy ? null : onTap,
+            child: SizedBox(
+              height: 54,
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(icon, size: 20, color: KC.ink),
+                    const SizedBox(width: 8),
+                    Text(isBusy ? '…' : label, style: const TextStyle(color: KC.ink, fontSize: 16)),
+                  ]),
+                ),
+              ),
+            ),
+          ),
+        );
+    Widget grid(List<Widget> items) => Column(children: [
+          for (var r = 0; r < items.length; r += 3) ...[
+            if (r > 0) const SizedBox(height: 10),
+            Row(children: [
+              for (var i = r; i < r + 3 && i < items.length; i++) ...[
+                if (i > r) const SizedBox(width: 10),
+                Expanded(child: items[i]),
+              ],
+            ]),
+          ],
+        ]);
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Container(
+        padding: const EdgeInsets.fromLTRB(18, 28, 18, 22),
+        decoration: BoxDecoration(
+          color: KC.card,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: const [BoxShadow(color: Color(0x0A000000), blurRadius: 2, offset: Offset(0, 1)), BoxShadow(color: Color(0x0F3C2814), blurRadius: 32, offset: Offset(0, 12))],
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Text(ar ? 'اختر نموذج الذكاء' : 'SELECT AI MODEL', textAlign: TextAlign.center, style: lbl),
+          const SizedBox(height: 24),
+          Row(children: [
+            for (final (i, m) in _ais.indexed) ...[
+              if (i > 0) const SizedBox(width: 10),
+              Expanded(child: tile(m.$2, () => ref.read(aiChoiceProvider.notifier).set(m.$1), on: ai == m.$1)),
+            ],
+          ]),
+          const SizedBox(height: 24),
+          TextField(
+            controller: text,
+            onSubmitted: (_) => _build(),
+            style: const TextStyle(color: KC.ink, fontSize: 16),
+            decoration: InputDecoration(
+              hintText: t('examplePh'),
+              hintStyle: const TextStyle(color: Color(0xFF8E8C88), fontSize: 15),
+              filled: true,
+              fillColor: const Color(0xFFF1F0EE),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 18),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: const BorderSide(color: Color(0xFFE7E6E3))),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: const BorderSide(color: Color(0xFFE7E6E3))),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: const BorderSide(color: Color(0xFFBDBBB7))),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Material(
+            color: KC.ink,
+            borderRadius: BorderRadius.circular(16),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: busy == 'build' ? null : _build,
+              child: SizedBox(
+                height: 54,
+                child: Center(child: Text(busy == 'build' ? '…' : t('buildBtn'), style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600))),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Row(children: [
+            Expanded(child: outlined(Icons.photo_camera_outlined, ar ? 'الكاميرا' : 'Camera', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CameraScreen())), false)),
+            const SizedBox(width: 10),
+            Expanded(child: outlined(Icons.mic_none, ar ? 'صوت' : 'Voice', _voiceReply, busy == 'voice')),
+            const SizedBox(width: 10),
+            Expanded(child: outlined(Icons.auto_fix_high_outlined, ar ? 'دانو' : 'Danu', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const DiscussScreen())), false)),
+          ]),
+          if (reply.isNotEmpty)
+            Container(
+              margin: const EdgeInsets.only(top: 14),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: K.soft, borderRadius: BorderRadius.circular(14)),
+              child: SelectableText(reply, style: const TextStyle(color: Colors.black, height: 1.6)),
+            ),
+          if (design == null) ...[
+            const SizedBox(height: 30),
+            Text(ar ? 'القوالب' : 'TEMPLATES', textAlign: TextAlign.center, style: lbl),
+            const SizedBox(height: 20),
+            grid([
+              for (final tpl in templates.take(6))
+                tile('${tpl.title[ar ? 'ar' : 'en']}', () {
+                  text.text = ar ? 'أبي تطبيق ${tpl.title['ar']}' : 'I want a ${tpl.title['en']} app';
+                  _build();
+                }),
+            ]),
+          ],
         ]),
-      ],
-      ]),
+      ),
       if (design != null && step == _Step.build) _previewCard(t),
       if (step == _Step.consent) _consentCard(t),
       if (step == _Step.connect) _connectCard(t),
       if (step == _Step.done && result != null) _doneCard(t),
     ]);
   }
-
-  Widget _aiPill(AiEngine e, String name, bool on) => InkWell(
-        borderRadius: BorderRadius.circular(14),
-        onTap: () => ref.read(aiChoiceProvider.notifier).set(e),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          decoration: BoxDecoration(
-            color: on ? KT.pillOnBg : KT.pillBg,
-            border: Border.all(color: on ? KT.pillOnBorder : KT.pillBorder),
-            borderRadius: BorderRadius.circular(14),
-          ),
-          child: FittedBox(
-            fit: BoxFit.scaleDown,
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              KBrandLogo(e.name, size: 16, invert: on && KT.dark),
-              const SizedBox(width: 4),
-              Text(name, style: TextStyle(color: on ? KT.pillOnFg : Colors.black, fontWeight: FontWeight.w600, fontSize: 14)),
-            ]),
-          ),
-        ),
-      );
 
   Widget _previewCard(String Function(String) t) => KCard(children: [
         Text(t('liveDemo'), textAlign: TextAlign.center, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),

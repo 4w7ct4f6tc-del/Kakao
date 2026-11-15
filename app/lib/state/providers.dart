@@ -75,7 +75,7 @@ class AiChoiceNotifier extends Notifier<AiEngine> {
   @override
   AiEngine build() {
     final saved = prefs.getString('ai_engine');
-    return AiEngine.values.firstWhere((e) => e.name == saved && e != AiEngine.auto, orElse: () => AiEngine.meta);
+    return AiEngine.values.firstWhere((e) => e.name == saved && e != AiEngine.auto && e != AiEngine.claude, orElse: () => AiEngine.meta);
   }
 
   Future<void> set(AiEngine e) async {
