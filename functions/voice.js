@@ -7,6 +7,7 @@ const { env } = require('./lib/admin');
 const { HttpError, wrap, optionalAuth, requireAuth, rateLimit, clientIp } = require('./lib/http');
 const { getKey } = require('./ai');
 const { getPlan, isPaid } = require('./lib/users');
+const { DIALECTS, STYLES } = require('./persona');
 
 const r = express.Router();
 
@@ -93,15 +94,17 @@ function cleanForSpeech(text) {
     .slice(0, 2500);
 }
 
-async function elevenTts(key, voiceId, text, speed) {
+const TAGS = /\[(laughs?|giggles?|sighs?|whispers?|chuckles?)\]/gi;
+
+async function elevenTts(key, voiceId, text, speed, { model, settings } = {}) {
   const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}?output_format=mp3_44100_128`, {
     method: 'POST',
     headers: { 'xi-api-key': key, 'Content-Type': 'application/json', Accept: 'audio/mpeg' },
     body: JSON.stringify({
       text,
-      model_id: env('ELEVENLABS_MODEL', 'eleven_multilingual_v2'),
+      model_id: model || env('ELEVENLABS_MODEL', 'eleven_multilingual_v2'),
       // Lower stability + some style = more human expression; speaker boost = clearer voice.
-      voice_settings: { stability: 0.38, similarity_boost: 0.8, style: 0.35, use_speaker_boost: true, speed: Math.min(1.2, Math.max(0.7, speed || 1)) },
+      voice_settings: { stability: 0.38, similarity_boost: 0.8, style: 0.35, use_speaker_boost: true, ...(settings || {}), speed: Math.min(1.2, Math.max(0.7, speed || 1)) },
     }),
   });
   if (!res.ok) throw new Error(`elevenlabs ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -145,27 +148,61 @@ function postProcess(buf, { pitch = 1, extraTempo = 1 }) {
   });
 }
 
-/** Shared TTS (also used by video jobs). Returns { audio: Buffer, accent, gender, provider }. */
-async function synthesize({ uid, text, voice = 'auto', gender = 'female', speed = 1, pitch = 1, provider = 'elevenlabs', lang }) {
+/** Shared TTS (also used by video jobs and the girl conversation).
+ *  dialect: one of persona DIALECTS (Arabic text), style: one of persona STYLES.
+ *  Returns { audio: Buffer, accent, gender, provider }. */
+async function synthesize({ uid, text, voice = 'auto', gender = 'female', speed = 1, pitch = 1, provider = 'elevenlabs', lang, dialect, style }) {
   const plan = await getPlan(uid);
-  const clean = cleanForSpeech(text);
-  if (!clean) throw new HttpError(400, 'Nothing to say', 'empty');
-  const v = resolveVoice({ voice, gender, text: clean, lang });
+  const raw = cleanForSpeech(text);
+  if (!raw.replace(TAGS, '').trim()) throw new HttpError(400, 'Nothing to say', 'empty');
+  const plain = raw.replace(TAGS, '').replace(/\s{2,}/g, ' ').trim();
+  const v = resolveVoice({ voice, gender, text: plain, lang });
+  const d = DIALECTS[dialect];
+  const st = STYLES[style];
+  const arabic = /[؀-ۿ]/.test(plain);
+  const useDialect = !!d && arabic && !v.cloneId;
   const preset = VOICES[v.accent] || VOICES.en_us;
   const sp = Math.min(2, Math.max(0.5, Number(speed) || 1));
   const eleven = await getKey(uid, 'elevenlabs');
   const openai = await getKey(uid, 'openai');
 
+  const instructions = useDialect
+    ? `You are a young Arab woman. Speak ONLY in the ${d.en} Arabic dialect (${d.ar}) with a native ${d.en} accent and intonation. Voice: ${st ? st.voice : 'warm and friendly'}. ${NATURAL} Where the text has [laughs] or [giggles], laugh lightly and naturally.`
+    : `${preset.instructions}${st ? ` Voice: ${st.voice}.` : ''}`;
+
+  const elevenVoiceId = () => {
+    if (v.cloneId) return v.cloneId;
+    if (useDialect) {
+      return env(`ELEVENLABS_VOICE_AR_${dialect.toUpperCase()}`) || env('ELEVENLABS_VOICE_AR_FEMALE') ||
+        env('ELEVENLABS_VOICE_BAHRAINI_FEMALE', env('ELEVENLABS_VOICE_BAHRAINI')) || DEFAULT_ELEVEN.female();
+    }
+    return (VOICES[v.accent] ? preset.eleven[v.gender]() : '') || DEFAULT_ELEVEN[v.gender]();
+  };
+
   const tryEleven = async () => {
     if (!eleven.key || (!isPaid(plan) && !eleven.byok)) throw new Error('elevenlabs unavailable');
-    const id = v.cloneId || preset.eleven[v.gender]() || DEFAULT_ELEVEN[v.gender]();
+    const id = elevenVoiceId();
     const elevenSpeed = Math.min(1.2, Math.max(0.7, sp));
-    const audio = await elevenTts(eleven.key, id, clean, elevenSpeed);
+    const settings = st ? { stability: st.tts.stability, style: st.tts.style } : undefined;
+    let audio;
+    // Expressive model understands [laughs] / [giggles]; fall back to multilingual v2 without tags.
+    const expressive = env('ELEVENLABS_MODEL_EXPRESSIVE', 'eleven_v3');
+    if (TAGS.test(raw) && expressive) {
+      TAGS.lastIndex = 0;
+      try {
+        audio = await elevenTts(eleven.key, id, raw, elevenSpeed, { model: expressive, settings: { ...settings, stability: 0.5 } });
+      } catch (e) {
+        console.warn('[tts] expressive model failed, using v2', e.message);
+      }
+    }
+    TAGS.lastIndex = 0;
+    if (!audio) audio = await elevenTts(eleven.key, id, plain, elevenSpeed, { settings });
     return postProcess(audio, { pitch, extraTempo: sp / elevenSpeed });
   };
   const tryOpenai = async () => {
     if (!openai.key) throw new Error('openai unavailable');
-    const audio = await openaiTts(openai.key, preset.openai[v.gender], preset.instructions, clean, sp);
+    const voiceName = useDialect ? (st && (style === 'formal') ? 'sage' : 'coral') : preset.openai[v.gender];
+    const audio = await openaiTts(openai.key, voiceName, instructions, plain, sp);
     return postProcess(audio, { pitch });
   };
   // A cloned voice only exists on ElevenLabs.
@@ -174,7 +211,7 @@ async function synthesize({ uid, text, voice = 'auto', gender = 'female', speed 
   for (const fn of order) {
     try {
       const audio = await fn();
-      return { audio, accent: v.accent, gender: v.gender, provider: fn === tryEleven ? 'elevenlabs' : 'openai' };
+      return { audio, accent: useDialect ? `ar_${dialect}` : v.accent, gender: useDialect ? 'female' : v.gender, provider: fn === tryEleven ? 'elevenlabs' : 'openai' };
     } catch (e) {
       lastErr = e;
       console.warn('[tts]', fn.name, e.message);
@@ -198,6 +235,8 @@ r.post('/voice/tts', optionalAuth, wrap(async (req, res) => {
     pitch: req.body.pitch,
     provider: req.body.provider,
     lang: req.body.lang,
+    dialect: req.body.dialect,
+    style: req.body.style,
   });
   res.json({ audio: out.audio.toString('base64'), mime: 'audio/mpeg', accent: out.accent, gender: out.gender, provider: out.provider });
 }));

@@ -1,13 +1,13 @@
 'use client';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import PreviewApp, { PhoneFrame } from '@/components/PreviewApp';
 import { Btn, Card, Input, Shell, TextArea } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
 import { ALL_SECTIONS, type Design, localDesign, TEMPLATES } from '@/lib/design';
-import { detectLang, useLang } from '@/lib/i18n';
-import { loadVoice, speak } from '@/lib/voice';
+import { useLang } from '@/lib/i18n';
+import { loadGirl, parseRequest, playVoice, talk } from '@/lib/girl';
 
 const PALETTE = ['#111111', '#FFFFFF', '#DC2626', '#E11D48', '#EC4899', '#7C3AED', '#2563EB', '#1E3A8A', '#0EA5E9', '#14B8A6', '#16A34A', '#84CC16', '#EAB308', '#C9A227', '#EA580C', '#7C2D12', '#6B7280', '#E7D7C1', '#FFFBEB', '#0F172A'];
 const FONTS = ['Cairo', 'Tajawal', 'Inter'];
@@ -19,6 +19,7 @@ function Builder() {
   const { t, lang, observe } = useLang();
   const ar = lang === 'ar';
   const params = useSearchParams();
+  const router = useRouter();
   const [ai, setAi] = useState('claude');
   const [text, setText] = useState('');
   const [design, setDesign] = useState<Design | null>(null);
@@ -60,23 +61,18 @@ function Builder() {
     setDesign(localDesign(text || t('examplePh'), lang, a.name, a.colors, a.sell));
   }
 
-  /** 🔊 Real voice reply in the user's language: Arabic → Bahraini dialect + Bahraini voice, English → English. */
+  /** 🔊 Real girl voice reply: dialect / type / mode come from the voice settings or from the text itself
+   *  ("سوي لي إعلان لمحلي باللهجة المصرية بنت تضحك" → Egyptian, laughing, ad). */
   async function voiceReply() {
     const content = text.trim();
     if (!content) return;
     setBusy('voice');
-    const spoken = detectLang(content) || lang;
-    let answerText = '';
-    try {
-      answerText = (await api<{ text: string }>('/ai/chat', { engine: ai, lang: spoken, voiceReply: true, messages: [{ role: 'user', content }] })).text;
-    } catch {
-      answerText = spoken === 'ar'
-        ? 'هلا والله! وصلتني رسالتك. اضغط ابنِ لي التطبيق وبتشوف تطبيقك على طول.'
-        : "Hey! Got your message. Tap build my app and you'll see your app right away.";
-    }
-    setReply(answerText);
-    const how = await speak(answerText, loadVoice(), { lang: spoken, followLanguage: true });
-    if (how === 'device') setMsg(spoken === 'ar' ? 'معاينة بصوت جهازك — الصوت البشري الحقيقي يشتغل بعد ربط ElevenLabs أو OpenAI.' : 'Device-voice preview — the real human voice works once ElevenLabs or OpenAI is connected.');
+    const asked = parseRequest(content);
+    const settings = { ...loadGirl(), mode: 'chat', ...asked };
+    const r = await talk('reply', settings, [{ role: 'user', content }], 0, ai);
+    setReply(r.text);
+    const how = await playVoice(r.audio, r.text, r.settings || settings);
+    if (how === 'device') setMsg(ar ? 'معاينة بصوت جهازك — صوت البنت الحقيقي (ElevenLabs) يشتغل بعد ربط المفاتيح.' : 'Device-voice preview — the real girl voice (ElevenLabs) works once keys are connected.');
     setBusy('');
   }
 
@@ -124,6 +120,7 @@ function Builder() {
           <Btn v="grey" className="!text-[15px]" onClick={() => file.current?.click()} disabled={busy === 'camera'}>{busy === 'camera' ? '…' : t('cameraBtn')}</Btn>
           <Btn v="grey" className="!text-[15px]" onClick={voiceReply} disabled={busy === 'voice'}>{busy === 'voice' ? '…' : t('voiceBtn')}</Btn>
         </div>
+        <Btn v="grey" onClick={() => router.push('/talk')}>🎤 {ar ? 'تكلم مع بنت خعخعو' : 'Talk with the KAkAo girl'}</Btn>
         <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={(e) => e.target.files?.[0] && camera(e.target.files[0])} />
         {reply && <p className="mt-3 whitespace-pre-wrap rounded-[14px] bg-[#F3F3F3] p-3 leading-7">{reply}</p>}
         {msg && <p className="mt-2 text-sm text-black/60">{msg}</p>}

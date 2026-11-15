@@ -8,9 +8,10 @@ import VideoPage from '@/app/video/page';
 import Settings from '@/app/settings/page';
 import Login from '@/app/login/page';
 import Templates from '@/app/templates/page';
+import TalkPage from '@/app/talk/page';
 import { navigate, useRoute } from './shims/navigation';
 
-const PAGES: Record<string, () => JSX.Element> = { '/': Home, '/builder': BuilderPage, '/video': VideoPage, '/settings': Settings, '/login': Login, '/templates': Templates };
+const PAGES: Record<string, () => JSX.Element> = { '/': Home, '/builder': BuilderPage, '/video': VideoPage, '/settings': Settings, '/login': Login, '/templates': Templates, '/talk': TalkPage };
 
 function App() {
   const route = useRoute();

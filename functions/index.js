@@ -25,6 +25,7 @@ app.get('/health', (_req, res) => res.json({ ok: true, service: 'kakao-api', tim
 app.use(require('./auth'));
 app.use(require('./ai'));
 app.use(require('./voice'));
+app.use(require('./talk'));
 app.use(require('./builder'));
 app.use(require('./vision'));
 app.use(require('./video'));

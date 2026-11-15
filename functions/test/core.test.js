@@ -78,3 +78,27 @@ test('voice follows the language: Arabic -> Bahraini, English -> US', () => {
   assert.strictEqual(resolveVoice({ text: 'x', voice: 'clone:abc' }).cloneId, 'abc');
   assert.strictEqual(cleanForSpeech('**مرحبا** 👋\n- أول'), 'مرحبا. أول');
 });
+
+test('girl voice: parses dialect, type and mode from free text', () => {
+  const { parseVoiceRequest, extractActions, DIALECTS } = require('../persona');
+  assert.strictEqual(Object.keys(DIALECTS).length, 18);
+  assert.deepStrictEqual(parseVoiceRequest('سوي لي إعلان لمحلي باللهجة المصرية بنت تضحك'), { dialect: 'egyptian', style: 'happy', mode: 'ad' });
+  assert.deepStrictEqual(parseVoiceRequest('سوي لي قصة بالبحريني بنت قصص'), { dialect: 'bahraini', style: 'story', mode: 'story' });
+  assert.strictEqual(parseVoiceRequest('كلميني حجازي').dialect, 'saudi_hijazi');
+  const p = extractActions('إذا انت تغلط [[PRANK]] تعال أتغشمر بس');
+  assert.strictEqual(p.action, 'prank');
+  assert.strictEqual(p.comeback, 'تعال أتغشمر بس');
+  assert.strictEqual(extractActions('اوك [[BUILD: محل ورد]]').build, 'محل ورد');
+});
+
+test('talk endpoint answers without keys with a clear error code', async () => {
+  const server = _app.listen(0);
+  try {
+    const r = await fetch(`http://127.0.0.1:${server.address().port}/talk/options`);
+    const d = await r.json();
+    assert.strictEqual(d.dialects.length, 18);
+    assert.strictEqual(d.styles.length, 7);
+  } finally {
+    server.close();
+  }
+});

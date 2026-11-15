@@ -4,6 +4,7 @@ import { Btn, Card } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
 import { useLang } from '@/lib/i18n';
 import { DEFAULT_VOICE, loadVoice, SAMPLES, saveVoice, speak, type VoiceSettings } from '@/lib/voice';
+import { DEFAULT_GIRL, DIALECTS, type GirlSettings, loadGirl, playVoice, saveGirl, SPEEDS, STYLES, talk } from '@/lib/girl';
 
 const CLONE_SECONDS = 30;
 
@@ -17,10 +18,20 @@ export default function VoiceCard() {
   const [note, setNote] = useState('');
   const [consent, setConsent] = useState(false);
   const [elapsed, setElapsed] = useState(-1);
+  const [girl, setGirl] = useState<GirlSettings>(DEFAULT_GIRL);
+  const [girlSaved, setGirlSaved] = useState<GirlSettings>(DEFAULT_GIRL);
   const rec = useRef<MediaRecorder | null>(null);
   const timer = useRef<ReturnType<typeof setInterval>>();
 
-  useEffect(() => { const v = loadVoice(); setSaved(v); setDraft(v); return () => clearInterval(timer.current); }, []);
+  useEffect(() => { const v = loadVoice(); setSaved(v); setDraft(v); const g = loadGirl(); setGirl(g); setGirlSaved(g); return () => clearInterval(timer.current); }, []);
+
+  async function testGirl() {
+    setBusy('girl');
+    const r = await talk('start', { ...girl, mode: 'chat' }, [], 0);
+    const how = await playVoice(r.audio, r.text, girl, draft.volume);
+    setNote(how === 'device' ? (ar ? 'معاينة بصوت جهازك — صوت البنت الحقيقي (ElevenLabs) يشتغل بعد ربط المفاتيح.' : 'Device-voice preview — the real girl voice works once keys are connected.') : '');
+    setBusy('');
+  }
   const changed = JSON.stringify(draft) !== JSON.stringify(saved);
   const set = (p: Partial<VoiceSettings>) => setDraft({ ...draft, ...p });
 
@@ -120,6 +131,18 @@ export default function VoiceCard() {
         <Btn v="green" onClick={confirm} disabled={!changed}>{ar ? '✅ اعتمد هذا الصوت' : '✅ Use this voice'}</Btn>
         {!changed && <p className="mt-1.5 text-center text-xs text-black/50">{ar ? 'هذا صوتك الحالي' : 'This is your current voice'}</p>}
         {note && <p className="mt-2 text-center text-sm text-black/60">{note}</p>}
+      </Card>
+      <Card>
+        <h2 className="text-lg font-extrabold">👩 {ar ? 'صوت البنت' : 'Girl voice'}</h2>
+        <p className="text-sm text-black/60">{ar ? 'بنت حقيقية بكل اللهجات العربية — للرد الصوتي والمحادثة والقصص والإعلانات.' : 'A real girl voice in every Arabic dialect — for voice replies, conversation, stories and ads.'}</p>
+        <p className="mb-2 mt-3 text-sm font-bold">{ar ? 'اللهجة' : 'Dialect'}</p>
+        <div className="flex flex-wrap gap-2">{DIALECTS.map(([id, a, e]) => <button key={id} onClick={() => setGirl({ ...girl, dialect: id })} className={pill(girl.dialect === id)}>{ar ? a : e}</button>)}</div>
+        <p className="mb-2 mt-3 text-sm font-bold">{ar ? 'النوع' : 'Type'}</p>
+        <div className="flex flex-wrap gap-2">{STYLES.map(([id, a, e]) => <button key={id} onClick={() => setGirl({ ...girl, style: id })} className={pill(girl.style === id)}>{ar ? a : e}</button>)}</div>
+        <p className="mb-2 mt-3 text-sm font-bold">{ar ? 'السرعة' : 'Speed'}</p>
+        <div className="flex flex-wrap gap-2">{SPEEDS.map(([id, a, e]) => <button key={id} onClick={() => setGirl({ ...girl, speed: id })} className={pill(girl.speed === id)}>{ar ? a : e}</button>)}</div>
+        <Btn onClick={testGirl} disabled={busy === 'girl'}>{busy === 'girl' ? '…' : `▶ ${ar ? 'جرّب الصوت' : 'Test voice'}`}</Btn>
+        <Btn v="green" disabled={JSON.stringify(girl) === JSON.stringify(girlSaved)} onClick={() => { saveGirl(girl); setGirlSaved(girl); setNote(ar ? '✅ تم اعتماد صوت البنت' : '✅ Girl voice saved'); }}>{ar ? '✅ اعتمد صوت البنت' : '✅ Use this girl voice'}</Btn>
       </Card>
       <Card>
         <h2 className="text-lg font-extrabold">🎙️ {ar ? 'استنسخ صوتي (30 ثانية)' : 'Clone my voice (30 sec)'}</h2>

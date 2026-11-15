@@ -1,0 +1,164 @@
+import 'dart:convert';
+
+import '../core/api.dart';
+import '../state/providers.dart' show prefs;
+
+/// Same lists as functions/persona.js — (id, Arabic, English).
+const girlDialects = [
+  ('bahraini', 'بحريني', 'Bahraini'), ('saudi_najdi', 'سعودي نجدي', 'Saudi Najdi'), ('saudi_hijazi', 'سعودي حجازي', 'Saudi Hijazi'),
+  ('emirati', 'إماراتي', 'Emirati'), ('kuwaiti', 'كويتي', 'Kuwaiti'), ('qatari', 'قطري', 'Qatari'), ('omani', 'عماني', 'Omani'),
+  ('egyptian', 'مصري', 'Egyptian'), ('moroccan', 'مغربي', 'Moroccan'), ('algerian', 'جزائري', 'Algerian'), ('tunisian', 'تونسي', 'Tunisian'),
+  ('jordanian', 'أردني', 'Jordanian'), ('palestinian', 'فلسطيني', 'Palestinian'), ('lebanese', 'لبناني', 'Lebanese'), ('syrian', 'سوري', 'Syrian'),
+  ('iraqi', 'عراقي', 'Iraqi'), ('yemeni', 'يمني', 'Yemeni'), ('sudanese', 'سوداني', 'Sudanese'),
+];
+const girlStyles = [
+  ('soft', 'ناعمة', 'Soft'), ('formal', 'رسمية', 'Formal'), ('happy', 'تضحك', 'Happy'), ('story', 'قصص', 'Storytelling'),
+  ('ad', 'إعلانات', 'Advertising'), ('kids', 'أطفال', 'Kids'), ('friendly', 'صديقة', 'Friendly'),
+];
+const girlModes = [('chat', 'محادثة', 'Chat'), ('story', 'قصة', 'Story'), ('ad', 'إعلان', 'Ad')];
+const girlSpeeds = [('slow', 'بطيء', 'Slow'), ('normal', 'عادي', 'Normal'), ('fast', 'سريع', 'Fast')];
+
+class GirlSettings {
+  final String dialect, style, mode, speed;
+  const GirlSettings({this.dialect = 'bahraini', this.style = 'friendly', this.mode = 'chat', this.speed = 'normal'});
+
+  GirlSettings copyWith({String? dialect, String? style, String? mode, String? speed}) =>
+      GirlSettings(dialect: dialect ?? this.dialect, style: style ?? this.style, mode: mode ?? this.mode, speed: speed ?? this.speed);
+
+  Map<String, dynamic> toJson() => {'dialect': dialect, 'style': style, 'mode': mode, 'speed': speed};
+  factory GirlSettings.fromJson(Map<String, dynamic> j) => GirlSettings(
+        dialect: (j['dialect'] ?? 'bahraini').toString(),
+        style: (j['style'] ?? 'friendly').toString(),
+        mode: (j['mode'] ?? 'chat').toString(),
+        speed: (j['speed'] ?? 'normal').toString(),
+      );
+
+  @override
+  bool operator ==(Object other) => other is GirlSettings && other.toJson().toString() == toJson().toString();
+  @override
+  int get hashCode => toJson().toString().hashCode;
+
+  static GirlSettings load() {
+    try {
+      final s = prefs.getString('girl');
+      return s == null ? const GirlSettings() : GirlSettings.fromJson(jsonDecode(s));
+    } catch (_) {
+      return const GirlSettings();
+    }
+  }
+
+  Future<void> save() => prefs.setString('girl', jsonEncode(toJson()));
+}
+
+class TalkReply {
+  final String text;
+  final String? audio;
+  final String? action; // insult | prank
+  final String? comebackText;
+  final String? comebackAudio;
+  final String? build;
+  final String? video;
+  final GirlSettings settings;
+  final bool offline;
+  TalkReply({required this.text, this.audio, this.action, this.comebackText, this.comebackAudio, this.build, this.video, required this.settings, this.offline = false});
+}
+
+/// "بنت خعخعو" — the girl voice conversation.
+class GirlService {
+  static const _keys = {
+    'saudi_hijazi': ['حجازي', 'جدة'], 'bahraini': ['بحريني', 'البحرين'], 'saudi_najdi': ['نجدي', 'سعودي'], 'emirati': ['إماراتي', 'اماراتي'],
+    'kuwaiti': ['كويتي'], 'qatari': ['قطري'], 'omani': ['عماني'], 'egyptian': ['مصري', 'المصرية'], 'moroccan': ['مغربي'], 'algerian': ['جزائري'],
+    'tunisian': ['تونسي'], 'jordanian': ['أردني', 'اردني'], 'palestinian': ['فلسطيني'], 'lebanese': ['لبناني'], 'syrian': ['سوري'],
+    'iraqi': ['عراقي'], 'yemeni': ['يمني'], 'sudanese': ['سوداني'],
+  };
+  static const _styleKeys = {'soft': ['ناعمة'], 'formal': ['رسمية'], 'happy': ['تضحك', 'ضحك'], 'story': ['قصص'], 'ad': ['إعلانات'], 'kids': ['أطفال', 'اطفال'], 'friendly': ['صديقة']};
+
+  /// "سوي لي إعلان لمحلي باللهجة المصرية بنت تضحك" → egyptian / happy / ad.
+  static GirlSettings applyRequest(GirlSettings s, String text) {
+    final t = text.toLowerCase();
+    var out = s;
+    for (final e in _keys.entries) {
+      if (e.value.any(t.contains)) {
+        out = out.copyWith(dialect: e.key);
+        break;
+      }
+    }
+    for (final e in _styleKeys.entries) {
+      if (e.value.any(t.contains)) {
+        out = out.copyWith(style: e.key);
+        break;
+      }
+    }
+    if (RegExp(r'(سوي|اكتب|ابي|أبي|ابغى).{0,20}(إعلان|اعلان)').hasMatch(t)) {
+      out = out.copyWith(mode: 'ad');
+    } else if (RegExp(r'(سوي|احكي|اكتب|ابي|أبي|ابغى).{0,20}(قصة|قصه|حكاية)').hasMatch(t)) {
+      out = out.copyWith(mode: 'story');
+    }
+    return out;
+  }
+
+  static Future<TalkReply> talk(String event, GirlSettings s, List<Map<String, String>> history, int strikes, {String engine = 'claude'}) async {
+    try {
+      final r = await Api.post('/talk', {'event': event, ...s.toJson(), 'messages': history, 'strikes': strikes, 'engine': engine},
+          retries: 0, timeout: const Duration(seconds: 60));
+      return TalkReply(
+        text: (r['text'] ?? '').toString(),
+        audio: r['audio'] as String?,
+        action: r['action'] as String?,
+        comebackText: r['comebackText'] as String?,
+        comebackAudio: r['comebackAudio'] as String?,
+        build: r['build'] as String?,
+        video: r['video'] as String?,
+        settings: r['settings'] is Map ? GirlSettings.fromJson(Map<String, dynamic>.from(r['settings'])) : s,
+      );
+    } catch (_) {
+      final last = history.lastWhere((m) => m['role'] == 'user', orElse: () => const {'content': ''})['content'] ?? '';
+      return _offline(event, applyRequest(s, last), last, strikes);
+    }
+  }
+
+  static const _greet = {
+    'bahraini': 'هلا والله يالحلو! أنا بنت خعخعو. شنو مسوي اليوم؟ ولا تقول لي ما سويت شي!',
+    'saudi_najdi': 'هلا والله! أنا بنت خعخعو. وش عندك اليوم؟ لا تقول لي مافي شي ترى أعرفك!',
+    'saudi_hijazi': 'أهلين! أنا بنت خعخعو. إيش عندك اليوم؟ قول بسرعة قبل ما أزعل!',
+    'emirati': 'هلا والله! شحالك؟ أنا بنت خعخعو. شو عندك اليوم؟',
+    'kuwaiti': 'هلا والله! شلونك؟ أنا بنت خعخعو. شنو عندك اليوم؟ لا تخبي علي!',
+    'qatari': 'هلا والله! شلونك؟ أنا بنت خعخعو. شنو مسوي اليوم؟',
+    'omani': 'حيّاك! كيف حالك؟ أنا بنت خعخعو. شو عندك اليوم؟',
+    'egyptian': 'أهلاً بيك! إزيك عامل إيه؟ أنا بنت خعخعو. عندك فكرة إيه النهارده؟',
+    'moroccan': 'مرحبا بيك! كيداير؟ أنا بنت خعخعو. شنو عندك اليوم؟',
+    'algerian': 'مرحبا! واش راك؟ أنا بنت خعخعو. واش عندك اليوم؟',
+    'tunisian': 'عسلامة! لاباس؟ أنا بنت خعخعو. شنوة عندك اليوم؟',
+    'jordanian': 'هلا والله! كيفك؟ أنا بنت خعخعو. شو عندك اليوم؟',
+    'palestinian': 'أهلين! كيفك؟ أنا بنت خعخعو. شو في عندك اليوم؟',
+    'lebanese': 'هلا حبيبي! كيفك؟ أنا بنت خعخعو. شو عندك اليوم؟ يلا خبرني!',
+    'syrian': 'أهلين! كيفك؟ أنا بنت خعخعو. شو عندك اليوم؟',
+    'iraqi': 'هلا عيوني! شلونك؟ أنا بنت خعخعو. شكو ماكو اليوم؟',
+    'yemeni': 'أهلاً وسهلاً! كيف حالك؟ أنا بنت خعخعو. ايش عندك اليوم؟',
+    'sudanese': 'أهلاً! كيفنك؟ أنا بنت خعخعو. عندك شنو الليلة؟',
+  };
+  static final _rude = RegExp(r'(غبي|غبية|حمار|حمارة|تافه|اسكتي|انقلعي|كلب|stupid|idiot|shut up|dumb)', caseSensitive: false);
+
+  /// Offline preview so the flow is visible without keys.
+  static TalkReply _offline(String event, GirlSettings s, String last, int strikes) {
+    TalkReply r(String text, {String? action, String? comeback, String? build, String? video}) =>
+        TalkReply(text: text, action: action, comebackText: comeback, build: build, video: video, settings: s, offline: true);
+    if (event == 'start' || last.isEmpty) return r(_greet[s.dialect] ?? _greet['bahraini']!);
+    if (event == 'nudge') return r('وينك؟ سكت؟ زعلت؟ ترى أنا أمزح وياك!');
+    if (_rude.hasMatch(last)) {
+      if (strikes == 0) return r('هاي المرة بمشيها، مرة ثانية انتبه لكلامك يالحلو.', action: 'insult');
+      return r('إذا انت تغلط، أنا أعلمك شلون أفرمت تلفون!', action: 'prank', comeback: 'تعال أتغشمر بس، خلك محترم يالحلو.');
+    }
+    if (RegExp(r'(ذكاء اصطناعي|روبوت|robot)', caseSensitive: false).hasMatch(last)) {
+      return r('إيه ذكاء اصطناعي، بس بدم خفيف أكثر منك! لا تناديني روبوت، أنا بنت خعخعو.');
+    }
+    if (RegExp(r'(تطبيق|app|موقع|متجر)', caseSensitive: false).hasMatch(last)) {
+      return r('أوك أوك، بسويه لك! بس قبلها، ليش تأخرت علي اليوم؟ كنت أنطرك!', build: last);
+    }
+    if (RegExp(r'(فيديو|video)', caseSensitive: false).hasMatch(last)) return r('بسوي لك، بس إذا طلع حلو، بتعزمني على كرك؟', video: last);
+    if (RegExp(r'(ما فهمت|مافهمت)').hasMatch(last)) {
+      return r('أدري ما فهمت، لأنك كنت تفكر في شي ثاني، صح؟ عادي، كلنا ما نفهم أول مرة. تعال أشرح لك من جديد وبكل هدوء.');
+    }
+    return r('حلو كلامك! بس هذي معاينة، أول ما نربط مفاتيح الذكاء الاصطناعي بسولف معاك صدق صدق.');
+  }
+}

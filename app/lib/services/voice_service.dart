@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -98,6 +99,57 @@ class VoiceService {
   }
 
   static Future<void> stop() => _player.stop();
+
+  /// Plays her MP3 (base64) and completes when she finishes or is interrupted.
+  static Future<void> playBase64(String audio, {double volume = 1}) async {
+    await _player.stop();
+    await _player.setVolume(volume);
+    final done = Completer<void>();
+    late StreamSubscription<void> a;
+    late StreamSubscription<PlayerState> b;
+    a = _player.onPlayerComplete.listen((_) => done.isCompleted ? null : done.complete());
+    b = _player.onPlayerStateChanged.listen((st) {
+      if ((st == PlayerState.stopped || st == PlayerState.paused) && !done.isCompleted) done.complete();
+    });
+    await _player.play(BytesSource(base64Decode(audio), mimeType: 'audio/mpeg'));
+    await done.future;
+    await a.cancel();
+    await b.cancel();
+  }
+
+  static bool _cancelListen = false;
+  static void cancelListening() => _cancelListen = true;
+
+  /// Records until the user stops talking (1.3 s of silence after speech).
+  /// Returns null when nothing was said within 8 s. [onLevel] gets 0..1 for the mic animation.
+  static Future<List<int>?> listenUntilSilence({void Function(double level)? onLevel}) async {
+    if (!await startRecording()) return null;
+    _cancelListen = false;
+    final started = DateTime.now();
+    var lastVoice = DateTime.now();
+    var spoke = false;
+    final done = Completer<void>();
+    final sub = _recorder.onAmplitudeChanged(const Duration(milliseconds: 120)).listen((amp) {
+      final level = ((amp.current + 60) / 60).clamp(0.0, 1.0);
+      onLevel?.call(level);
+      final now = DateTime.now();
+      if (amp.current > -38) {
+        spoke = true;
+        lastVoice = now;
+      }
+      final silentFor = now.difference(lastVoice).inMilliseconds;
+      final total = now.difference(started).inMilliseconds;
+      if (_cancelListen || (spoke && silentFor > 1300) || (!spoke && total > 8000) || total > 30000) {
+        if (!done.isCompleted) done.complete();
+      }
+    });
+    await done.future;
+    await sub.cancel();
+    final bytes = await stopRecording();
+    onLevel?.call(0);
+    return spoke ? bytes : null;
+  }
+
 
   static Future<bool> startRecording() async {
     if (!await _recorder.hasPermission()) return false;

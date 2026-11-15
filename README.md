@@ -115,6 +115,40 @@ How it works:
 - **Voice clone:** tick the consent box, then record 30 seconds (it stops by itself). ElevenLabs Instant Voice Clone creates your voice and you can choose it like any other.
 - **Bahraini voice IDs:** set `ELEVENLABS_VOICE_BAHRAINI_MALE` and `ELEVENLABS_VOICE_BAHRAINI_FEMALE` (see `functions/.env.example`).
 
+## 👩 Girl voice and voice conversation (بنت خعخعو)
+
+**Where to find it:** **🎤 تكلم مع بنت خعخعو** in the builder (`/talk` on the web, `TalkScreen` in Flutter).
+
+**Before talking, you choose:**
+- **Dialect (18):** بحريني، سعودي نجدي، سعودي حجازي، إماراتي، كويتي، قطري، عماني، مصري، مغربي، جزائري، تونسي، أردني، فلسطيني، لبناني، سوري، عراقي، يمني، سوداني.
+- **Type:** ناعمة، رسمية، تضحك، قصص، إعلانات، أطفال، صديقة.
+- **Speed:** بطيء، عادي، سريع.
+- **Mode:** محادثة، قصة، إعلان.
+
+**How the conversation works:**
+- 🎤 listens until you stop talking (voice-activity detection), then Whisper turns your speech into text.
+- She replies in the same dialect, as text plus a real ElevenLabs voice, in one call (`POST /talk`).
+- Tapping 🎤 while she talks interrupts her.
+- In hands-free mode she listens again on her own.
+- If you go quiet for 15 seconds she nudges you ("وينك؟ سكت؟ زعلت؟").
+- **غيري اللهجة** changes the dialect at any point.
+
+**Understands free text:** "سوي لي إعلان لمحلي باللهجة المصرية بنت تضحك" gives Egyptian, laughing, ad. The same parser runs when you press **🔊 رد بصوت حقيقي**.
+
+**Personality:** strict, caring and mischievous. She teases, asks cheeky questions and never just says "حاضر". When you don't understand, she explains more simply ("عادي، كلنا ما نفهم أول مرة"). She keeps it respectful: no romance, and fully child-safe in the أطفال type.
+
+**Being honest about being AI:** if you jokingly call her "روبوت" she answers back playfully. If you seriously ask whether she is a human, she says she is KAKAO's AI voice assistant.
+
+**Rude users:**
+- First time: a warning.
+- Second time: a **visual prank only**. Falling green codes with "دورني", then 5 seconds of black, then she comes back with "تعال أتغشمر بس، خلك محترم يالحلو".
+- The prank is only an on-screen animation. No data, settings or files are touched, ever.
+
+**Voices:**
+- Set one ElevenLabs female voice per dialect with `ELEVENLABS_VOICE_AR_<DIALECT>`.
+- Laughs (`[laughs]`, `[giggles]`) use `eleven_v3`.
+- OpenAI `gpt-4o-mini-tts` is the backup, with dialect and style instructions.
+
 ## Where to paste each key
 
 All server keys go in **`functions/.env`**. Copy it from `functions/.env.example`. Anything still set to `YOUR_...` counts as "not configured", and that feature switches to its fallback instead of crashing.

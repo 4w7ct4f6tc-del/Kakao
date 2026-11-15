@@ -6,16 +6,17 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config.dart';
-import '../../core/i18n.dart';
 import '../../models/app_design.dart';
 import '../../models/templates.dart';
 import '../../services/ai_service.dart';
+import '../../services/girl_service.dart';
 import '../../services/builder_service.dart';
 import '../../services/voice_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart' show toast, friendlyError;
 import '../../widgets/kakao_ui.dart';
 import '../camera/camera_screen.dart';
+import '../talk/talk_screen.dart';
 import '../settings/plans_screen.dart';
 import 'design_editor.dart';
 import 'phone_preview.dart';
@@ -73,19 +74,19 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
         prompt: _prompt, lang: ref.read(languageProvider), name: qName.text, colorsText: qColors.text, sellText: qSell.text));
   }
 
-  /// 🔊 Real voice reply in the user's language: Arabic → Bahraini dialect and
-  /// Bahraini voice, English → English voice. Uses the chosen gender / speed / pitch.
+  /// 🔊 Real girl voice reply. Dialect / type / mode come from the saved girl voice
+  /// or from the text itself ("سوي لي إعلان لمحلي باللهجة المصرية بنت تضحك").
   Future<void> _voiceReply() async {
     final said = text.text.trim();
     if (said.isEmpty) return;
     setState(() => busy = 'voice');
-    final String spoken = I18n.detectFromText(said) ?? ref.read(languageProvider);
-    final r = await AiService.chat(history: [ChatMessage('user', said)], engine: ref.read(aiChoiceProvider), lang: spoken, voiceReply: true);
+    final settings = GirlService.applyRequest(GirlSettings.load().copyWith(mode: 'chat'), said);
+    final r = await GirlService.talk('reply', settings, [{'role': 'user', 'content': said}], 0, engine: ref.read(aiChoiceProvider).name);
     setState(() => reply = r.text);
-    try {
-      await VoiceService.speak(r.text, ref.read(voiceProvider), lang: spoken, followLanguage: true);
-    } catch (e) {
-      if (mounted) toast(context, friendlyError(e, ref.read(languageProvider)));
+    if (r.audio != null) {
+      await VoiceService.playBase64(r.audio!, volume: ref.read(voiceProvider).volume);
+    } else if (mounted) {
+      toast(context, ref.read(languageProvider) == 'ar' ? 'صوت البنت الحقيقي يشتغل بعد ربط مفتاح ElevenLabs.' : 'The real girl voice works once the ElevenLabs key is connected.');
     }
     if (mounted) setState(() => busy = null);
   }
@@ -156,6 +157,8 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
           const SizedBox(width: 10),
           Expanded(child: KBtn(t('voiceBtn'), v: KVariant.grey, fontSize: 15, busy: busy == 'voice', onTap: _voiceReply)),
         ]),
+        KBtn(ar ? '🎤 تكلم مع بنت خعخعو' : '🎤 Talk with the KAkAo girl', v: KVariant.grey, fontSize: 15,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TalkScreen()))),
         if (reply.isNotEmpty)
           Container(
             margin: const EdgeInsets.only(top: 12),
