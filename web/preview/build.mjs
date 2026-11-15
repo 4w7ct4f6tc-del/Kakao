@@ -27,11 +27,9 @@ const css = readFileSync(path.join(tmp, 'out.css'), 'utf8');
 const html = `<title>KAkAo Live</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Inter:wght@400;600;700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700;800;900&family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;600;700;800;900&display=swap">
 <style>
-/* KAKAO brand: one dark world (#0F0F0F), white cards, black buttons, green #16A34A. Deliberately single-theme. */
-:root{--bg:#0F0F0F;--fg:#FFFFFF;--accent:#16A34A;color-scheme:dark}
-html,body{background:var(--bg);color:var(--fg)}
+/* KAKAO: the app's own appearance setting (light by default, dark in Settings → Appearance) drives every color token. */
 body{padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
 ${css}
 main{padding-left:max(16px,env(safe-area-inset-left,0px))!important;padding-right:max(16px,env(safe-area-inset-right,0px))!important}

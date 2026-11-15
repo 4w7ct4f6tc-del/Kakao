@@ -140,7 +140,7 @@ export default function Login() {
           <Btn v="grey" onClick={() => setMode('main')}>{t('back')}</Btn>
         </Card>
       )}
-      {msg && <p className="mt-3 text-center text-sm text-white/70">{msg}</p>}
+      {msg && <p className="mt-3 text-center text-sm opacity-70">{msg}</p>}
     </Shell>
   );
 }

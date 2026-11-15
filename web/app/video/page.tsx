@@ -76,7 +76,7 @@ export default function VideoPage() {
         <Card>
           <div className="flex items-center justify-between">
             <b>{t('storyboard')} • {board.length}</b>
-            <button onClick={play} className="flex items-center gap-1.5 rounded-full bg-black px-4 py-2 text-sm font-bold text-white"><Icon name="play" size={14} />{ar ? 'شغّل' : 'Play'}</button>
+            <button onClick={play} className="k-pill k-pill-on"><Icon name="play" size={14} />{ar ? 'شغّل' : 'Play'}</button>
           </div>
           <div className="mt-3 space-y-2.5">
             {board.map((s, i) => (

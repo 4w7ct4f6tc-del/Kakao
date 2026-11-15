@@ -25,7 +25,7 @@ export default function Templates() {
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           {TEMPLATES.map((t) => (
-            <button key={t.type} onClick={() => setActive(t.type)} className={`rounded-full px-3.5 py-2 text-sm font-bold ${active === t.type ? 'bg-black text-white' : 'bg-[#E5E5E5] text-black'}`}>
+            <button key={t.type} onClick={() => setActive(t.type)} className={`k-pill ${active === t.type ? 'k-pill-on' : ''}`}>
               {t.title[l]}
             </button>
           ))}

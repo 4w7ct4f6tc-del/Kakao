@@ -201,7 +201,7 @@ export default function Discuss() {
     setStatus('idle');
   }
 
-  const pill = (on: boolean) => `rounded-full px-3.5 py-2 text-sm font-bold ${on ? 'bg-black text-white' : 'bg-[#E5E5E5] text-black'}`;
+  const pill = (on: boolean) => `k-pill ${on ? 'k-pill-on' : ''}`;
   const name = (list: [string, string, string][] | [string, string, string, number][], id: string) => list.find((x) => x[0] === id)?.[ar ? 1 : 2];
   const statusText = { idle: ar ? 'اضغط المايك وتكلم' : 'Tap the mic and talk', thinking: ar ? 'يفكرون…' : 'Thinking…', speaking: ar ? 'دانو تتكلم… اضغط المايك تقاطعها' : 'Danu is talking… tap the mic to interrupt', listening: ar ? 'أسمعك…' : 'Listening…' }[status];
   const dialectChips = <div className="flex flex-wrap gap-2">{DIALECTS.map(([id, a, e]) => <button key={id} onClick={() => { setS({ ...s, dialect: id }); setPicker(false); }} className={pill(s.dialect === id)}>{ar ? a : e}</button>)}</div>;
@@ -216,7 +216,7 @@ export default function Discuss() {
           {call ? (
             <button onClick={() => hangUp(null)} className="flex items-center gap-1.5 rounded-full bg-[#DC2626] px-3.5 py-2 text-sm font-bold text-white"><Icon name="phone" size={16} className="rotate-[135deg]" />{ar ? 'إنهاء المكالمة' : 'End call'}</button>
           ) : (
-            <button onClick={() => setSetup(!setup)} className="flex items-center gap-1.5 rounded-full bg-[#16A34A] px-3.5 py-2 text-sm font-bold text-white"><Icon name="phone" size={16} />{ar ? 'اتصلوا حق دانو' : 'Call Danu'}</button>
+            <button onClick={() => setSetup(!setup)} className="flex items-center gap-1.5 rounded-[14px] px-3.5 py-2 text-sm font-semibold" style={{ background: 'var(--strong-bg)', color: 'var(--strong-fg)' }}><Icon name="phone" size={16} />{ar ? 'اتصلوا حق دانو' : 'Call Danu'}</button>
           )}
         </div>
         <div className="mt-3 flex flex-wrap gap-2">{AIS.map(([id, n]) => <button key={id} onClick={() => setEngine(id)} className={pill(engine === id)}>{n}</button>)}</div>
@@ -226,7 +226,7 @@ export default function Discuss() {
         </p>
         {call && (
           <div className="mt-2 flex justify-end">
-            <button onClick={() => setPicker(!picker)} className="rounded-full bg-black px-3.5 py-2 text-sm font-bold text-white">{ar ? 'غيري اللهجة' : 'Change dialect'}</button>
+            <button onClick={() => setPicker(!picker)} className="k-pill k-pill-on">{ar ? 'غيري اللهجة' : 'Change dialect'}</button>
           </div>
         )}
         {picker && <div className="mt-3">{dialectChips}</div>}
@@ -259,7 +259,7 @@ export default function Discuss() {
           {msgs.map((m, i) => (
             <div key={i} className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}>
               <span className="mb-0.5 text-[11px] font-bold text-black/50">{label[m.role]}</span>
-              <p className={`max-w-[88%] whitespace-pre-wrap rounded-[16px] px-3.5 py-2.5 leading-7 ${m.role === 'user' ? 'bg-black text-white' : m.role === 'danu' ? 'bg-[#E8F7EE] text-black' : 'bg-[#F3F3F3] text-black'}`}>{m.content}</p>
+              <p className={`max-w-[88%] whitespace-pre-wrap rounded-[16px] px-3.5 py-2.5 leading-7 ${m.role === 'user' ? 'bg-[#4a78b5] text-white' : m.role === 'danu' ? 'bg-[#E8F7EE] text-black' : 'bg-[#F3F3F3] text-black'}`}>{m.content}</p>
             </div>
           ))}
           <div ref={end} />
@@ -281,8 +281,8 @@ export default function Discuss() {
             <button
               onClick={listen}
               aria-label={ar ? 'تكلم' : 'Talk'}
-              className={`mx-auto flex h-20 w-20 items-center justify-center rounded-full text-3xl text-white transition ${status === 'listening' ? 'bg-[#16A34A]' : 'bg-black'}`}
-              style={{ boxShadow: status === 'listening' ? `0 0 0 ${6 + level * 22}px rgba(22,163,74,0.25)` : status === 'speaking' ? '0 0 0 8px rgba(0,0,0,0.12)' : 'none' }}
+              className="mx-auto flex h-20 w-20 items-center justify-center rounded-full text-3xl text-white transition"
+              style={{ background: status === 'listening' ? '#16A34A' : 'var(--strong-bg)', boxShadow: status === 'listening' ? `0 0 0 ${6 + level * 22}px rgba(22,163,74,0.25)` : status === 'speaking' ? '0 0 0 8px rgba(0,0,0,0.12)' : 'none' }}
             >
               <Icon name="mic" size={34} />
             </button>
@@ -291,7 +291,7 @@ export default function Discuss() {
         )}
         <div className="mt-2 flex gap-2">
           <Input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { handsFree.current = false; send(text); setText(''); } }} placeholder={call ? (ar ? 'تكلم أو اكتب…' : 'Talk or type…') : (ar ? 'اكتب فكرتك…' : 'Write your idea…')} />
-          <button onClick={() => { handsFree.current = false; send(text); setText(''); }} className="mt-2.5 rounded-[14px] bg-black px-4 font-bold text-white" aria-label="send"><Icon name="send" /></button>
+          <button onClick={() => { handsFree.current = false; send(text); setText(''); }} className="mt-2.5 rounded-[14px] px-4 font-bold" style={{ background: 'var(--primary-bg)', color: 'var(--primary-fg)' }} aria-label="send"><Icon name="send" /></button>
         </div>
         {status === 'thinking' && <div className="mt-2 h-1 w-16 animate-pulse rounded bg-[#16A34A]" />}
         {note && <p className="mt-2 text-center text-xs text-black/60">{note}</p>}

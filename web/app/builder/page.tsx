@@ -3,17 +3,17 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { QRCodeSVG } from 'qrcode.react';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import PreviewApp, { PhoneFrame } from '@/components/PreviewApp';
-import { Btn, Card, Input, Shell, TextArea } from '@/components/ui';
+import { Btn, Card, Input, Label, Pill, Shell, TextArea } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
 import { ALL_SECTIONS, type Design, localDesign, TEMPLATES } from '@/lib/design';
-import Icon from '@/components/Icon';
+import Icon, { type IconName } from '@/components/Icon';
 import { useLang } from '@/lib/i18n';
 import { loadGirl, parseRequest, playVoice, talk } from '@/lib/girl';
 
 const PALETTE = ['#111111', '#FFFFFF', '#DC2626', '#E11D48', '#EC4899', '#7C3AED', '#2563EB', '#1E3A8A', '#0EA5E9', '#14B8A6', '#16A34A', '#84CC16', '#EAB308', '#C9A227', '#EA580C', '#7C2D12', '#6B7280', '#E7D7C1', '#FFFBEB', '#0F172A'];
 const FONTS = ['Cairo', 'Tajawal', 'Inter'];
 const SECTION_NAMES: Record<string, [string, string]> = { hero: ['الواجهة', 'Hero'], categories: ['الأقسام', 'Categories'], products: ['المنتجات', 'Products'], offers: ['العروض', 'Offers'], booking: ['الحجز', 'Booking'], reviews: ['التقييمات', 'Reviews'], map: ['الخريطة', 'Map'], contact: ['التواصل', 'Contact'], about: ['من نحن', 'About'] };
-const AIS: [string, string][] = [['claude', 'Claude'], ['chatgpt', 'ChatGPT'], ['meta', 'Meta'], ['gemini', 'Gemini']];
+const AIS: [string, string, IconName][] = [['claude', 'Claude', 'aiBurst'], ['chatgpt', 'ChatGPT', 'aiKnot'], ['meta', 'Meta', 'aiLoop'], ['gemini', 'Gemini', 'aiStar']];
 type Step = 'build' | 'consent' | 'connect' | 'done';
 
 function Builder() {
@@ -108,31 +108,32 @@ function Builder() {
 
   return (
     <>
-      <Card>
-        <div className="flex flex-wrap gap-2">
-          {AIS.map(([id, name]) => (
-            <button key={id} onClick={() => setAi(id)} className={`rounded-full px-4 py-2 text-sm font-bold ${ai === id ? 'bg-black text-white' : 'bg-[#E5E5E5] text-black'}`}>{name}</button>
-          ))}
-        </div>
-        <p className="mt-3 text-sm font-semibold">{t('chosenAI')}: {AIS.find((x) => x[0] === ai)![1]}</p>
-        <TextArea rows={4} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('examplePh')} />
-        <Btn icon="sparkles" onClick={() => build()} disabled={busy === 'build'}>{busy === 'build' ? '…' : t('buildBtn')}</Btn>
-        <div className="grid grid-cols-2 gap-2.5">
-          <Btn v="grey" icon="camera" className="!text-[15px]" onClick={() => file.current?.click()} disabled={busy === 'camera'}>{busy === 'camera' ? '…' : t('cameraBtn')}</Btn>
-          <Btn v="grey" icon="volume" className="!text-[15px]" onClick={voiceReply} disabled={busy === 'voice'}>{busy === 'voice' ? '…' : t('voiceBtn')}</Btn>
-        </div>
-        <Btn v="grey" icon="chat" onClick={() => router.push('/talk')}>{ar ? 'ناقش فكرتك مع دانو' : 'Discuss your idea with Danu'}</Btn>
-        <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={(e) => e.target.files?.[0] && camera(e.target.files[0])} />
-        {reply && <p className="mt-3 whitespace-pre-wrap rounded-[14px] bg-[#F3F3F3] p-3 leading-7">{reply}</p>}
-        {msg && <p className="mt-2 text-sm text-black/60">{msg}</p>}
-        {!design && (
-          <div className="mt-3 flex flex-wrap gap-1.5">
+      <Label>{ar ? 'اختر نموذج الذكاء' : 'Select AI model'}</Label>
+      <div className="grid grid-cols-4 gap-1.5">
+        {AIS.map(([id, name, icon]) => <Pill key={id} on={ai === id} onClick={() => setAi(id)} icon={icon} className="!justify-center !gap-1 !px-1 !text-[13.5px]">{name}</Pill>)}
+      </div>
+      <TextArea rows={3} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('examplePh')} className="mt-8 text-center" />
+      <Btn icon="sparkles" wide={false} className="mt-5" onClick={() => build()} disabled={busy === 'build'}>{busy === 'build' ? '…' : t('buildBtn')}</Btn>
+      <div className="mt-8 grid grid-cols-3 gap-2.5">
+        <Btn v="grey" icon="camera" className="!mt-0 !px-2 !text-[15px]" onClick={() => file.current?.click()} disabled={busy === 'camera'}>{busy === 'camera' ? '…' : (ar ? 'الكاميرا' : 'Camera')}</Btn>
+        <Btn v="grey" icon="volume" className="!mt-0 !px-2 !text-[15px]" onClick={voiceReply} disabled={busy === 'voice'}>{busy === 'voice' ? '…' : (ar ? 'صوت' : 'Voice')}</Btn>
+        <Btn v="grey" icon="chat" accentText className="!mt-0 !px-2 !text-[15px]" onClick={() => router.push('/talk')}>{ar ? 'دانو' : 'Danu'}</Btn>
+      </div>
+      <input ref={file} type="file" accept="image/*" capture="environment" hidden onChange={(e) => e.target.files?.[0] && camera(e.target.files[0])} />
+      {reply && <p className="mt-4 whitespace-pre-wrap rounded-[14px] bg-[#F3F3F3] p-3 leading-7 text-black">{reply}</p>}
+      {msg && <p className="mt-2 text-center text-sm" style={{ color: 'var(--muted)' }}>{msg}</p>}
+      {!design && (
+        <>
+          <Label>{ar ? 'القوالب' : 'Templates'}</Label>
+          <div className="flex flex-wrap justify-center gap-2.5">
             {TEMPLATES.slice(0, 6).map((tpl) => (
-              <button key={tpl.type} onClick={() => { const p = ar ? `أبي تطبيق ${tpl.title.ar}` : `I want a ${tpl.title.en} app`; setText(p); build(p); }} className="rounded-full bg-[#F3F3F3] px-3 py-1.5 text-xs font-semibold">{ar ? tpl.title.ar : tpl.title.en}</button>
+              <button key={tpl.type} onClick={() => { const p = ar ? `أبي تطبيق ${tpl.title.ar}` : `I want a ${tpl.title.en} app`; setText(p); build(p); }} className="rounded-[14px] border px-5 py-2.5 text-[16px] font-medium" style={{ background: 'var(--chip-bg)', color: 'var(--chip-fg)', borderColor: 'var(--outline-border)' }}>
+                {ar ? tpl.title.ar : tpl.title.en}
+              </button>
             ))}
           </div>
-        )}
-      </Card>
+        </>
+      )}
 
       {design && step === 'build' && (
         <Card>
@@ -158,12 +159,12 @@ function Builder() {
               </div>
             ))}
             <div className="mt-3 flex gap-1.5">
-              {FONTS.map((f) => <button key={f} onClick={() => setDesign({ ...design, font: f })} className={`flex-1 rounded-[10px] py-2 text-sm font-bold ${design.font === f ? 'bg-black text-white' : 'bg-white'}`} style={{ fontFamily: f }}>{f}</button>)}
+              {FONTS.map((f) => <button key={f} onClick={() => setDesign({ ...design, font: f })} className={`k-pill flex-1 justify-center ${design.font === f ? 'k-pill-on' : ''}`} style={{ fontFamily: f }}>{f}</button>)}
             </div>
             <div className="mt-3 flex flex-wrap gap-1.5">
               {ALL_SECTIONS.map((sec) => {
                 const on = design.sections.includes(sec);
-                return <button key={sec} onClick={() => setDesign({ ...design, sections: ALL_SECTIONS.filter((x) => (x === sec ? !on : design.sections.includes(x))) })} className={`rounded-full px-3 py-1.5 text-xs font-bold ${on ? 'bg-black text-white' : 'bg-white text-black/60'}`}>{SECTION_NAMES[sec][ar ? 0 : 1]}</button>;
+                return <button key={sec} onClick={() => setDesign({ ...design, sections: ALL_SECTIONS.filter((x) => (x === sec ? !on : design.sections.includes(x))) })} className={`k-pill !px-3 !py-1.5 !text-xs ${on ? 'k-pill-on' : ''}`}>{SECTION_NAMES[sec][ar ? 0 : 1]}</button>;
               })}
             </div>
             <div className="mt-3 space-y-1.5">

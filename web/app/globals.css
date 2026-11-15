@@ -2,8 +2,82 @@
 @tailwind components;
 @tailwind utilities;
 
-html { background: #0F0F0F; }
+/*
+ * KAKAO appearance tokens.
+ * Light (default): white, soft blue accents, serif wordmark — the owner's new design.
+ * Dark (Settings → Appearance): the first design — #0F0F0F, white cards, black buttons, green approve.
+ */
+:root {
+  --bg: #ffffff;
+  --text: #1f2328;
+  --muted: #8a8f98;
+  --line: #dfe2e6;
+  --soft: #f4f5f7;
+  --card: transparent;
+  --card-fg: #1f2328;
+  --card-pad: 4px;
+  --tile: #dce7f6;
+  --primary-bg: #e8f0fb;
+  --primary-fg: #3f6fb0;
+  --strong-bg: #4a78b5;
+  --strong-fg: #ffffff;
+  --outline-bg: #ffffff;
+  --outline-fg: #1f2328;
+  --outline-border: #d6d9de;
+  --tab-on-bg: #eaf1fb;
+  --tab-on-fg: #4a78b5;
+  --tab-off-bg: transparent;
+  --tab-off-fg: #8a8f98;
+  --pill-bg: #ffffff;
+  --pill-fg: #1f2328;
+  --pill-border: #d6d9de;
+  --pill-on-bg: #eef3fb;
+  --pill-on-fg: #3f6fb0;
+  --pill-on-border: #9db8de;
+  --chip-bg: #efefef;
+  --chip-fg: #1f2328;
+  color-scheme: light;
+}
+:root[data-app-theme='dark'] {
+  --bg: #0f0f0f;
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.6);
+  --line: #2a2a2a;
+  --soft: #f3f3f3;
+  --card: #ffffff;
+  --card-fg: #000000;
+  --card-pad: 16px;
+  --tile: #000000;
+  --primary-bg: #000000;
+  --primary-fg: #ffffff;
+  --strong-bg: #16a34a;
+  --strong-fg: #ffffff;
+  --outline-bg: #e5e5e5;
+  --outline-fg: #000000;
+  --outline-border: #e5e5e5;
+  --tab-on-bg: #ffffff;
+  --tab-on-fg: #000000;
+  --tab-off-bg: #2a2a2a;
+  --tab-off-fg: #ffffff;
+  --pill-bg: #e5e5e5;
+  --pill-fg: #000000;
+  --pill-border: #e5e5e5;
+  --pill-on-bg: #000000;
+  --pill-on-fg: #ffffff;
+  --pill-on-border: #000000;
+  --chip-bg: #f3f3f3;
+  --chip-fg: #000000;
+  color-scheme: dark;
+}
+
+html, body { background: var(--bg); color: var(--text); }
 body { font-family: Inter, Cairo, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
 html[dir='rtl'] body { font-family: Cairo, Tajawal, system-ui, sans-serif; }
+.k-wordmark { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500; letter-spacing: 0.18em; }
+html[dir='rtl'] .k-wordmark { font-family: Amiri, 'Cormorant Garamond', serif; letter-spacing: 0.02em; }
+.k-label { font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text); opacity: 0.8; }
+html[dir='rtl'] .k-label { letter-spacing: 0; text-transform: none; }
+.k-pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 14px; border: 1px solid var(--pill-border); background: var(--pill-bg); color: var(--pill-fg); padding: 8px 14px; font-size: 14px; font-weight: 600; }
+.k-pill-on { border-color: var(--pill-on-border); background: var(--pill-on-bg); color: var(--pill-on-fg); }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #bbb; border-radius: 3px; }

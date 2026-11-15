@@ -29,4 +29,6 @@ function App() {
   return <Page />;
 }
 
+try { document.documentElement.setAttribute('data-app-theme', localStorage.getItem('appearance') === 'dark' ? 'dark' : 'light'); } catch { document.documentElement.setAttribute('data-app-theme', 'light'); }
+
 createRoot(document.getElementById('root')!).render(<LangProvider><App /></LangProvider>);

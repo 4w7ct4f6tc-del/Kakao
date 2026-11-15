@@ -91,7 +91,7 @@ export default function VoiceCard() {
     if (rec.current?.state === 'recording') rec.current.stop();
   }
 
-  const pill = (on: boolean) => `rounded-full px-3.5 py-2 text-sm font-bold ${on ? 'bg-black text-white' : 'bg-[#E5E5E5] text-black'}`;
+  const pill = (on: boolean) => `k-pill ${on ? 'k-pill-on' : ''}`;
   const accents: [string, string][] = [
     ['auto', ar ? 'تلقائي حسب لغتك' : 'Auto by language'], ['bahraini', ar ? 'بحريني' : 'Bahraini Arabic'],
     ['en_us', 'English US'], ['en_uk', 'English UK'], ['fr', 'Français'], ['hi', 'हिन्दी'],
@@ -132,18 +132,6 @@ export default function VoiceCard() {
         <Btn v="green" icon="check" onClick={confirm} disabled={!changed}>{ar ? 'اعتمد هذا الصوت' : 'Use this voice'}</Btn>
         {!changed && <p className="mt-1.5 text-center text-xs text-black/50">{ar ? 'هذا صوتك الحالي' : 'This is your current voice'}</p>}
         {note && <p className="mt-2 text-center text-sm text-black/60">{note}</p>}
-      </Card>
-      <Card>
-        <h2 className="flex items-center gap-2 text-lg font-extrabold"><Icon name="user" />{ar ? 'صوت البنت' : 'Girl voice'}</h2>
-        <p className="text-sm text-black/60">{ar ? 'بنت حقيقية بكل اللهجات العربية — للرد الصوتي والمحادثة والقصص والإعلانات.' : 'A real girl voice in every Arabic dialect — for voice replies, conversation, stories and ads.'}</p>
-        <p className="mb-2 mt-3 text-sm font-bold">{ar ? 'اللهجة' : 'Dialect'}</p>
-        <div className="flex flex-wrap gap-2">{DIALECTS.map(([id, a, e]) => <button key={id} onClick={() => setGirl({ ...girl, dialect: id })} className={pill(girl.dialect === id)}>{ar ? a : e}</button>)}</div>
-        <p className="mb-2 mt-3 text-sm font-bold">{ar ? 'النوع' : 'Type'}</p>
-        <div className="flex flex-wrap gap-2">{STYLES.map(([id, a, e]) => <button key={id} onClick={() => setGirl({ ...girl, style: id })} className={pill(girl.style === id)}>{ar ? a : e}</button>)}</div>
-        <p className="mb-2 mt-3 text-sm font-bold">{ar ? 'السرعة' : 'Speed'}</p>
-        <div className="flex flex-wrap gap-2">{SPEEDS.map(([id, a, e]) => <button key={id} onClick={() => setGirl({ ...girl, speed: id })} className={pill(girl.speed === id)}>{ar ? a : e}</button>)}</div>
-        <Btn icon="play" onClick={testGirl} disabled={busy === 'girl'}>{busy === 'girl' ? '…' : (ar ? 'جرّب الصوت' : 'Test voice')}</Btn>
-        <Btn v="green" icon="check" disabled={JSON.stringify(girl) === JSON.stringify(girlSaved)} onClick={() => { saveGirl(girl); setGirlSaved(girl); setNote(ar ? 'تم اعتماد صوت البنت' : 'Girl voice saved'); }}>{ar ? 'اعتمد صوت البنت' : 'Use this girl voice'}</Btn>
       </Card>
       <Card>
         <h2 className="flex items-center gap-2 text-lg font-extrabold"><Icon name="mic" />{ar ? 'استنسخ صوتي (30 ثانية)' : 'Clone my voice (30 sec)'}</h2>
