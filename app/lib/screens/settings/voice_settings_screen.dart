@@ -1,11 +1,17 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../services/account_service.dart';
 import '../../services/voice_service.dart';
 import '../../state/providers.dart';
 import '../../widgets/common.dart';
 import '../../widgets/kakao_ui.dart';
 
+/// Real human voice: ElevenLabs + OpenAI TTS.
+/// Pick رجالي / نسائي and an accent (تلقائي follows your language: Arabic → Bahraini),
+/// tune speed / pitch / volume, ▶ test it, then ✅ confirm. Plus a 30-second voice clone.
 class VoiceSettingsScreen extends ConsumerStatefulWidget {
   const VoiceSettingsScreen({super.key});
 
@@ -14,51 +20,93 @@ class VoiceSettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
+  static const cloneSeconds = 30;
+  late VoiceSettings draft = ref.read(voiceProvider);
   bool testing = false;
-  bool recording = false;
+  bool saving = false;
   bool consent = false;
+  bool recording = false;
   bool cloning = false;
-  DateTime? recStart;
+  int elapsed = 0;
+  Timer? timer;
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  bool get ar => ref.read(languageProvider) == 'ar';
+
+  /// Sample in the accent being tested.
+  String _sample() {
+    final accent = draft.isClone || draft.voice == 'auto' ? (ar ? 'bahraini' : 'en_us') : draft.voice;
+    switch (accent) {
+      case 'bahraini':
+        return 'هلا والله! شلونك؟ أنا صوتك الجديد في خعخعو. قول لي شنو تبي، وأسويه لك على طول.';
+      case 'fr':
+        return 'Bonjour ! Je suis votre nouvelle voix. Dites-moi ce que vous voulez construire.';
+      case 'hi':
+        return 'नमस्ते! मैं आपकी नई आवाज़ हूँ। बताइए, आप क्या बनाना चाहते हैं?';
+      default:
+        return "Hey! I'm your new voice in KAkAo. Tell me what you want to build, and I'll make it for you.";
+    }
+  }
 
   Future<void> _test() async {
-    final lang = ref.read(languageProvider);
-    final s = ref.read(voiceProvider);
     setState(() => testing = true);
-    final sample = lang == 'ar'
-        ? (s.voice == 'bahraini' ? 'هلا والله! شلونك؟ أنا صوتك الجديد في التطبيق.' : 'مرحباً! هذا صوتك الجديد في التطبيق.')
-        : 'Hello! This is your new voice in the app.';
     try {
-      await VoiceService.speak(sample, s, lang: lang);
+      await VoiceService.speak(_sample(), draft, lang: ar ? 'ar' : 'en');
     } catch (e) {
-      if (mounted) toast(context, friendlyError(e, lang));
+      if (mounted) toast(context, friendlyError(e, ref.read(languageProvider)));
     }
     if (mounted) setState(() => testing = false);
   }
 
-  Future<void> _record() async {
-    if (!recording) {
-      if (await VoiceService.startRecording()) {
-        setState(() {
-          recording = true;
-          recStart = DateTime.now();
-        });
-      }
+  Future<void> _confirm() async {
+    setState(() => saving = true);
+    await ref.read(voiceProvider.notifier).update(draft);
+    try {
+      await AccountService.savePrefs({'voice': draft.toJson()});
+    } catch (_) {}
+    if (mounted) {
+      setState(() => saving = false);
+      toast(context, ref.read(tProvider)('saved'));
+    }
+  }
+
+  Future<void> _startClone() async {
+    if (!await VoiceService.startRecording()) {
+      if (mounted) toast(context, ar ? 'اسمح للتطبيق باستخدام المايك' : 'Allow microphone access');
       return;
     }
+    setState(() {
+      recording = true;
+      elapsed = 0;
+    });
+    timer = Timer.periodic(const Duration(seconds: 1), (t) {
+      setState(() => elapsed++);
+      if (elapsed >= cloneSeconds) _finishClone();
+    });
+  }
+
+  Future<void> _finishClone() async {
+    timer?.cancel();
+    if (!recording) return;
     setState(() {
       recording = false;
       cloning = true;
     });
     final audio = await VoiceService.stopRecording();
     try {
-      if (audio == null) throw Exception('no audio');
+      if (audio == null || elapsed < 10) throw Exception(ar ? 'سجّل 30 ثانية تقريباً' : 'Record about 30 seconds');
       final id = await VoiceService.cloneVoice(audio, 'My voice');
       if (id.isNotEmpty) {
-        await ref.read(voiceProvider.notifier).update(ref.read(voiceProvider).copyWith(voice: 'clone:$id'));
-        if (mounted) toast(context, ref.read(tProvider)('saved'));
+        draft = draft.copyWith(voice: 'clone:$id');
+        await _confirm();
       }
     } catch (e) {
-      if (mounted) toast(context, friendlyError(e, ref.read(languageProvider)));
+      if (mounted) toast(context, e is Exception && e.toString().contains('30') ? e.toString().replaceFirst('Exception: ', '') : friendlyError(e, ref.read(languageProvider)));
     }
     if (mounted) setState(() => cloning = false);
   }
@@ -66,17 +114,17 @@ class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final t = ref.watch(tProvider);
-    final s = ref.watch(voiceProvider);
-    final n = ref.read(voiceProvider.notifier);
-    final voices = [
-      ('male', '👨 ${t('voiceMale')}'),
-      ('female', '👩 ${t('voiceFemale')}'),
-      ('bahraini', '🇧🇭 ${t('voiceBahraini')}'),
+    final saved = ref.watch(voiceProvider);
+    final arUi = ref.watch(languageProvider) == 'ar';
+    final changed = draft != saved;
+    final accents = <(String, String)>[
+      ('auto', arUi ? '🌐 تلقائي حسب لغتك' : '🌐 Auto by language'),
+      ('bahraini', arUi ? '🇧🇭 بحريني' : '🇧🇭 Bahraini Arabic'),
       ('en_us', '🇺🇸 English US'),
       ('en_uk', '🇬🇧 English UK'),
       ('fr', '🇫🇷 Français'),
       ('hi', '🇮🇳 हिन्दी'),
-      if (s.voice.startsWith('clone:')) (s.voice, '🎙️ Clone'),
+      if (draft.isClone) (draft.voice, arUi ? '🎙️ صوتي' : '🎙️ My voice'),
     ];
     Widget slider(String label, double value, double min, double max, ValueChanged<double> onChanged, {int? divisions}) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,40 +136,81 @@ class _VoiceSettingsScreenState extends ConsumerState<VoiceSettingsScreen> {
     return KPage(children: [
       KCard(children: [
         Text(t('voice'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4),
+        Text(arUi ? 'صوت إنسان حقيقي — ElevenLabs و OpenAI' : 'Real human voice — ElevenLabs & OpenAI', style: const TextStyle(color: Colors.black54)),
         const SizedBox(height: 12),
-        KPills<String>(items: voices, selected: s.voice, onSelect: (v) => n.update(s.copyWith(voice: v))),
+        KPills<String>(
+          items: [('male', arUi ? '👨 رجالي' : '👨 Male'), ('female', arUi ? '👩 نسائي' : '👩 Female')],
+          selected: draft.gender,
+          onSelect: (g) => setState(() => draft = draft.copyWith(gender: g)),
+        ),
+        const SizedBox(height: 10),
+        KPills<String>(items: accents, selected: draft.voice, onSelect: (v) => setState(() => draft = draft.copyWith(voice: v))),
+        if (draft.voice == 'auto')
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(arUi ? 'تكتب عربي → يرد بحريني. تكتب إنجليزي → يرد إنجليزي.' : 'Write Arabic → Bahraini voice. Write English → English voice.',
+                style: const TextStyle(color: Colors.black54, fontSize: 12)),
+          ),
         const SizedBox(height: 12),
         KPills<String>(
           items: const [('elevenlabs', 'ElevenLabs'), ('openai', 'OpenAI Voice')],
-          selected: s.provider,
-          onSelect: (v) => n.update(s.copyWith(provider: v)),
+          selected: draft.provider,
+          onSelect: (v) => setState(() => draft = draft.copyWith(provider: v)),
         ),
-        slider('${t('speed')}: ${s.speed.toStringAsFixed(1)}x', s.speed, 0.5, 2.0, (v) => n.update(s.copyWith(speed: v)), divisions: 15),
-        slider('${t('pitch')}: ${s.pitch.toStringAsFixed(2)}', s.pitch, 0.5, 1.5, (v) => n.update(s.copyWith(pitch: v)), divisions: 20),
-        slider('${t('volume')}: ${(s.volume * 100).round()}%', s.volume, 0, 1, (v) => n.update(s.copyWith(volume: v))),
+        slider('${t('speed')}: ${draft.speed.toStringAsFixed(1)}x', draft.speed, 0.5, 2.0, (v) => setState(() => draft = draft.copyWith(speed: v)), divisions: 15),
+        slider('${t('pitch')}: ${draft.pitch.toStringAsFixed(2)}', draft.pitch, 0.5, 1.5, (v) => setState(() => draft = draft.copyWith(pitch: v)), divisions: 20),
+        slider('${t('volume')}: ${(draft.volume * 100).round()}%', draft.volume, 0, 1, (v) => setState(() => draft = draft.copyWith(volume: v))),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          value: s.autoRead,
+          value: draft.autoRead,
           activeThumbColor: K.green,
           title: Text(t('autoRead'), style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
-          onChanged: (v) => n.update(s.copyWith(autoRead: v)),
+          onChanged: (v) => setState(() => draft = draft.copyWith(autoRead: v)),
         ),
-        KBtn('▶ ${t('testVoice')}', v: KVariant.green, busy: testing, onTap: _test),
+        KBtn('▶ ${t('testVoice')}', busy: testing, onTap: _test),
+        KBtn(arUi ? '✅ اعتمد هذا الصوت' : '✅ Use this voice', v: KVariant.green, busy: saving, onTap: changed ? _confirm : null),
+        if (!changed)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text(arUi ? 'هذا صوتك الحالي' : 'This is your current voice', textAlign: TextAlign.center, style: const TextStyle(color: Colors.black54, fontSize: 12)),
+          ),
       ]),
       KCard(children: [
         Text(t('cloneVoice'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4),
+        Text(
+          arUi ? 'اقرأ أي كلام بصوتك الطبيعي لمدة 30 ثانية في مكان هادئ. التسجيل يوقف لحاله.' : 'Read anything in your natural voice for 30 seconds in a quiet place. Recording stops by itself.',
+          style: const TextStyle(color: Colors.black54),
+        ),
         CheckboxListTile(
           contentPadding: EdgeInsets.zero,
           value: consent,
           activeColor: K.green,
           title: Text(t('cloneConsent'), style: const TextStyle(color: Colors.black)),
-          onChanged: (v) => setState(() => consent = v ?? false),
+          onChanged: recording ? null : (v) => setState(() => consent = v ?? false),
         ),
+        if (recording) ...[
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(value: elapsed / cloneSeconds, minHeight: 10, color: Colors.black, backgroundColor: K.grey),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Text('🔴 $elapsed / $cloneSeconds', textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w700)),
+          ),
+        ],
         KBtn(
-          recording ? '⏹ ${t('stop')} (${DateTime.now().difference(recStart!).inSeconds}s / 30s)' : '🎙️ ${t('record')}',
+          recording ? '⏹ ${t('stop')}' : '🎙️ ${t('record')} (30s)',
           busy: cloning,
-          onTap: consent ? _record : null,
+          onTap: !consent ? null : (recording ? _finishClone : _startClone),
         ),
+        if (draft.isClone)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(arUi ? '✅ صوتك المستنسخ جاهز — اختاره فوق وجربه' : '✅ Your cloned voice is ready — pick it above and test it',
+                textAlign: TextAlign.center, style: const TextStyle(color: K.green, fontWeight: FontWeight.w700)),
+          ),
       ]),
     ]);
   }

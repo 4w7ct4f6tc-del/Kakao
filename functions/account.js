@@ -18,6 +18,18 @@ r.post('/me/prefs', requireAuth, wrap(async (req, res) => {
   if (typeof req.body.language === 'string') allowed.language = req.body.language.slice(0, 8);
   if (typeof req.body.aiChoice === 'string') allowed.aiChoice = req.body.aiChoice.slice(0, 20);
   if (typeof req.body.name === 'string') allowed.name = req.body.name.slice(0, 80);
+  const v = req.body.voice;
+  if (v && typeof v === 'object') {
+    allowed.voice = {
+      voice: String(v.voice || 'auto').slice(0, 60),
+      gender: v.gender === 'male' ? 'male' : 'female',
+      speed: Math.min(2, Math.max(0.5, Number(v.speed) || 1)),
+      pitch: Math.min(1.5, Math.max(0.5, Number(v.pitch) || 1)),
+      volume: Math.min(1, Math.max(0, Number(v.volume) || 1)),
+      autoRead: !!v.autoRead,
+      provider: v.provider === 'openai' ? 'openai' : 'elevenlabs',
+    };
+  }
   await db.collection('users').doc(req.user.uid).set(allowed, { merge: true });
   res.json({ ok: true });
 }));

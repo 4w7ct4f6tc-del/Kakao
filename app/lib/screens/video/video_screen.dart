@@ -52,7 +52,7 @@ class _VideoTabState extends ConsumerState<VideoTab> {
       msg = null;
     });
     try {
-      jobId = await VideoService.create(story: story.text, lang: ref.read(languageProvider), long: false, voice: ref.read(voiceProvider).voice);
+      jobId = await VideoService.create(story: story.text, lang: ref.read(languageProvider), long: false, voice: ref.read(voiceProvider).voice, gender: ref.read(voiceProvider).gender);
       poll?.cancel();
       poll = Timer.periodic(const Duration(seconds: 3), (_) => _check());
     } catch (e) {
@@ -85,7 +85,7 @@ class _VideoTabState extends ConsumerState<VideoTab> {
       if (!mounted) return;
       setState(() => playing = i);
       try {
-        await VoiceService.speak(board[i].text, voice, lang: lang);
+        await VoiceService.speak(board[i].text, voice, lang: lang, followLanguage: true);
         await Future.delayed(Duration(milliseconds: 600 + board[i].text.length * 60));
       } catch (_) {
         await Future.delayed(const Duration(seconds: 3));

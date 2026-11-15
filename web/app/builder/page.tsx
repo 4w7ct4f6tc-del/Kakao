@@ -6,7 +6,8 @@ import PreviewApp, { PhoneFrame } from '@/components/PreviewApp';
 import { Btn, Card, Input, Shell, TextArea } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
 import { ALL_SECTIONS, type Design, localDesign, TEMPLATES } from '@/lib/design';
-import { useLang } from '@/lib/i18n';
+import { detectLang, useLang } from '@/lib/i18n';
+import { loadVoice, speak } from '@/lib/voice';
 
 const PALETTE = ['#111111', '#FFFFFF', '#DC2626', '#E11D48', '#EC4899', '#7C3AED', '#2563EB', '#1E3A8A', '#0EA5E9', '#14B8A6', '#16A34A', '#84CC16', '#EAB308', '#C9A227', '#EA580C', '#7C2D12', '#6B7280', '#E7D7C1', '#FFFBEB', '#0F172A'];
 const FONTS = ['Cairo', 'Tajawal', 'Inter'];
@@ -59,26 +60,23 @@ function Builder() {
     setDesign(localDesign(text || t('examplePh'), lang, a.name, a.colors, a.sell));
   }
 
+  /** 🔊 Real voice reply in the user's language: Arabic → Bahraini dialect + Bahraini voice, English → English. */
   async function voiceReply() {
     const content = text.trim();
     if (!content) return;
-    observe(content);
     setBusy('voice');
+    const spoken = detectLang(content) || lang;
     let answerText = '';
     try {
-      answerText = (await api<{ text: string }>('/ai/chat', { engine: ai, lang, messages: [{ role: 'user', content }] })).text;
+      answerText = (await api<{ text: string }>('/ai/chat', { engine: ai, lang: spoken, voiceReply: true, messages: [{ role: 'user', content }] })).text;
     } catch {
-      answerText = ar ? 'وصلتني رسالتك ✅ اضغط "ابنِ لي التطبيق" وبتشوف تطبيقك مباشرة.' : 'Got it ✅ Tap "Build my app" to see your app live.';
+      answerText = spoken === 'ar'
+        ? 'هلا والله! وصلتني رسالتك. اضغط ابنِ لي التطبيق وبتشوف تطبيقك على طول.'
+        : "Hey! Got your message. Tap build my app and you'll see your app right away.";
     }
     setReply(answerText);
-    try {
-      const r = await api<{ audio: string }>('/voice/tts', { text: answerText, voice: 'female', lang });
-      await new Audio(`data:audio/mpeg;base64,${r.audio}`).play();
-    } catch {
-      const u = new SpeechSynthesisUtterance(answerText);
-      u.lang = lang;
-      speechSynthesis.speak(u);
-    }
+    const how = await speak(answerText, loadVoice(), { lang: spoken, followLanguage: true });
+    if (how === 'device') setMsg(spoken === 'ar' ? 'معاينة بصوت جهازك — الصوت البشري الحقيقي يشتغل بعد ربط ElevenLabs أو OpenAI.' : 'Device-voice preview — the real human voice works once ElevenLabs or OpenAI is connected.');
     setBusy('');
   }
 

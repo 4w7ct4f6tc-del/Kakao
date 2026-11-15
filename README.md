@@ -100,6 +100,21 @@ Every template includes Home, Products, Search, Cart, Checkout, WhatsApp order, 
 
 ---
 
+## Real voice
+
+Speech uses real human voices from ElevenLabs, with OpenAI `gpt-4o-mini-tts` as the backup. Both are tuned to sound like a person talking:
+- ElevenLabs uses expressive settings (lower stability, some style, speaker boost).
+- OpenAI gets instructions to speak warmly, with natural pauses.
+- Markdown, emojis and links are removed before speaking.
+
+How it works:
+- **Voices:** رجالي / نسائي, combined with an accent: تلقائي (Auto), بحريني, English US, English UK, Français or हिन्दी.
+- **🔊 رد بصوت حقيقي follows your language:** you write Arabic, the AI answers in **Bahraini dialect** and speaks it in the Bahraini voice. You write English, it answers and speaks in English.
+- **Controls:** speed 0.5x–2x (beyond ElevenLabs' range, FFmpeg adjusts tempo), pitch (FFmpeg), volume, auto-read.
+- **Test before saving:** **▶ جرّب الصوت** plays a sample. Nothing changes until you press **✅ اعتمد هذا الصوت**.
+- **Voice clone:** tick the consent box, then record 30 seconds (it stops by itself). ElevenLabs Instant Voice Clone creates your voice and you can choose it like any other.
+- **Bahraini voice IDs:** set `ELEVENLABS_VOICE_BAHRAINI_MALE` and `ELEVENLABS_VOICE_BAHRAINI_FEMALE` (see `functions/.env.example`).
+
 ## Where to paste each key
 
 All server keys go in **`functions/.env`**. Copy it from `functions/.env.example`. Anything still set to `YOUR_...` counts as "not configured", and that feature switches to its fallback instead of crashing.

@@ -24,7 +24,8 @@ r.post('/video/create', requireAuth, wrap(async (req, res) => {
     id: ref.id, userId: uid, story,
     lang: String(req.body.lang || 'en').slice(0, 8),
     length: req.body.length === 'long' ? 'long' : 'short',
-    voice: String(req.body.voice || 'female').slice(0, 60),
+    voice: String(req.body.voice || 'auto').slice(0, 60),
+    gender: req.body.gender === 'male' ? 'male' : 'female',
     status: 'queued', progress: 0, videoUrl: null, createdAt: now(),
   });
   // Firebase: the Firestore trigger (index.js) starts it. Render/local server: start inline.
@@ -72,7 +73,7 @@ async function runVideoPipeline(id) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-kakao-secret': env('VIDEO_SERVICE_SECRET') },
       body: JSON.stringify({
-        id, story: v.story, lang: v.lang, length: v.length, voice: v.voice,
+        id, story: v.story, lang: v.lang, length: v.length, voice: v.voice, gender: v.gender,
         uploadUrl, path: outPath, callbackUrl: `${apiUrl()}/video/callback`, resolution: '1920x1080',
       }),
     });

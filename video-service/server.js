@@ -56,7 +56,7 @@ async function storyPipeline(job) {
       await report(job, { status: 'images', progress: 15 + Math.round(((i + 1) / scenes.length) * 35) });
     }
     for (let i = 0; i < scenes.length; i++) {
-      const audio = await narrate(scenes[i].narration, { voice: job.voice, speed: Number(job.speed) || 1 });
+      const audio = await narrate(scenes[i].narration, { voice: job.voice, gender: job.gender, speed: Number(job.speed) || 1, lang: job.lang });
       if (audio) {
         scenes[i].audioPath = path.join(dir, `voice${i}.mp3`);
         await fs.writeFile(scenes[i].audioPath, audio);

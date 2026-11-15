@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Btn, Card, Input, Shell } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
 import { useLang } from '@/lib/i18n';
+import VoiceCard from '@/components/VoiceCard';
 
 const INTEGRATIONS: [string, string, 'oauth' | 'apikey'][] = [
   ['google', 'Google (Drive, Sheets, Maps, Gmail)', 'oauth'], ['facebook', 'Facebook', 'oauth'], ['instagram', 'Instagram', 'oauth'],
@@ -21,7 +22,6 @@ export default function Settings() {
   const [keys, setKeys] = useState<Record<string, boolean>>({});
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [msg, setMsg] = useState('');
-  const [voice, setVoice] = useState({ voice: 'female', speed: 1 });
 
   const load = () => {
     api('/me').then(setMe).catch(() => {});
@@ -32,20 +32,6 @@ export default function Settings() {
   const run = async (fn: () => Promise<unknown>) => { try { setMsg(''); await fn(); load(); } catch (e) { setMsg(friendly(e, lang)); } };
   const pay = (plan: string, method: string) => run(async () => { const r = await api<{ url: string }>('/payments/checkout', { plan, method }); window.location.href = r.url; });
 
-  async function testVoice() {
-    const text = ar ? 'هلا والله! هذا صوتك في التطبيق.' : 'Hello! This is your voice in the app.';
-    try {
-      const r = await api<{ audio: string }>('/voice/tts', { text, voice: voice.voice, speed: voice.speed, lang });
-      const a = new Audio(`data:audio/mpeg;base64,${r.audio}`);
-      a.playbackRate = voice.speed;
-      await a.play();
-    } catch {
-      const u = new SpeechSynthesisUtterance(text);
-      u.lang = lang;
-      u.rate = voice.speed;
-      speechSynthesis.speak(u);
-    }
-  }
 
   return (
     <Shell>
@@ -70,17 +56,7 @@ export default function Settings() {
         ))}
       </Card>
 
-      <Card>
-        <h2 className="text-lg font-extrabold">🔊 {ar ? 'الصوت' : 'Voice'}</h2>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {[['male', ar ? 'رجل' : 'Male'], ['female', ar ? 'امرأة' : 'Female'], ['bahraini', ar ? 'بحريني' : 'Bahraini']].map(([id, label]) => (
-            <button key={id} onClick={() => setVoice({ ...voice, voice: id })} className={`rounded-full px-4 py-2 text-sm font-bold ${voice.voice === id ? 'bg-black text-white' : 'bg-[#E5E5E5]'}`}>{label}</button>
-          ))}
-        </div>
-        <label className="mt-3 block text-sm font-semibold">{ar ? 'السرعة' : 'Speed'}: {voice.speed.toFixed(1)}x</label>
-        <input type="range" min={0.5} max={2} step={0.1} value={voice.speed} onChange={(e) => setVoice({ ...voice, speed: Number(e.target.value) })} className="w-full accent-black" />
-        <Btn onClick={testVoice}>▶ {ar ? 'جرّب الصوت' : 'Test voice'}</Btn>
-      </Card>
+      <VoiceCard />
 
       <Card>
         <h2 className="text-lg font-extrabold">{t('integrations')}</h2>

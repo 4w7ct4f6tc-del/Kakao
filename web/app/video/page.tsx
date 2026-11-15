@@ -2,7 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Btn, Card, Shell, TextArea } from '@/components/ui';
 import { api, friendly } from '@/lib/api';
-import { useLang } from '@/lib/i18n';
+import { detectLang, useLang } from '@/lib/i18n';
+import { loadVoice, speak } from '@/lib/voice';
 
 type Scene = { narration: string; imageUrl?: string; emoji?: string };
 type Job = { status: string; progress: number; videoUrl?: string; scenes: Scene[]; error?: string };
@@ -27,7 +28,7 @@ export default function VideoPage() {
     // Instant storyboard while the real 1080p video renders.
     setBoard(story.split(/(?<=[.!؟?])\s+|\n+/).filter(Boolean).slice(0, 10).map((p, i) => ({ narration: p, emoji: EMOJI[i] })));
     try {
-      const { id } = await api<{ id: string }>('/video/create', { story, lang, length: 'short' });
+      const { id } = await api<{ id: string }>('/video/create', { story, lang, length: 'short', voice: loadVoice().voice, gender: loadVoice().gender });
       clearInterval(timer.current);
       timer.current = setInterval(async () => {
         const j = await api<Job>(`/video/status?id=${id}`).catch(() => null);
@@ -42,15 +43,10 @@ export default function VideoPage() {
   }
 
   async function play() {
+    const v = loadVoice();
     for (let i = 0; i < board.length; i++) {
       setPlaying(i);
-      await new Promise<void>((res) => {
-        const u = new SpeechSynthesisUtterance(board[i].narration);
-        u.lang = lang;
-        u.onend = () => res();
-        u.onerror = () => res();
-        speechSynthesis.speak(u);
-      });
+      await speak(board[i].narration, v, { lang: detectLang(board[i].narration) || lang, followLanguage: true });
     }
     setPlaying(-1);
   }

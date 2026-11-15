@@ -37,8 +37,8 @@ class VideoJob {
 /// Story -> script + scenes (LLM) -> images (DALL·E/Imagen) -> narration
 /// (ElevenLabs) -> music -> FFmpeg 1080p MP4 with subtitles (Render service).
 class VideoService {
-  static Future<String> create({required String story, required String lang, required bool long, String voice = 'female'}) async {
-    final res = await Api.post('/video/create', {'story': story, 'lang': lang, 'length': long ? 'long' : 'short', 'voice': voice},
+  static Future<String> create({required String story, required String lang, required bool long, String voice = 'auto', String gender = 'female'}) async {
+    final res = await Api.post('/video/create', {'story': story, 'lang': lang, 'length': long ? 'long' : 'short', 'voice': voice, 'gender': gender},
         timeout: const Duration(seconds: 60));
     return res['id'] as String;
   }

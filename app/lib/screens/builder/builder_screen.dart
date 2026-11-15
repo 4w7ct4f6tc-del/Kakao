@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/config.dart';
+import '../../core/i18n.dart';
 import '../../models/app_design.dart';
 import '../../models/templates.dart';
 import '../../services/ai_service.dart';
@@ -72,16 +73,19 @@ class _BuilderTabState extends ConsumerState<BuilderTab> {
         prompt: _prompt, lang: ref.read(languageProvider), name: qName.text, colorsText: qColors.text, sellText: qSell.text));
   }
 
+  /// 🔊 Real voice reply in the user's language: Arabic → Bahraini dialect and
+  /// Bahraini voice, English → English voice. Uses the chosen gender / speed / pitch.
   Future<void> _voiceReply() async {
-    if (text.text.trim().isEmpty) return;
+    final said = text.text.trim();
+    if (said.isEmpty) return;
     setState(() => busy = 'voice');
-    final lang = ref.read(languageProvider);
-    final r = await AiService.chat(history: [ChatMessage('user', text.text.trim())], engine: ref.read(aiChoiceProvider), lang: lang);
+    final String spoken = I18n.detectFromText(said) ?? ref.read(languageProvider);
+    final r = await AiService.chat(history: [ChatMessage('user', said)], engine: ref.read(aiChoiceProvider), lang: spoken, voiceReply: true);
     setState(() => reply = r.text);
     try {
-      await VoiceService.speak(r.text, ref.read(voiceProvider), lang: lang);
+      await VoiceService.speak(r.text, ref.read(voiceProvider), lang: spoken, followLanguage: true);
     } catch (e) {
-      if (mounted) toast(context, friendlyError(e, lang));
+      if (mounted) toast(context, friendlyError(e, ref.read(languageProvider)));
     }
     if (mounted) setState(() => busy = null);
   }

@@ -8,8 +8,11 @@ import 'package:record/record.dart';
 
 import '../core/api.dart';
 
+/// Voice preferences. [voice] is the accent: auto (follows the language —
+/// Arabic → Bahraini), bahraini, en_us, en_uk, fr, hi, or `clone:ID`.
 class VoiceSettings {
-  final String voice; // male | female | bahraini | en_us | en_uk | fr | hi | clone
+  final String voice;
+  final String gender; // male | female
   final double speed; // 0.5 .. 2.0
   final double pitch; // 0.5 .. 1.5
   final double volume; // 0 .. 1
@@ -17,7 +20,8 @@ class VoiceSettings {
   final String provider; // elevenlabs | openai
 
   const VoiceSettings({
-    this.voice = 'female',
+    this.voice = 'auto',
+    this.gender = 'female',
     this.speed = 1.0,
     this.pitch = 1.0,
     this.volume = 1.0,
@@ -25,9 +29,12 @@ class VoiceSettings {
     this.provider = 'elevenlabs',
   });
 
-  VoiceSettings copyWith({String? voice, double? speed, double? pitch, double? volume, bool? autoRead, String? provider}) =>
+  bool get isClone => voice.startsWith('clone:');
+
+  VoiceSettings copyWith({String? voice, String? gender, double? speed, double? pitch, double? volume, bool? autoRead, String? provider}) =>
       VoiceSettings(
         voice: voice ?? this.voice,
+        gender: gender ?? this.gender,
         speed: speed ?? this.speed,
         pitch: pitch ?? this.pitch,
         volume: volume ?? this.volume,
@@ -36,16 +43,31 @@ class VoiceSettings {
       );
 
   Map<String, dynamic> toJson() =>
-      {'voice': voice, 'speed': speed, 'pitch': pitch, 'volume': volume, 'autoRead': autoRead, 'provider': provider};
+      {'voice': voice, 'gender': gender, 'speed': speed, 'pitch': pitch, 'volume': volume, 'autoRead': autoRead, 'provider': provider};
 
-  factory VoiceSettings.fromJson(Map<String, dynamic> j) => VoiceSettings(
-        voice: (j['voice'] ?? 'female').toString(),
-        speed: (j['speed'] as num?)?.toDouble() ?? 1.0,
-        pitch: (j['pitch'] as num?)?.toDouble() ?? 1.0,
-        volume: (j['volume'] as num?)?.toDouble() ?? 1.0,
-        autoRead: j['autoRead'] == true,
-        provider: (j['provider'] ?? 'elevenlabs').toString(),
-      );
+  factory VoiceSettings.fromJson(Map<String, dynamic> j) {
+    var voice = (j['voice'] ?? 'auto').toString();
+    var gender = (j['gender'] ?? 'female').toString();
+    if (voice == 'male' || voice == 'female') {
+      gender = voice;
+      voice = 'auto';
+    }
+    return VoiceSettings(
+      voice: voice,
+      gender: gender,
+      speed: (j['speed'] as num?)?.toDouble() ?? 1.0,
+      pitch: (j['pitch'] as num?)?.toDouble() ?? 1.0,
+      volume: (j['volume'] as num?)?.toDouble() ?? 1.0,
+      autoRead: j['autoRead'] == true,
+      provider: (j['provider'] ?? 'elevenlabs').toString(),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) => other is VoiceSettings && other.toJson().toString() == toJson().toString();
+
+  @override
+  int get hashCode => toJson().toString().hashCode;
 }
 
 /// Real voice: ElevenLabs (primary) / OpenAI TTS (fallback) on the server.
@@ -54,11 +76,15 @@ class VoiceService {
   static final AudioPlayer _player = AudioPlayer();
   static final AudioRecorder _recorder = AudioRecorder();
 
-  static Future<void> speak(String text, VoiceSettings s, {String? lang}) async {
+  /// Speaks [text] with a real human voice. With [followLanguage] the accent
+  /// follows the text (Arabic → Bahraini, English → English), keeping the
+  /// chosen gender, speed, pitch and volume. A cloned voice is always kept.
+  static Future<void> speak(String text, VoiceSettings s, {String? lang, bool followLanguage = false}) async {
     if (text.trim().isEmpty) return;
     final res = await Api.post('/voice/tts', {
       'text': text.length > 2500 ? text.substring(0, 2500) : text,
-      'voice': s.voice,
+      'voice': followLanguage && !s.isClone ? 'auto' : s.voice,
+      'gender': s.gender,
       'speed': s.speed,
       'pitch': s.pitch,
       'provider': s.provider,
@@ -67,10 +93,8 @@ class VoiceService {
     final bytes = base64Decode(res['audio'] as String);
     await _player.stop();
     await _player.setVolume(s.volume);
+    // Speed and pitch are applied on the server, so the voice stays natural.
     await _player.play(BytesSource(bytes, mimeType: 'audio/mpeg'));
-    try {
-      await _player.setPlaybackRate(s.speed);
-    } catch (_) {}
   }
 
   static Future<void> stop() => _player.stop();
@@ -109,6 +133,7 @@ class VoiceService {
   static Future<String> cloneVoice(List<int> audio, String name) async {
     final res = await Api.post('/voice/clone', {
       'audio': base64Encode(audio),
+      'mime': 'audio/mp4',
       'name': name,
       'consent': true,
     }, timeout: const Duration(seconds: 120));

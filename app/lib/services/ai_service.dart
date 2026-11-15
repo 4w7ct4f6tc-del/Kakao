@@ -46,6 +46,7 @@ class AiService {
     required AiEngine engine,
     required String lang,
     String? chatId,
+    bool voiceReply = false,
   }) async {
     final last = history.last;
     final chosen = engine == AiEngine.auto ? autoRoute(last.text, hasImage: last.imageBase64 != null) : engine;
@@ -55,6 +56,7 @@ class AiService {
         'lang': lang,
         'chatId': chatId,
         'messages': history.map((m) => m.toJson()).toList(),
+        if (voiceReply) 'voiceReply': true,
         if (last.imageBase64 != null) 'image': last.imageBase64,
       }, timeout: const Duration(seconds: 90));
       return AiReply((res['text'] ?? '').toString(), (res['engine'] ?? chosen.name).toString());

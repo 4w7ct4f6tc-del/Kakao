@@ -49,6 +49,13 @@ const SYSTEM = (lang) =>
     'If the user wants an app/website/store, tell them to tap "Build this app" and ask for the shop name, colors and what they sell.',
   ].join('\n');
 
+const VOICE_STYLE = [
+  'This reply will be spoken aloud by a real human voice.',
+  'Write natural spoken language: 2-4 short sentences, no lists, no markdown, no emojis, no links.',
+  'If the user writes in Arabic, reply in the Bahraini Gulf Arabic dialect (لهجة بحرينية), warm and friendly, like a Bahraini friend talking (e.g. "هلا والله"، "شلونك"، "زين"، "وايد").',
+  'If the user writes in English, reply in natural conversational English. Otherwise reply in the user\'s language.',
+].join('\n');
+
 function cleanHistory(messages) {
   const list = (messages || [])
     .filter((m) => m && typeof m.content === 'string' && m.content.trim())
@@ -233,7 +240,9 @@ r.post('/ai/chat', optionalAuth, wrap(async (req, res) => {
   // Free = unlimited chat, protected from abuse by a generous per-minute limit.
   await rateLimit(`chat:${uid || clientIp(req)}`, plan === 'free' ? 30 : 120, 60);
   const image = req.body.image ? { data: String(req.body.image), mime: req.body.mime || 'image/jpeg' } : null;
-  const out = await routeChat({ uid, engine: req.body.engine, messages: req.body.messages, lang: req.body.lang, image });
+  // 🔊 Voice reply: write it the way a person would say it out loud.
+  const system = req.body.voiceReply ? `${SYSTEM(req.body.lang)}\n${VOICE_STYLE}` : undefined;
+  const out = await routeChat({ uid, engine: req.body.engine, messages: req.body.messages, lang: req.body.lang, image, system });
   if (uid) {
     const chatId = req.body.chatId || `${uid}_default`;
     const msgs = (req.body.messages || []).slice(-40).map((m) => ({ role: m.role, content: String(m.content || '').slice(0, 4000) }));

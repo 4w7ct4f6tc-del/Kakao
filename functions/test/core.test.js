@@ -69,3 +69,12 @@ test('express app: health + 404 + auth guard', async () => {
     server.close();
   }
 });
+
+test('voice follows the language: Arabic -> Bahraini, English -> US', () => {
+  const { resolveVoice, cleanForSpeech } = require('../voice');
+  assert.deepStrictEqual(resolveVoice({ text: 'هلا والله شلونك', gender: 'male' }), { accent: 'bahraini', gender: 'male' });
+  assert.strictEqual(resolveVoice({ text: 'Hello there' }).accent, 'en_us');
+  assert.strictEqual(resolveVoice({ text: 'Hello', voice: 'en_uk' }).accent, 'en_uk');
+  assert.strictEqual(resolveVoice({ text: 'x', voice: 'clone:abc' }).cloneId, 'abc');
+  assert.strictEqual(cleanForSpeech('**مرحبا** 👋\n- أول'), 'مرحبا. أول');
+});
