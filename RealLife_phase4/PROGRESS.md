@@ -1,0 +1,270 @@
+# RealLife — سجل التقدّم
+
+> **لأي أحد يفتح المشروع، شخص أو جلسة Claude:**
+> 1. اقرأ هالملف كامل قبل لا تسوي أي شي. فيه كل اللي تحتاجه عشان تكمّل، وما تحتاج ترجع للمحادثات القديمة.
+> 2. كمّل من قسم **"📍 وين وقفنا"**، وبعده **"⏭️ الخطوات الجاية"** بالترتيب.
+> 3. بعد كل خطوة تسويها، حدّث هالملف على طول:
+>    - انقل الخطوة لقسم "✅ اللي خلص".
+>    - عدّل "وين وقفنا".
+>    - غيّر التاريخ اللي تحت.
+> 4. الكلام مع المستخدم يكون بالعربي، بلهجة خليجية.
+> 5. **فكرة اللعبة الكاملة والمراحل (0 إلى 17) في [GAME_IDEA.md](GAME_IDEA.md).** اقراه بعد هالملف. نشتغل مرحلة مرحلة بالترتيب. **المرحلة 4 انكتب كودها، وباقي تجربتها في Unity**، وبعدها المرحلة 5.
+> 6. المستخدم عطى صلاحية كاملة: كمّل بدون ما توقف وتسأل، لين هو يقول وقّف.
+
+**آخر تحديث:** 2026-11-16، الساعة 14:30 UTC تقريباً (جلسة Claude سحابية، بدون Unity)
+
+---
+
+## 📍 وين وقفنا بالضبط
+- **المراحل 1 و 2 و 3 خلصت من ناحية الكود، وتجرّبت آلياً في Play بدون أخطاء.** باقي إن المستخدم يجربهم بيده بالكيبورد والماوس.
+  - **المرحلة 1 — المدينة والسيارة:** مشهد `Assets/Scenes/NYC.unity` (أول مشهد في إعدادات البناء)، وسيارة Sport Coupe تنركب بـ **F**. التجربة: المحرك اشتغل، السيارة وصلت 83 كم/س، وبعد النزول فرملت ووقفت وطفى المحرك.
+  - **المرحلة 2 — الفلوس والأكل والشرب:** `PlayerStats` (فلوس 500، صحة، جوع، عطش)، واجهة فيها الأشرطة، وعربة أكل (`Shop`) جنب نقطة البداية تفتح بـ **E** وتشتري بالأرقام. التجربة: الشراء يخصم ويرفع الجوع، يرفض إذا الفلوس ما تكفي، وإذا الصحة خلصت يغمى عليك وترجع لنقطة البداية وتدفع فاتورة مستشفى.
+  - **المرحلة 3 — الحفظ والتحميل:** `SaveSystem` يحفظ في `%USERPROFILE%\AppData\LocalLow\DefaultCompany\RealLife\save.json`. يحمّل بروحه عند البداية، يحفظ كل 30 ثانية ووقت الخروج، و **F5** حفظ و **F9** تحميل. التجربة: سكّرنا Play ورجعنا، والفلوس والحالة ومكان اللاعب والسيارة رجعوا صح. ملف التجربة انمسح، فالمستخدم يبدأ من جديد.
+- **اللي ما تجرّب:** أي شي بالكيبورد والماوس الفعليين (المشي للسيارة و F، السواقة بـ WASD، فتح المحل بـ E والشراء بالأرقام، F5 و F9)، وشكل الواجهة على الشاشة (OnGUI ما ينصوّر بأداة التصوير). التجارب الآلية نادت الدوال مباشرة.
+- **المرحلة 4 — المواطنين والمرور: الكود انكتب، وما تجرّب في Unity للحين.**
+  - انكتب في جلسة Claude سحابية ما فيها Unity ولا Windows، من نسخة المشروع `after-phase3_2026-11-16.zip`.
+  - تكامبل بـ Roslyn مع بدائل (stubs) لـ UnityEngine، وطلع بدون أخطاء ولا تحذيرات. يعني الكتابة صح، بس **السلوك ما تجرّب**.
+  - الملفات الجديدة: `Assets/Scripts/LoopPath.cs`، `TrafficSystem.cs`، `Pedestrian.cs`، `TrafficCar.cs`، `AgentParts.cs`. وانضافت `TrafficTest` في `Assets/Editor/RLPlay.cs`.
+  - **ما تحتاج تعيد بناء المشهد.** `TrafficSystem` ينضاف بروحه لكائن `Game` أول ما تضغط Play.
+- **الخطوة الجاية بالضبط:**
+  1. انسخ الملفات الجديدة للمشروع، وانتظر Unity يكامبل، وشيّك إن Console ما فيه أخطاء حمرا.
+  2. افتح مشهد NYC واضغط Play. لازم يطلع في Console سطر يبدأ بـ `[Traffic]` فيه مكان البلوك وعدد المشاة والسيارات.
+  3. في نافذة Scene تشوف المسارات (Gizmos): أخضر للرصيف، وأصفر وبرتقالي للحارتين. تأكد إن الأخضر على الرصيف والحارات على الشارع.
+  4. إذا المسارات غلط، عدّل القيم في `TrafficSystem` على كائن `Game` (شوف "إعدادات المرور" تحت).
+### ⚠️ قيود عرفناها
+- **النسخة المجانية من Vehicle Physics Pro (Community Edition) تسمح بسيارة وحدة بس في المشهد.** السيارة الثانية تنطفي ويطلع خطأ. يعني سيارات المرور وسيارات اللاعبين الثانين (المرحلة 4 و 9 و 10) لازم لها فيزياء سيارات من كتابتنا (WheelCollider حق Unity)، أو النسخة المدفوعة.
+- مشهد NYC بلوك واحد بس (207×207 متر). حوالينه أرضية رمادية فاضية (`OuterGround`) حطيناها عشان اللي يطلع برا ما يطيح. توسعة المدينة (مثلاً بحزمة Demo City) لسا ما انسوت.
+- حزمة Demo City مستوردة بس **ما استخدمناها** في المشهد للحين.
+- المرور يمشي **حول البلوك الواحد بس** (حارتين ورصيف). لما نوسّع المدينة، لازم شبكة شوارع بدال الحلقة.
+- ملفات DLL حق VPP مشفّرة الأسماء من الداخل، بس الـ API العام واضح (`VPStandardInput`، `VehicleBase.data`).
+---
+
+## 👤 للي يكمّل من حساب ثاني
+الحساب الثاني ممكن يكون مستخدم Windows ثاني، أو حساب Unity ثاني، أو جهاز ثاني. **سوِّ هالخطوات بالترتيب قبل أي شي:**
+1. **المشروع:**
+   - انسخ مجلد `RealLife` كامل لمكان تقدر توصله، مثل سطح المكتب حقك.
+   - مجلدات `Library` و `Temp` و `Logs` ما تحتاجها، Unity يرجع يسويها.
+2. **المحرر:** لازم يكون **6000.6.9f1** بالضبط.
+   - في نفس الجهاز، المحرر موجود في `C:\Program Files\Unity\Hub\Editor\6000.6.9f1`، وهذا المسار للجهاز كله.
+   - في جهاز ثاني، ثبّت نفس النسخة.
+3. **Unity Hub:** تأكد إنه النسخة العادية في `C:\Program Files\Unity Hub`، **مب MSIX**.
+   - إذا المحرر مب ظاهر في Installs، اضغط Locate واختر `Unity.exe`.
+4. **تسجيل الدخول في Hub:** اضغط أيقونة الحساب فوق على اليسار ← Sign in، وسجّل دخول بحساب Unity.
+5. **فعّل رخصة Personal من جديد:** Preferences ← Licenses ← Add ← Get a free personal license.
+   - الرخصة مربوطة بحساب Unity وبمستخدم Windows، فما تنتقل بروحها.
+   - تأكد إنه انسوى ملف `%LOCALAPPDATA%\Unity\licenses\UnityEntitlementLicense.xml`.
+   - عشان batchmode يشتغل، لازم يكون فيه ملف `C:\ProgramData\Unity\Unity_lic.ulf`.
+6. **حزم Asset Store:** لازم الحزم الثلاث تكون **مضافة لحساب Unity اللي بتشتغل عليه**:
+   - Demo City by Versatile Studio
+   - NYC Block #6
+   - Vehicle Physics Pro
+
+   إذا مب مضافة، افتح assetstore.unity.com بنفس الحساب، وضغط "Add to My Assets" لكل وحدة. بعدها تطلع في Package Manager ← My Assets.
+7. **ضيف المشروع في Hub:** Projects ← Add ← Add project from disk.
+8. كمّل من "⏭️ الخطوات الجاية" تحت.
+
+---
+
+## 🎮 فكرة اللعبة
+لعبة ثلاثية الأبعاد، فيها شخصية تمشي في مدينة، والكاميرا من ورا الشخصية (شخص ثالث).
+- كودنا مكتوب بـ C# من الصفر.
+- ما نستخدم أصول أو أسماء من ألعاب ثانية.
+- حزم Asset Store اللي بنستخدمها مجانية، والمستخدم ضافها لحسابه.
+
+## 🖥️ البيئة والتثبيت
+| الشي | القيمة |
+|---|---|
+| ويندوز | Windows 11 Pro |
+| محرر Unity | **6000.6.9f1** (Unity 6.6) في `C:\Program Files\Unity\Hub\Editor\6000.6.9f1\Editor\Unity.exe` |
+| طريقة تثبيت المحرر | من ملف `UnitySetup64` مباشرة، **مب من Hub**. عشان كذا ما فيه `modules.json` ولا إضافات (modules)، وما فيه Visual Studio |
+| Unity Hub | النسخة العادية (nullsoft) ‏**3.22.6** في `C:\Program Files\Unity Hub`. انثبّت بـ `winget install --id Unity.UnityHub --exact --installer-type nullsoft` |
+| مسار المشروع (المستخدم الأول) | `C:\Users\Khalifa_AlThawadi\Desktop\RealLife`. سطح المكتب هنا مجلد محلي، مب OneDrive |
+| خط الرسم | **URP 17.6.0**، من القالب الرسمي `com.unity.template.urp-blank-17.2.6` اللي يجي مع المحرر |
+| الإدخال | `activeInputHandler: 2` (Both)، وسكربتاتنا تستخدم `UnityEngine.Input` القديم |
+| الحزم (manifest) | URP 17.6.0، Input System 1.20.0، ugui 2.6.0، ide.rider، ide.visualstudio، collab-proxy |
+
+### تاريخ Unity Hub (مهم)
+1. أول مرة ثبّتنا Hub من winget، وطلع **نسخة MSIX**. هالنسخة معزولة: بياناتها تنحفظ في `%LOCALAPPDATA%\Packages\UnityTechnologies.UnityHub_...`، فرخصتها ما توصل للمحرر. وكانت تطلع خطأين: `Unsupported protocol version '1.19.0'` و `Token not found in cache`.
+2. شلناها، وثبّتنا **النسخة العادية (nullsoft)**، وبعدها اشتغلت الرخصة.
+3. ⚠️ Hub نزّل بروحه تحديث 4.0.0، واسم الملف `UnityHubSetup-4.0.0-x64-msix-converter.exe`. يمكن هالتحديث يرجّعه لنسخة MSIX. إذا رجعت مشكلة الرخصة بعد التحديث، شيل Hub وثبّت النسخة العادية من جديد.
+
+### الرخصة (مهم للحساب الثاني)
+- **رخصة Personal مربوطة بحساب Unity وبمستخدم Windows.**
+  - في مستخدم Windows ثاني أو حساب Unity ثاني، لازم تسجّل دخول في Hub من جديد، وتفعّل الرخصة من Preferences ← Licenses ← Add ← Get a free personal license.
+  - وحزم Asset Store لازم تكون مضافة لحساب Unity اللي بتشتغل عليه، ومنزّلة من نفس الحساب.
+- مكان ملفات الرخصة بعد التفعيل:
+  - `%LOCALAPPDATA%\Unity\licenses\UnityEntitlementLicense.xml` (لكل مستخدم Windows بروحه)
+  - `C:\ProgramData\Unity\Unity_lic.ulf` (للجهاز كله)
+- **batchmode يشتغل بس إذا ملف `Unity_lic.ulf` موجود.** رخصة الـ entitlement بروحها ما فيها صلاحية `com.unity.editor.headless`، وبدونها يطلع خطأ `No valid Unity Editor license found` و exit 198.
+- إذا شي ما اشتغل، شيّك هالسجلات:
+  - `%LOCALAPPDATA%\Unity\Unity.Licensing.Client.log`
+  - `%LOCALAPPDATA%\Unity\Unity.Entitlements.Audit.log`. لازم تشوف فيه `granted: True`.
+  - `%APPDATA%\UnityHub\logs\info-log.json`. إذا فيه `No tokens found` يعني ما فيه تسجيل دخول.
+
+---
+
+## 📁 هيكل المشروع
+```
+RealLife/
+├─ Assets/
+│  ├─ Scripts/
+│  │  ├─ PlayerController.cs   حركة الشخصية: CharacterController، مشي/ركض/نط، تمشي على اتجاه الكاميرا
+│  │  ├─ ThirdPersonCamera.cs  كاميرا من ورا الشخصية: تدور بالماوس، تنعيم (SmoothDamp)، زوم، ما تدخل في الجدران (SphereCast)
+│  │  ├─ CityBuilder.cs        يولّد المدينة: 6×6 بلوكات، شوارع بخطوط، أرصفة، مبانٍ بشبابيك، حدائق، أعمدة إنارة + الشخصية والكاميرا والشمس
+│  │  ├─ GameHUD.cs            شاشة مساعدة بالأزرار والسرعة (OnGUI، والزر H يخفيها)
+│  │  ├─ GameBootstrap.cs      احتياط: إذا ضغطت Play في مشهد ما فيه شخصية، تنبني المدينة بروحها
+│  │  ├─ VehicleInteraction.cs ركوب ونزول بالزر F، ينحط على السيارة
+│  │  ├─ VppParkedBrake.cs     يربط سيارة VPP: يشغّل المحرك لما تركب، ويفرمل ويطفيه لما تنزل
+│  │  ├─ PlayerStats.cs        فلوس، صحة، جوع، عطش (على كائن Game)
+│  │  ├─ Shop.cs               محل أكل وشرب (E يفتح، الأرقام تشتري)
+│  │  ├─ GameHUD.cs            الواجهة: المساعدة، الفلوس، الأشرطة، الرسايل (على كائن Game)
+│  │  ├─ SaveSystem.cs         الحفظ والتحميل (على كائن Game)
+│  │  ├─ TrafficSystem.cs      المرحلة 4: يمسح الأرض ويلقى البلوك، يسوي مسار رصيف وحارتين، ويوزّع المشاة والسيارات. ينضاف بروحه لكائن Game
+│  │  ├─ LoopPath.cs           مسار مقفول (مستطيل بزوايا مدوّرة): نقطة، اتجاه، أقرب نقطة
+│  │  ├─ Pedestrian.cs         مواطن: يمشي ويوقف ويرجع، يتلفّت للاعب، ينحاش من السيارة، يطيح إذا انصدم ويقوم بعد 6 ثواني
+│  │  ├─ TrafficCar.cs         سيارة مرور (kinematic): توقف للي قدامها، تزمّر للاعب، تتجاوز الشي الواقف، توقف إذا انصدمت
+│  │  └─ AgentParts.cs         أدوات بناء الأشكال والمواد، وحجم سيارة اللاعب
+│  ├─ Editor/
+│  │  └─ RealLifeSetup.cs      إذا City.unity مب موجود، يسويه ويفتحه أول ما ينفتح المشروع + قائمة "RealLife" + الدالة BatchSetup
+│  ├─ Scenes/City.unity        المشهد الأساسي (8.4MB، فيه 3252 مجسم)، ومضاف لإعدادات البناء
+│  ├─ Settings/                إعدادات URP من القالب
+│  └─ InputSystem_Actions.inputactions  من القالب، وما نستخدمه للحين
+├─ Packages/manifest.json
+├─ ProjectSettings/            من القالب، و productName = RealLife
+├─ Backups/                    نسخ احتياطية (zip) من Assets و Packages و ProjectSettings. برا Assets، فـ Unity ما يشوفها
+├─ README.md                   طريقة التشغيل والأزرار
+└─ PROGRESS.md                 هذا الملف
+```
+
+## 🕹️ التحكم
+- WASD أو الأسهم: المشي
+- Shift: الركض
+- Space: النط
+- الماوس: الكاميرا، والعجلة للزوم
+- Esc: يطلّع المؤشر، والكلك يقفله
+- H: يخفي المساعدة
+- **F**: تركب السيارة إذا كنت قريب منها (3.5 متر)، و F مرة ثانية تنزل
+- في السيارة: W/S أو الأسهم بنزين وفرامل، A/D لف، Space فرامل يد
+- **E**: تفتح المحل إذا كنت واقف عنده، والأرقام 1 إلى 9 تشتري
+- **F5** حفظ، **F9** تحميل
+
+## 🔧 تفاصيل تقنية مهمة
+- الشخصية في طبقة `Ignore Raycast` (رقم 2)، عشان تصادم الكاميرا يتجاهلها.
+- المواد تنسخ من المادة الافتراضية حق الأشكال الأساسية، وتتلوّن بـ `material.color`، فتشتغل مع أي خط رسم.
+- المدينة تنولّد بـ seed ثابت (12345).
+- الشخصية تبدأ على الشارع اللي جنب تقاطع النص. وإذا طاحت تحت y = -30، ترجع للنقطة (0, 2, 0).
+- من القائمة **RealLife → Rebuild City In Open Scene** تعيد بناء المدينة، ومن **RealLife → Create City Scene** تسوي المشهد من جديد.
+- أمر batchmode اللي نجح:
+  ```
+  "C:\Program Files\Unity\Hub\Editor\6000.6.9f1\Editor\Unity.exe" -batchmode -quit -projectPath "<مسار RealLife>" -executeMethod RealLife.EditorTools.RealLifeSetup.BatchSetup -logFile "<مسار السجل>"
+  ```
+- لازم المحرر يكون مسكّر قبل أي أمر batchmode على نفس المشروع.
+- تقدر تكامبل السكربتات بسرعة بدون Unity، بـ Roslyn اللي يجي مع المحرر:
+  - المترجم: `Editor\Data\DotNetSdk\dotnet.exe Editor\Data\DotNetSdk\sdk\8.0.318\Roslyn\bincore\csc.dll`
+  - المراجع: `-nostdlib+`، و `Editor\Data\NetStandard\ref\2.1.0\netstandard.dll`، وكل ملفات `Editor\Data\Managed\UnityEngine\*.dll`.
+
+---
+
+## ✅ اللي خلص (بالترتيب)
+1. ثبّتنا Unity Hub (أول مرة MSIX من winget) والمحرر 6000.6.9f1 من `UnitySetup64`. هذا كان في الجلسة الأولى.
+2. سوّينا مشروع `RealLife` على سطح المكتب، وإعداداته منسوخة من قالب URP الرسمي.
+3. كتبنا السكربتات الست، وكامبلناها بـ Roslyn، وطلعت بدون أخطاء ولا تحذيرات.
+4. batchmode والمحرر فشلوا أول، لأنه ما فيه رخصة. ولقينا إن السبب عزل نسخة MSIX من Hub.
+5. شلنا Hub نسخة MSIX، وثبّتنا النسخة العادية (nullsoft) 3.22.6.
+6. المستخدم سجّل دخول وفعّل رخصة Personal. انسوى ملف `UnityEntitlementLicense.xml`، ومعه `Unity_lic.ulf`.
+7. batchmode نجح (exit 0):
+   - نزلت الحزم، وتكامبلت السكربتات بدون أخطاء.
+   - انسوى `City.unity`، وانضاف لإعدادات البناء.
+8. فتحنا المحرر العادي على مشهد City، والسجل ما فيه أخطاء.
+9. **المستخدم جرّب Play، وكل شي شغال تمام.**
+10. استلمنا طلب الحزم الثلاث، وشيّكنا الكاش في `%APPDATA%\Unity\Asset Store-5.x`، وطلع فاضي يعني الحزم ما نزلت.
+11. **نسخة احتياطية قبل الاستيراد:** `Backups\pre-import_2026-11-16.zip` (0.42MB، 64 ملف = كل ملفات `Assets` و `Packages` و `ProjectSettings`). عشان نرجّعها: نسكّر المحرر، نمسح المجلدات الثلاثة، ونفك الـ zip في جذر المشروع.
+12. **كتبنا `VehicleInteraction.cs` مسبقاً** وتكامبل مع باقي السكربتات بـ Roslyn بدون أخطاء ولا تحذيرات. ما تجرّب في Unity للحين. طريقة شغله:
+    - ينحط على جذر السيارة. يلقى `PlayerController` و `ThirdPersonCamera` بروحه إذا ما انحطوا.
+    - `driveControls`: نحط فيها سكربتات تحكم السيارة (إدخال VPP). تنطفي في البداية، وتشتغل وقت السواقة بس.
+    - **F** قريب من السيارة (`enterDistance` = 3.5م): يطفي GameObject الشخصية، ويحوّل `ThirdPersonCamera.target` للسيارة، ويبعّد الكاميرا (8م)، ويطفي تصادم الكاميرا عشان جسم السيارة ما يقرّبها.
+    - **F** مرة ثانية: الشخصية تنزل على `exitPoint`، وإذا فاضي فعلى يسار السيارة، وإذا مسدود فاليمين، وإذا مسدود ففوقها. وترجع إعدادات الكاميرا.
+    - `VehicleInteraction.Current` (static) = السيارة المركوبة الحين، فما تركب سيارتين.
+    - ⚠️ ما يوقّف السيارة وقت النزول. هذا نسويه وقت الربط مع VPP (فرامل أو تصفير الإدخال)، بعد ما نشوف الـ API حقه.
+
+13. **نزّلنا الحزم الثلاث بالكود** من داخل المحرر (`Assets/Editor/RLAssetStore.cs`، يستخدم خدمات Package Manager الداخلية بالـ reflection وبحساب المستخدم). المحرر لازم يشتغل مربوط بـ Hub عشان يكون مسجّل دخول (شوف "تشغيل المحرر" تحت). أرقام المنتجات: NYC Block #6 = `16272`، Vehicle Physics Pro CE = `153556`، Demo City = `269772`. الملفات في `%APPDATA%\Unity\Asset Store-5.x`:
+    - `NoneCG\3D ModelsEnvironmentsUrban\NYC Block 6.unitypackage` (428.5MB)
+    - `Edy\ScriptingPhysics\Vehicle Physics Pro - Community Edition.unitypackage` (70.8MB)
+    - `Versatile Studio\3D ModelsEnvironmentsUrban\Demo City By Versatile Studio Mobile Friendly.unitypackage` (282.7MB)
+14. **استوردنا الحزم الثلاث** (`Tools\import.ps1`). طلعت نافذتين وضغطناهم:
+    - «Missing signature» لكل حزمة (حزم قديمة بدون توقيع رقمي، نازلة من Asset Store الرسمي) ← Import Anyway.
+    - «Precompiled Assemblies Update Consent Request» لملفات DLL حق VPP ← Yes (API Updater عدّلهم لـ Unity 6.6).
+    - المجلدات: `Assets/OutPost` (NYC)، `Assets/Vehicle Physics Pro`، `Assets/Versatile Studio Assets`.
+15. **`Packages/manifest.json` تغيّر:** ضفنا موديولات `animation, audio, imgui, particlesystem, physics, terrain, terrainphysics, ui, vehicles, ai, imageconversion, jsonserialize, screencapture, unitywebrequest`. بدون `screencapture` سكربت VPP ما يتكامبل.
+16. **حوّلنا 279 مادة لـ URP** (`RLMaterialConverter`، القائمة RealLife → Convert Materials To URP). ما بقى ولا شيدر Built-in. أشجار Tree Creator صارت URP Lit بقص ألفا.
+17. **بنينا `Assets/Scenes/NYC.unity`** (`RLNycBuilder`، القائمة RealLife → Build NYC Scene): نسخة من مشهد الحزمة، شلنا كاميرتها والسكربتات المفقودة، وضفنا `OuterGround` والشخصية والكاميرا وسيارة Sport Coupe مع `VehicleInteraction` و `VppParkedBrake`.
+18. **`VppParkedBrake.cs`:** يشغّل محرك VPP لما تركب، ولما تنزل يفرمل ويسحب فرامل اليد ويطفي المحرك.
+19. **جرّبنا آلياً في Play** (`RLPlay`): نجح، وبدون أخطاء.
+20. **كتبنا [GAME_IDEA.md](GAME_IDEA.md):** الفكرة الكاملة و 18 مرحلة.
+21. **المرحلة 2:** `PlayerStats.cs` و `Shop.cs`، و `GameHUD.cs` انكتب من جديد وانتقل من الشخصية لكائن مستقل اسمه `Game` (عشان يبقى ظاهر وقت السواقة). `CityBuilder.CreateGameSystems()` يسوي كائن `Game`، و `CityBuilder.CreateFoodCart()` يبني العربة. نصوص الواجهة إنجليزي لأن OnGUI ما يوصّل الحروف العربية.
+22. **المرحلة 3:** `SaveSystem.cs` على كائن `Game`. إذا الحفظ من مشهد ثاني، ياخذ الفلوس والحالة بس. سيارة VPP ترجع لمكانها بـ `HardReposition`.
+23. تجارب آلية جديدة في `RLPlay`: `StatsTest` و `SaveTest("save" | "check" | "delete")`.
+24. **المرحلة 4 — المواطنين والمرور (الكود بس، ما تجرّب في Unity):**
+    - **`TrafficSystem`:** بعد أول فريم، يمسح شبكة 180 متر حول اللاعب (خلية كل 2 متر) بأشعة من فوق. أوطى أرض = الشارع (أو `OuterGround`)، وكل شي أعلى منها بـ 12 سم = بلوك (رصيف أو مبنى). يشيل الأشياء النحيفة (ذراع الإشارة والأعمدة) بـ erosion و dilation، وياخذ أكبر مجموعة متصلة وأقربها للاعب.
+    - من البلوك يسوي ثلاث مسارات: رصيف داخل الحافة بـ 1.8م، وحارة مع عقارب الساعة على بُعد 4م، وحارة عكسها على بُعد 7.5م (يعني السواقة على اليمين).
+    - **24 مواطن و 8 سيارات**، أشكال من أشكال أساسية بألوان عشوائية (seed ثابت 4242). كلهم في طبقة Ignore Raycast عشان الكاميرا ما تصطدم فيهم.
+    - **المواطن:** يمشي 1.1 إلى 1.7 م/ث، يوقف أحياناً، يغيّر اتجاهه، يتجنّب العوائق. إذا اللاعب وقف جنبه (2.2م) يوقف ويتلفّت له. إذا سيارة اللاعب جاية أسرع من 5 م/ث ينحاش على جنب. إذا انصدم (أسرع من 2.5 م/ث) يطيح ويطلع "You hit a pedestrian!"، وبعد 6 ثواني يقوم في مكان بعيد عن اللاعب (25م).
+    - سيارة اللاعب ما تصطدم فيزيائياً بالمشاة (`Physics.IgnoreCollision`)، عشان ما توقف كأنها صدمت عمود. الصدمة تنحسب بالكود من حجم السيارة المحلي.
+    - **سيارة المرور:** Rigidbody نوعه kinematic، تمشي على الحارة بـ `MovePosition`. سرعتها ~32 كم/س، و 18 كم/س في اللفات. تطالع قدامها بـ BoxCast وتفرمل للي قدامها. إذا اللاعب واقف قدامها 1.5 ثانية تزمّر ("BEEP BEEP!"). إذا شي ثابت سكّر الطريق 3 ثواني تتجاوزه من اليسار. إذا صدمتها سيارة اللاعب (أسرع من 3 م/ث) توقف 3 ثواني ويطلع "Crash!".
+    - تجربة آلية جديدة: `RLPlay.TrafficTest("report" | "hit" | "rescan")`.
+---
+
+## 🧰 أدوات التطوير (مهمة للي يكمّل)
+**جسر الأوامر `RLBridge`:** المحرر المفتوح يقرا أمر من `Library/RLBridge/cmd.txt` وينفذه ويكتب النتيجة في `result.txt`. يخلّي Claude يشغّل كود داخل المحرر بدون ما يسكّره وبدون batchmode.
+- من PowerShell: `.\Tools\rl.ps1 -Cmd "RealLife.EditorTools.<Class>.<Method>" -Arg "<نص>"`
+- بعد أي تعديل سكربت: `.\Tools\rl.ps1 -Cmd refresh` (يعيد الكامبايل ويطبع الأخطاء).
+- الأدوات (كلها في `Assets/Editor`):
+
+| الملف | وش يسوي |
+|---|---|
+| `RLBridge.cs` | الجسر + `DumpTypes(regex)` يكتب أعضاء أي نوع في `dump.txt` |
+| `RLAssetStore.cs` | `LoginState`، `ListPurchases`، `Download("id,id")`، `Status("id,id")` |
+| `RLImport.cs` | `Import(<مسار unitypackage>)`، ويفضّل تستخدم `Tools\import.ps1` لأنه يضغط نافذة التوقيع |
+| `RLInspect.cs` | `SceneReport`، `PrefabReport`، `MaterialReport` ← `report.txt` |
+| `RLMaterialConverter.cs` | `ConvertAll("")` يحوّل المواد لـ URP |
+| `RLNycBuilder.cs` | `Build()` يبني مشهد NYC من جديد |
+| `RLPlay.cs` | `Enter(<مشهد>)`، `Status`، `DriveTest("0.7")`، `ExitCarTest`، `Exit`. أخطاء Play تنكتب في `log.txt` |
+| `RLShot.cs` | `Main("name")` و `From("name;x,y,z;lx,ly,lz")` يصوّر PNG في `Library/RLBridge/shots` |
+
+**تشغيل المحرر (لازم كذا عشان يكون مسجّل دخول):**
+1. شغّل Hub: `C:\Program Files\Unity Hub\Unity Hub.exe`، وانتظر ~12 ثانية.
+2. شغّل المحرر: `Unity.exe -projectPath "<RealLife>" -useHub -hubIPC -cloudEnvironment production`
+3. انتظر لين يطلع `Library/RLBridge/ready.txt`.
+- إذا أمر ما رد، غالباً فيه نافذة (modal) موقّفة المحرر. شيّك عناوين نوافذ عملية Unity.
+
+---
+
+## ⏭️ الخطوات الجاية (بالترتيب)
+1. **(المستخدم)** يجرب بيده في مشهد NYC:
+   - امش للسيارة الصفرا، **F** تركب، WASD تسوق، Space فرامل يد، **F** تنزل.
+   - امش لعربة الأكل (حمرا وبيضا، ورا نقطة البداية)، **E** تفتح، الأرقام 1 إلى 4 تشتري.
+   - **F5** تحفظ، وقّف Play وشغّله مرة ثانية، وتأكد إن كل شي رجع.
+2. **تجربة المرحلة 4 في Unity** (الكود انكتب، شوف "وين وقفنا بالضبط" فوق):
+   - من PowerShell، بعد ما تدخل Play في NYC: `.\Tools\rl.ps1 -Cmd "RealLife.EditorTools.RLPlay.TrafficTest" -Arg "report"`، وبعدها `-Arg "hit"`.
+   - صوّر بـ `RLShot` وشيّك إن المشاة على الرصيف والسيارات على الشارع.
+   - بيدك: امش جنب مواطن (يوقف ويتلفّت)، اوقف قدام سيارة مرور (تزمّر)، سق بسرعة على الرصيف (المشاة ينحاشون أو يطيحون).
+   - إذا كله تمام: علّم المرحلة 4 ✅ في GAME_IDEA.md.
+3. بعدها المرحلة 5 (الوظايف، وأولها الشرطة)، وهكذا بالترتيب.
+
+### ⚙️ إعدادات المرور (على كائن Game ← TrafficSystem)
+| القيمة | الافتراضي | متى تغيّرها |
+|---|---|---|
+| `pedestrianCount` / `carCount` | 24 / 8 | أكثر أو أقل ناس وسيارات |
+| `curbHeight` | 0.12 | إذا البلوك ما انلقى (Console يقول `detect failed`) أو انلقى غلط: صغّرها لو الرصيف واطي |
+| `sidewalkInset` | 1.8 | المشاة قريبين من الشارع زيادة أو داخلين في المباني |
+| `innerLaneOffset` / `outerLaneOffset` | 4 / 7.5 | السيارات تصدم الرصيف (كبّرها) أو بعيدة عنه زيادة (صغّرها) |
+| `useManualBlock` + `manualBlock` | false | إذا المسح فشل تماماً: حط مستطيل البلوك بيدك (x,y = أقل X وأقل Z) |
+### تحسينات صغيرة للمرحلة 1 (مب ضرورية)
+- الكاميرا وقت السواقة ما تلف ورا السيارة بروحها، تدور بالماوس بس.
+- صوت السيارة ومؤثراتها ما تجرّبت بالسماع.
+- توسعة المدينة: أكثر من بلوك، أو دمج Demo City.
+
+## 💡 أفكار للتطوير بعدين (اختياري)
+- أنيميشن للشخصية بدال الكبسولة.
+- دورة ليل ونهار، ونسوّي أعمدة الإنارة أضواء حقيقية.
+- نستخدم Input System الجديد بدال الإدخال القديم.
