@@ -151,6 +151,62 @@ namespace RealLife.EditorTools
             return t.Report();
         }
 
+        /// <summary>
+        /// تجربة المرحلة 5 (الوظايف). step = "police" أو "courier": يقدّم، ويداوم 3 دوامات كاملة (كأنه يوصل لكل هدف)، ويطبع الفلوس والرتبة.
+        /// step = "reject": يجرب الرفض (صحة واطية). step = "save": يحفظ ويحمّل ويتأكد إن الوظيفة رجعت. step = "report": الحالة الحالية.
+        /// </summary>
+        public static string JobTest(string step)
+        {
+            if (!EditorApplication.isPlaying) return "not playing";
+            var js = JobSystem.Instance; var s = PlayerStats.Instance;
+            if (js == null || s == null) return "missing jobs=" + (js != null) + " stats=" + (s != null);
+            step = (step ?? "").Trim();
+            var sb = new StringBuilder();
+            string Line(string tag)
+            {
+                var job = js.CurrentJob;
+                return tag + ": money=" + s.money + " job=" + (job != null ? job.title + "/" + job.RankFor(js.State.ShiftsDone(job.id)).title + " shifts=" + js.State.ShiftsDone(job.id) : "none")
+                    + " onDuty=" + js.State.onDuty + " task=" + js.State.taskIndex + " carrying=" + js.State.carrying
+                    + " target=" + (js.Target.HasValue ? js.Target.Value.ToString() : "none") + " offices=" + js.Offices.Count + " msg=" + s.LastMessage;
+            }
+            if (step == "reject")
+            {
+                float h = s.health; s.health = 10f;
+                sb.AppendLine("apply police with health 10 -> " + js.Apply(Jobs.Police));
+                s.health = h;
+                sb.AppendLine(Line("after"));
+                return sb.ToString();
+            }
+            if (step == "save")
+            {
+                var save = SaveSystem.Instance;
+                if (save == null) return "no save system";
+                sb.AppendLine(Line("before save"));
+                save.Save();
+                js.Quit();
+                sb.AppendLine(Line("after quit"));
+                save.Load();
+                sb.AppendLine(Line("after load"));
+                return sb.ToString();
+            }
+            if (step == "police" || step == "courier")
+            {
+                var job = Jobs.Get(step);
+                s.health = 100f; s.hunger = 100f; s.thirst = 100f;
+                sb.AppendLine(Line("start"));
+                sb.AppendLine("apply -> " + js.Apply(job));
+                for (int shift = 0; shift < 3; shift++)
+                {
+                    sb.AppendLine("shift " + (shift + 1) + " -> " + js.StartShift());
+                    sb.AppendLine(Line("  first target"));
+                    for (int i = 0; i < 20 && js.State.onDuty; i++) js.DebugArrive();
+                    sb.AppendLine(Line("  done"));
+                }
+                return sb.ToString();
+            }
+            return Line("report");
+        }
+
         public static string ExitCarTest()
         {
             if (!EditorApplication.isPlaying) return "not playing";

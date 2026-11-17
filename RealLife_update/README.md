@@ -18,6 +18,7 @@
 - Space: النط
 - **F**: تركب السيارة إذا كنت قريب منها
 - **E**: تشتري من المحل إذا كنت واقف عنده
+- **E** عند كشك الوظيفة (مركز الشرطة أو مستودع التوصيل): **1** تقديم أو بدء دوام، **2** استقالة
 
 **في السيارة:**
 - W / S: بنزين وفرامل (S وأنت واقف: رجوع)
@@ -43,4 +44,5 @@
 - `Assets/Scripts/CityBuilder.cs`: يولّد المدينة القديمة، وفيه دوال إنشاء الشخصية والكاميرا
 - `Assets/Scripts/TrafficSystem.cs`: المرحلة 4، يلقى البلوك بروحه ويوزّع المشاة وسيارات المرور حوله (ينضاف بروحه وقت Play)
 - `Assets/Scripts/Pedestrian.cs` و `TrafficCar.cs` و `LoopPath.cs` و `AgentParts.cs`: المشاة وسيارات المرور ومساراتهم
+- `Assets/Scripts/Jobs.cs` و `JobSystem.cs` و `JobOffice.cs`: المرحلة 5، الوظايف (الشرطة والتوصيل)
 - `Assets/Editor/`: أدوات المحرر. قائمة **RealLife** فيها: Build NYC Scene، Convert Materials To URP، Rebuild City
